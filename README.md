@@ -13,27 +13,23 @@ This is a python project to help developers with boolean expressions during our 
 
 2.  Run:
     `$ python start_example.py`
-    You should get:
-      Sorry, run test1.py first, to solve the riddle :)
+    Sorry, run test1.py first, to solve the riddle :)
 
-3. So, run tests with:
-    `$ python -m unittest discover`
-  
-  Should see:
-    We have solved the riddle, go run start_example.py again!!!
-    .......
-    ----------------------------------------------------------------------
-    Ran 7 tests in 0.016s
+3. So, run tests with: `$ python -m unittest discover`
+
+        We have solved the riddle, go run start_example.py again!!!
+        .......
+        ----------------------------------------------------------------------
+        Ran 7 tests in 0.016s
+        
+        OK
+
+4.  Run: `$ python start_example.py`
     
-    OK
+          You made it, Congrats !!!
+          Now, go and see functions1.py, enjoy :)
 
-4.  Run:
-    `$ python start_example.py`
-    Should get:
-      You made it, Congrats !!!
-      Now, go and see functions1.py, enjoy :)
-
-You just solved 4 boolean expressions on file `functions/functions1.py`: `and`, `or`, `xor` & `and3`. The requirements for these functions are specified in `tests/test1.py`. You can now add a new custom function with:
+You just solved 4 boolean expressions on file `functions/functions1.py`: `and`, `or`, `xor` & `and3`. Specs for these functions are in `tests/test1.py`. You can now add a new custom function with:
 
     @solve_boolean()
     def my_function(a, b):
@@ -49,7 +45,7 @@ And on `tests/test1.py` add specs:
                        ((True, True), False)}
         solver.execute(self, functions1.and_function, truth_table)
 
-Then run `test1.py` and see the expression on `def my_function(a, b)`.
+Then run `test1.py` and see the result below `def my_function(a, b)`.
 
 
 
