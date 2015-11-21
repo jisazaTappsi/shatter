@@ -1,9 +1,7 @@
 __author__ = 'juan pablo isaza'
 from util import *
 import re
-import sys
-sys.path.insert(0, 'quine_mccluskey-0.2')
-from quine_mccluskey import qm
+import qm
 import warnings
 
 

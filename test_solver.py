@@ -76,6 +76,14 @@ class MyTest(unittest.TestCase):
     def xor_function(a, b):
         return a and not b or not a and b
 
+    @s.solve_boolean()
+    def nand_function(a, b):
+        return not b or not a
+
+    @s.solve_boolean()
+    def and3_function(a, b, c):
+        return a and b and c
+
     #                b1     b0   output
     and_table = {((False, False), False),
                  ((False, True), False),
@@ -92,12 +100,23 @@ class MyTest(unittest.TestCase):
                  ((True, False), True),
                  ((True, True), False)}
 
+    nand_truth_table = {((False, False), True),
+                        ((False, True), True),
+                        ((True, False), True),
+                        ((True, True), False)}
+
+    and3_table = {((True, True, True), True)}
+
     sig_and = "and_function(a, b)"
     exp_and = "a and b"
     sig_or = "or_function(a, b)"
     exp_or = "a or b"
     sig_xor = "xor_function(a, b)"
     exp_xor = "a and not b or not a and b"
+    sig_nand = "nand_function(a, b)"
+    exp_nand = "not b or not a"
+    sig_and3 = "and3_function(a, b, c)"
+    exp_and3 = "a and b and c"
 
     def test_get_function_implementation(self):
         """
@@ -110,7 +129,7 @@ class MyTest(unittest.TestCase):
 
     def factor_execute(self, table, a_callable, signature, expression):
         """
-        Factoring function, not much here.
+        Factoring tests.
         """
         solution = s.execute(self, a_callable, table)
         expected_code = ["    def " + signature + ":", "        return " + expression]
@@ -121,3 +140,5 @@ class MyTest(unittest.TestCase):
         self.factor_execute(self.and_table, self.and_function, self.sig_and, self.exp_and)
         self.factor_execute(self.or_table, self.or_function, self.sig_or, self.exp_or)
         self.factor_execute(self.xor_table, self.xor_function, self.sig_xor, self.exp_xor)
+        self.factor_execute(self.nand_truth_table, self.nand_function, self.sig_nand, self.exp_nand)
+        self.factor_execute(self.and3_table, self.and3_function, self.sig_and3, self.exp_and3)
