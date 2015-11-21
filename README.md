@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a python project to help developers with boolean expressions during our coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, especialy when expressions get big. Therefore there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your requirement in a test and set a dummy function on your code. When you run your tests a solver will take your requeriments and code them in a simple boolean expression, enjoy:)
+This is a python project to help developers with boolean expressions during our coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, specially when expressions get big. Therefore there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your specs in a test and set a dummy function on your code. When you run your tests a solver will take your specs and code them into a simple boolean expression, enjoy :).
 
 ## Instructions
 
@@ -13,7 +13,8 @@ This is a python project to help developers with boolean expressions during our 
 
 2.  Run:
     `$ python start_example.py`
-    Sorry, run test1.py first, to solve the riddle :)
+
+        Sorry, run test1.py first, to solve the riddle :)
 
 3. So, run tests with: `$ python -m unittest discover`
 
