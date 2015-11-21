@@ -41,7 +41,7 @@ You just solved 4 boolean expressions on file `functions/functions1.py`: `and`, 
 
 And on `tests/test1.py` add specs:
 
-    def test_AND_function(self):
+    def test_MY_function(self):
         #                  b1     b0   output
         truth_table = {((False, False), False),
                        ((False, True), False),
