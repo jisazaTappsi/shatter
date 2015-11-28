@@ -1,8 +1,8 @@
 __author__ = 'juan pablo isaza'
 
 import unittest
-import solver as s
-import warnings
+
+from boolean_solver import solver as s
 
 
 class MyTest(unittest.TestCase):
@@ -129,7 +129,7 @@ class MyTest(unittest.TestCase):
 
     def factor_execute(self, table, a_callable, signature, expression):
         """
-        Factoring tests.
+        Factoring test.
         """
         solution = s.execute(self, a_callable, table)
         expected_code = ["    def " + signature + ":", "        return " + expression]

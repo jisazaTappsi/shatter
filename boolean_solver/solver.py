@@ -1,8 +1,10 @@
 __author__ = 'juan pablo isaza'
-from util import *
 import re
-from quine_mccluskey import qm
 import warnings
+
+from quine_mccluskey import qm
+
+from boolean_solver.util import *
 
 
 FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*(\w+)(,\s*(\w+))+\)")
@@ -23,14 +25,14 @@ def solve_boolean():
     def wrap(f):
 
         def wrapped_f(*args):
-            #  TODO: run tests and implement and run function.
+            #  TODO: run test and implement and run function.
             """
             if hasattr(output.generated_code, f.__name__):
                 function_to_call = getattr(output.generated_code, f.__name__)
                 return function_to_call(*args)
             else:
                 warnings.warn('function name: ' + str(f.__name__) +
-                              ' is still a mock function, please run tests to generate it')
+                              ' is still a mock function, please run test to generate it')
             """
 
             return f(*args)

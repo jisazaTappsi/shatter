@@ -55,3 +55,15 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Created by https://www.gitignore.io
+
+### Intellij ###
+# Covering PyCharm
+
+## Directory-based project format:
+.idea/
+
+## File-based project format:
+*.ipr
+*.iws

@@ -1,6 +1,6 @@
 __author__ = 'juan pablo isaza'
 
-from solver import *
+from boolean_solver.solver import *
 
 
 @solve_boolean()

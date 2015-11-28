@@ -1,8 +1,9 @@
 __author__ = 'juan pablo isaza'
 
 import unittest
-import solver
-from functions import functions1
+
+from boolean_solver import solver
+from functions_sample import functions1
 
 
 class MyTest(unittest.TestCase):
@@ -46,4 +47,4 @@ class MyTest(unittest.TestCase):
 
         solver.execute(self, functions1.and_function_3_variables, truth_table)
 
-print "We have solved the riddle, go run start_example.py!!!"
+print "We have solved the riddle, go run start_sample.py!!!"
