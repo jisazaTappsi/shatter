@@ -10,13 +10,14 @@ This is a python project to help developers with boolean expressions during our 
 
 1.  Clone repository:
     `$ git clone git@github.com:jisazaTappsi/BooleanSolver.git`
-
-2.  Run:
+2.  Install quine-mccluskey:
+    `$ pip install quine-mccluskey`
+3.  Run:
     `$ python start_example.py`
 
         Sorry, run test1.py first, to solve the riddle :)
 
-3. So, run tests with: `$ python -m unittest discover`
+4. So, run tests with: `$ python -m unittest discover`
 
         We have solved the riddle, go run start_example.py again!!!
         .......
@@ -25,7 +26,7 @@ This is a python project to help developers with boolean expressions during our 
         
         OK
 
-4.  Run: `$ python start_example.py`
+5.  Run: `$ python start_example.py`
     
           You made it, Congrats !!!
           Now, go and see functions1.py, enjoy :)
