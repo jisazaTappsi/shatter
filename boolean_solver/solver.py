@@ -105,7 +105,7 @@ def get_function_inputs(signature):
     """
     Given function signatures gets the name of the function.
     :param signature: exp: sum(a,b)
-    :return: name as a string.
+    :return: input names on a list.
     """
     word_match = re.findall(WORD_PATTERN, signature)
     return word_match[1:]

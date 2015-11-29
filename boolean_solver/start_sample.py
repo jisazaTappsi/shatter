@@ -5,22 +5,22 @@ from solver import *
 
 @solve_boolean()
 def and_function(a, b):
-    return a and b
+    return False
 
 
 @solve_boolean()
 def or_function(a, b):
-    return a or b
+    return False
 
 
 @solve_boolean()
 def xor_function(a, b):
-    return a and not b or not a and b
+    return False
 
 
 @solve_boolean()
 def and_function_3_variables(a, b, c):
-    return a and b and c
+    return False
 
 txt_fail = '''Sorry, run:
 $ python -m unittest test_sample
