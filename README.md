@@ -10,34 +10,46 @@ This is a python project to help developers with boolean expressions during our 
 
 1.  Clone repository:
     `$ git clone git@github.com:jisazaTappsi/BooleanSolver.git`
+
 2.  Install quine-mccluskey:
     `$ pip install quine-mccluskey`
-3.  Run:
-    `$ python start_example.py`
 
-        Sorry, run test1.py first, to solve the riddle :)
+3.  Then:
+    `$ cd boolean_solver/`
 
-4. So, run tests with: `$ python -m unittest discover`
+4.  Run:
+    `$ python start_sample.py`
 
-        We have solved the riddle, go run start_example.py again!!!
-        .......
+        Sorry, run:
+        $ python -m unittest test_sample
+        first, to solve the riddle :)
+
+5. So, run test with:
+   `$ python -m unittest test_sample`
+
+        Solved and tested and_function_3_variables
+        .Solved and tested and_function
+        .Solved and tested or_function
+        .Solved and tested xor_function
+        .
         ----------------------------------------------------------------------
-        Ran 7 tests in 0.016s
-        
+        Ran 4 tests in 0.006s
+
         OK
 
-5.  Run: `$ python start_example.py`
+6.  Run:
+    `$ python start_sample.py`
     
           You made it, Congrats !!!
-          Now, go and see functions1.py, enjoy :)
+          Now, see the functions, enjoy :)
 
-You just solved 4 boolean expressions on file `functions/functions1.py`: `and`, `or`, `xor` & `and3`. Specs for these functions are in `tests/test1.py`. You can now add a new custom function with:
+You just solved 4 boolean expressions: `and`, `or`, `xor` & `and3`. Specs for these functions are in `test_sample.py`. You can now add a new custom function with:
 
     @solve_boolean()
     def my_function(a, b):
         return False
 
-And on `tests/test1.py` add specs:
+And on `test_sample.py` add specs:
 
     def test_MY_function(self):
         #                  b1     b0   output
@@ -47,7 +59,4 @@ And on `tests/test1.py` add specs:
                        ((True, True), False)}
         solver.execute(self, functions1.and_function, truth_table)
 
-Then run `test1.py` and see the result below `def my_function(a, b)`.
-
-
-
+Then run `$ python -m unittest test_sample` and see the result below `def my_function(a, b)`.

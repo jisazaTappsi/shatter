@@ -4,7 +4,7 @@ import warnings
 
 from quine_mccluskey import qm
 
-from boolean_solver.util import *
+from util import *
 
 
 FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*(\w+)(,\s*(\w+))+\)")
@@ -39,6 +39,7 @@ def solve_boolean():
 
         wrapped_f.__name__ = f.__name__
         wrapped_f.__module__ = f.__module__
+        wrapped_f.internal_func_code = f.func_code
         return wrapped_f
     return wrap
 
@@ -261,6 +262,8 @@ def execute(unittest_object, callable_function, table):
         # will not count space lines.
         if line.strip() != "":
             line_before = line
+
+    print "Solved and tested " + callable_function.__name__
 
     return Solution(expression=expression,
                     implementation=implementation,

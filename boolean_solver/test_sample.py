@@ -1,9 +1,8 @@
 __author__ = 'juan pablo isaza'
 
 import unittest
-
-from boolean_solver import solver
-from functions_sample import functions1
+import solver
+import start_sample
 
 
 class MyTest(unittest.TestCase):
@@ -21,7 +20,7 @@ class MyTest(unittest.TestCase):
                        ((True, False), False),
                        ((True, True), True)}
 
-        solver.execute(self, functions1.and_function, truth_table)
+        solver.execute(self, start_sample.and_function, truth_table)
 
     def test_OR_function(self):
 
@@ -30,7 +29,7 @@ class MyTest(unittest.TestCase):
                        ((True, False), True),
                        ((True, True), True)}
 
-        solver.execute(self, functions1.or_function, truth_table)
+        solver.execute(self, start_sample.or_function, truth_table)
 
     def test_XOR_function(self):
 
@@ -39,12 +38,12 @@ class MyTest(unittest.TestCase):
                        ((True, False), True),
                        ((True, True), False)}
 
-        solver.execute(self, functions1.xor_function, truth_table)
+        solver.execute(self, start_sample.xor_function, truth_table)
 
     def test_AND_3_VARIABLES_function(self):
 
         truth_table = {((True, True, True), True)}
 
-        solver.execute(self, functions1.and_function_3_variables, truth_table)
+        solver.execute(self, start_sample.and_function_3_variables, truth_table)
 
-print "We have solved the riddle, go run start_sample.py!!!"
+print "We have solved the riddle, go run start_sample.py, again!!!"

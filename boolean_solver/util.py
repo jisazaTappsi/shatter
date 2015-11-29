@@ -1,6 +1,5 @@
 __author__ = 'juan pablo isaza'
 import os
-BASE_PATH = os.path.dirname(__file__)
 
 
 def read_file(filename):
@@ -80,8 +79,10 @@ def from_bool_to_bit(boolean):
 
 def get_function_path(callable_function):
     """
-    This has to be done this way, because the Decorator if we call inspect.getsourcefile(object)
+    Passes the internal func_code to a attribute called internal_func_code on the wrapper.
+    Then we call the wrapper attribute which throws metadata of the internal function, and gets the path.
     it will go to the solver.py, fucking meta programming.
     :return: path
     """
-    return BASE_PATH + '/' + callable_function.__module__.replace('.', '/') + '.py'
+    code = callable_function.internal_func_code
+    return code.co_filename
