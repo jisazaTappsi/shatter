@@ -11,7 +11,7 @@ This is a [python 2 project](https://pypi.python.org/pypi/Boolean-Solver/0.1.1#d
 1.  Clone repository:
     `$ git clone git@github.com:jisazaTappsi/BooleanSolver.git`
 
-2.  Install quine-mccluskey:
+2.  Install quine-mccluskey package:
     `$ pip install quine-mccluskey`
 
 ### Intro Example
