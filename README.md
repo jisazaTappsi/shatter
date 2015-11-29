@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a python project to help developers with boolean expressions during our coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, specially when expressions get big. Therefore there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your specs in a test and set a dummy function on your code. When you run your tests a solver will take your specs and code them into a simple boolean expression, enjoy :).
+This is a [python 2 project](https://pypi.python.org/pypi/Boolean-Solver/0.1.1#downloads) to speed up boolean expression coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, specially when expressions get big. But there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your specs in a test and set a dummy function on your code. When you run your tests a solver will take your specs and code them into a simple boolean expression, enjoy :).
 
 ## Instructions
 
@@ -16,7 +16,7 @@ This is a python project to help developers with boolean expressions during our 
 
 ### Intro Example
 
-1.  Then:
+1.  Enter `boolean_solver`:
     `$ cd boolean_solver/`
 
 2.  Run:
@@ -26,7 +26,7 @@ This is a python project to help developers with boolean expressions during our 
         $ python -m unittest test_sample
         first, to solve the riddle :)
 
-3. So, run tes with:
+3. So, run test with:
    `$ python -m unittest test_sample`
 
         Solved and tested and_function_3_variables
@@ -69,11 +69,11 @@ Then run `$ python -m unittest test_sample` and see the result below `def my_fun
 
 ### How does Boolean Solver works?
 
-Takes a function and a truth_table which is processed using the Quine-McCluskey Algorithm. Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator(@boolean_solver()).
+Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@boolean_solver()`.
 
 ### Details
 
-#### Arguments of solver.execute(test, callable_function, truth_table)
+#### Arguments of `solver.execute(test, callable_function, truth_table)`
 
 1. The test case itself, to be able to perform tests, eg: `self`
 
@@ -84,4 +84,4 @@ Takes a function and a truth_table which is processed using the Quine-McCluskey 
 
 3. truth table is a set containing tuples. Where each row is a tuple the general form is:
 
-    {tuple_row(tuple_inputs(a, b, ...), output), ...}
+    `{tuple_row(tuple_inputs(a, b, ...), output), ...}`
