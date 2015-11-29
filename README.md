@@ -6,7 +6,7 @@ This is a python project to help developers with boolean expressions during our 
 
 ## Instructions
 
-### Intro Example
+### Setup
 
 1.  Clone repository:
     `$ git clone git@github.com:jisazaTappsi/BooleanSolver.git`
@@ -14,17 +14,19 @@ This is a python project to help developers with boolean expressions during our 
 2.  Install quine-mccluskey:
     `$ pip install quine-mccluskey`
 
-3.  Then:
+### Intro Example
+
+1.  Then:
     `$ cd boolean_solver/`
 
-4.  Run:
+2.  Run:
     `$ python start_sample.py`
 
         Sorry, run:
         $ python -m unittest test_sample
         first, to solve the riddle :)
 
-5. So, run test with:
+3. So, run tes with:
    `$ python -m unittest test_sample`
 
         Solved and tested and_function_3_variables
@@ -37,19 +39,23 @@ This is a python project to help developers with boolean expressions during our 
 
         OK
 
-6.  Run:
+4.  Run:
     `$ python start_sample.py`
     
           You made it, Congrats !!!
           Now, see the functions, enjoy :)
 
-You just solved 4 boolean expressions: `and`, `or`, `xor` & `and3`. Specs for these functions are in `test_sample.py`. You can now add a new custom function with:
+You just solved 4 boolean expressions: `and`, `or`, `xor` & `and3`. Specs for these functions are in `test_sample.py`.
+
+### Short Example
+
+You can now add a new custom function with:
 
     @solve_boolean()
     def my_function(a, b):
         return False
 
-And on `test_sample.py` add specs:
+And on a test (for example on `test_sample.py`) add specs:
 
     def test_MY_function(self):
         #                  b1     b0   output
@@ -60,3 +66,22 @@ And on `test_sample.py` add specs:
         solver.execute(self, functions1.and_function, truth_table)
 
 Then run `$ python -m unittest test_sample` and see the result below `def my_function(a, b)`.
+
+### How does Boolean Solver works?
+
+Takes a function and a truth_table which is processed using the Quine-McCluskey Algorithm. Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator(@boolean_solver()).
+
+### Details
+
+#### Arguments of solver.execute(test, callable_function, truth_table)
+
+1. The test case itself, to be able to perform tests, eg: `self`
+
+2. A function to optimize, passed as a callable (with no arguments). This function needs a 3 mock line definition with:
+    line 1: decorator = `@solve_boolean()`
+    line 2: signature eg: `def myfunction(a, b)`
+    line 3: body: only one line, eg: `return False`. This line will be replaced by the boolean expression.
+
+3. truth table is a set containing tuples. Where each row is a tuple the general form is:
+
+    {tuple_row(tuple_inputs(a, b, ...), output), ...}

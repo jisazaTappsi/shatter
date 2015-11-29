@@ -81,7 +81,6 @@ def get_function_path(callable_function):
     """
     Passes the internal func_code to a attribute called internal_func_code on the wrapper.
     Then we call the wrapper attribute which throws metadata of the internal function, and gets the path.
-    it will go to the solver.py, fucking meta programming.
     :return: path
     """
     code = callable_function.internal_func_code
