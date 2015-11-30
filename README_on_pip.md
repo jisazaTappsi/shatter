@@ -7,10 +7,7 @@ This is a [python 2 project](https://pypi.python.org/pypi/Boolean-Solver/0.1.1#d
 
 Setup
 -----
-1.  Install quine-mccluskey package:
-    `$ pip install quine-mccluskey`
-    
-2.  Install Boolean-Solver package:
+1.  Install Boolean-Solver package:
     `$ pip install Boolean-Solver`
     
 Short Example

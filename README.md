@@ -10,9 +10,6 @@ Setup
 1.  Clone repository:
     `$ git clone git@github.com:jisazaTappsi/BooleanSolver.git`
 
-2.  Install quine-mccluskey package:
-    `$ pip install quine-mccluskey`
-
 Intro Example
 -------------
 1.  Enter `boolean_solver`:
