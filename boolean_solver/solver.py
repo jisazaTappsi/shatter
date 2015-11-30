@@ -1,8 +1,7 @@
 __author__ = 'juan pablo isaza'
 import re
 import warnings
-
-from quine_mccluskey import qm
+import qm
 
 from util import *
 
