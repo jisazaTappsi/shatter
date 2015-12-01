@@ -7,7 +7,7 @@ Introduction
 A picture is worth a thousand words and a vid is worth a thousand pictures, so watch a short intro:
 
 https://youtu.be/w8tuJ9kqjJc
-  
+ 
 or continue reading...
 This is a python 2 [open source project](https://github.com/jisazaTappsi/BooleanSolver) to speed up boolean expression coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, specially when expressions get big. But there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your specs in a test and set a dummy function on your code. When you run your tests a solver will take your specs and code them into a simple boolean expression, enjoy :).
 
