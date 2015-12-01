@@ -5,7 +5,7 @@ import setuptools
 
 setup(
     name='Boolean Solver',
-    version='0.1.9',
+    version='0.1.10',
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Fast development with generated boolean expressions.',
