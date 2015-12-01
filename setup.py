@@ -9,7 +9,7 @@ setup(
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Fast development with generated boolean expressions.',
-    long_description=open('README_on_pip.md').read(),
+    long_description=open('README.md').read(),
     license='MIT',
     keywords='Quine McCluskey, Boolean, code, automatic code generation, expression, Boolean expression',
     url='https://github.com/jisazaTappsi/BooleanSolver',

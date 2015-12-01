@@ -8,13 +8,57 @@ A picture is worth a thousand words and a vid is worth a thousand pictures, so w
 
 This is a [python 2 project](https://pypi.python.org/pypi/Boolean-Solver) to speed up boolean expression coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, specially when expressions get big. But there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your specs in a test and set a dummy function on your code. When you run your tests a solver will take your specs and code them into a simple boolean expression, enjoy :).
 
-Setup
------
+Package Setup
+-------------
+1.  Install Boolean-Solver package:
+    `$ pip install Boolean-Solver`
+
+Short Example
+-------------
+Add new script(start.py) with a mock function:
+
+    from boolean_solver import solver as s
+
+    @s.solve_boolean()
+    def and_function(a, b):
+        return False
+
+Add a unittest(test.py) with specs:
+
+    import unittest
+    from boolean_solver import solver
+    import start
+    
+    
+    class MyTest(unittest.TestCase):
+        """
+        1. Set the truth table of your boolean function (at least for rows where output=True)
+        2. run solver.execute(self, callable, table) where callable is the boolean function
+         with the decorator=@solve_boolean() in functions1.
+         See examples below:
+        """
+        def test_AND_function(self):
+
+        #                  b1     b0    output
+        truth_table = {((False, False), False),
+                       ((False, True), False),
+                       ((True, False), False),
+                       ((True, True), True)}
+
+        solver.execute(self, start.and_function, truth_table)
+
+Then run `$ python -m unittest test` and see the result below `def and_function(a, b)`.
+
+Source Code
+-----------
+
+Setup with source code
+----------------------
 1.  Clone repository:
     `$ git clone git@github.com:jisazaTappsi/BooleanSolver.git`
 
-Intro Example
--------------
+Intro Example with source code
+------------------------------
 1.  Enter `boolean_solver`:
     `$ cd boolean_solver/`
 
@@ -46,25 +90,6 @@ Intro Example
 
 You just solved 4 boolean expressions: `and`, `or`, `xor` & `and3`. Specs for these functions are in `test_sample.py`.
 
-Short Example
--------------
-You can now add a new custom function with:
-
-    @solve_boolean()
-    def my_function(a, b):
-        return False
-
-And on a test (for example on `test_sample.py`) add specs:
-
-    def test_MY_function(self):
-        #                  b1     b0   output
-        truth_table = {((False, False), False),
-                       ((False, True), False),
-                       ((True, False), True),
-                       ((True, True), False)}
-        solver.execute(self, functions1.and_function, truth_table)
-
-Then run `$ python -m unittest test_sample` and see the result below `def my_function(a, b)`.
 
 How does Boolean Solver works?
 ------------------------------
