@@ -15,17 +15,13 @@ class MyTest(unittest.TestCase):
     def test_AND_function(self):
 
         #                  b1     b0   output
-        truth_table = {((False, False), False),
-                       ((False, True), False),
-                       ((True, False), False),
-                       ((True, True), True)}
+        truth_table = {((True, True), True)}
 
         solver.execute(self, start_sample.and_function, truth_table)
 
     def test_OR_function(self):
 
-        truth_table = {((False, False), False),
-                       ((False, True), True),
+        truth_table = {((False, True), True),
                        ((True, False), True),
                        ((True, True), True)}
 
@@ -33,8 +29,7 @@ class MyTest(unittest.TestCase):
 
     def test_XOR_function(self):
 
-        truth_table = {((False, False), False),
-                       ((False, True), True),
+        truth_table = {((False, True), True),
                        ((True, False), True),
                        ((True, True), False)}
 

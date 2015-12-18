@@ -1,17 +1,16 @@
 __author__ = 'juan pablo isaza'
 import re
-import warnings
 import qm
 
+#  TODO: from boolean_solver import solver as prod_solver
 from util import *
-
+from conditions import *
 
 FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*(\w+)(,\s*(\w+))+\)")
 DEF_PATTERN = re.compile(r"\s*def\s*")
 FUNCTION_PATTERN_DEFINITION = re.compile(DEF_PATTERN.pattern + FUNCTION_PATTERN.pattern)
 WORD_PATTERN = re.compile(r"\w+")
 INDENT = re.compile(r"^\s*")
-DECORATOR = re.compile(r"@.*\.?solve_boolean\(\)")
 
 # TODO: do the comment section of functions.
 
@@ -158,8 +157,14 @@ def from_table_to_ones(table):
     """
     ones = []
     for row in table:
-        if row[1]:  # only do it for true outputs.
-            ones.append(''.join(list(map(from_bool_to_bit, list(row[0])))))
+
+        # case 1: when the output is explicit.
+        if isinstance(row[0], tuple):
+            if row[1]:  # only do it for true outputs.
+                ones.append(''.join(list(map(from_bool_to_bit, list(row[0])))))
+
+        else:  # case 2: The output is a implicit True. inputs are in the row.
+            ones.append(''.join(list(map(from_bool_to_bit, list(row)))))
 
     return set(ones)
 
@@ -174,8 +179,12 @@ def test_expression(test_class, expression, table, inputs):
     :return: pass or not pass
     """
     for row in table:
-        r = eval(replace_expression(expression, inputs, row[0]))
-        test_class.assertEqual(r, row[1])
+        if isinstance(row[0], tuple):
+            r = eval(replace_expression(expression, inputs, row[0]))
+            test_class.assertEqual(r, row[1])
+        else:
+            r = eval(replace_expression(expression, inputs, row))
+            test_class.assertEqual(r, True)
 
 
 def replace_expression(expression, inputs, values):
@@ -187,8 +196,8 @@ def replace_expression(expression, inputs, values):
     :return: expression that can be evaluated.
     """
     for n, var in enumerate(inputs):
-            regex = "(^|\s+)" + var + "(\s+|$)"
-            expression = re.sub(re.compile(regex), " " + str(values[n]) + " ", expression)
+        regex = "(^|\s+)" + var + "(\s+|$)"
+        expression = re.sub(re.compile(regex), " " + str(values[n]) + " ", expression)
     return expression
 
 
@@ -196,11 +205,11 @@ class Solution:
     """
     Contains the data describing the solution to the puzzle.
     """
-    def __init__(self, expression, implementation, callable_function, table):
+    def __init__(self, expression, implementation, callable_function, conditions):
         self.expression = expression
         self.implementation = implementation
         self.callable_function = callable_function
-        self.table = table
+        self.conditions = conditions
 
 
 def alter_file(line_number, input_file_list, implementation, input_path):
@@ -217,30 +226,41 @@ def alter_file(line_number, input_file_list, implementation, input_path):
     rewrite_file(input_path, input_file_list)
 
 
+def get_empty_solution(callable_function, conditions):
+    return Solution(expression='',
+                    implementation=[],
+                    callable_function=callable_function,
+                    conditions=conditions)
+
+
 def execute(unittest_object, callable_function, table):
     """
     Solves the riddle, Writes it and tests it.
-    :param table: a truth table, or at least the rows where the output is True.
+    :param table: a partial truth table (explicit or implicit) or conditions object
     :return: True for successful operation, False if not.
     """
+
+    # input validation
+    if not valid_function(callable_function) or not valid_conditions(table):
+        return get_empty_solution(callable_function, table)
+
     input_path = get_function_path(callable_function)
+
+    if not os.path.exists(input_path):
+        return get_empty_solution(callable_function, table)
+
     input_file_list = read_file(input_path)
-    expression = ''
-    implementation = []
 
     # iterate over the file and find annotation and definition.
-    line_before = ""
     for line_number, line in enumerate(input_file_list):
 
-        match_dec = re.search(DECORATOR, line_before)
         match_def = re.search(FUNCTION_PATTERN_DEFINITION, line)
 
-        if match_dec and match_def:
+        if match_def:
 
-            decorator = match_dec.group()
             definition = match_def.group()
 
-            if decorator and definition:
+            if definition:
 
                 signature = get_signature(definition)
 
@@ -248,23 +268,20 @@ def execute(unittest_object, callable_function, table):
 
                     inputs = get_function_inputs(signature)
                     expression = get_function_expression(table, inputs)
+                    implementation = []
 
-                    # test, before writing.
-                    test_expression(unittest_object, expression, table, inputs)
+                    if len(expression) > 0:
+                        # test, before writing.
+                        test_expression(unittest_object, expression, table, inputs)
 
-                    implementation = get_function_implementation(expression, definition)
+                        implementation = get_function_implementation(expression, definition)
 
-                    alter_file(line_number, input_file_list, implementation, input_path)
+                        alter_file(line_number, input_file_list, implementation, input_path)
+                        print "Solved and tested " + callable_function.__name__
 
-                    break
+                    return Solution(expression=expression,
+                                    implementation=implementation,
+                                    callable_function=callable_function,
+                                    conditions=table)
 
-        # will not count space lines.
-        if line.strip() != "":
-            line_before = line
-
-    print "Solved and tested " + callable_function.__name__
-
-    return Solution(expression=expression,
-                    implementation=implementation,
-                    callable_function=callable_function,
-                    table=table)
+    return get_empty_solution(callable_function, table)
