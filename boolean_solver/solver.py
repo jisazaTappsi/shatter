@@ -215,21 +215,21 @@ def get_empty_solution(callable_function, conditions):
                     conditions=conditions)
 
 
-def execute(unittest_object, callable_function, table):
+def execute(unittest_object, callable_function, conditions):
     """
     Solves the riddle, Writes it and tests it.
-    :param table: a partial truth table (explicit or implicit) or conditions object
+    :param conditions: a partial truth table (explicit or implicit) or conditions object
     :return: True for successful operation, False if not.
     """
 
     # input validation
-    if not valid_function(callable_function) or not valid_conditions(table):
-        return get_empty_solution(callable_function, table)
+    if not valid_function(callable_function) or not valid_conditions(conditions):
+        return get_empty_solution(callable_function, conditions)
 
     input_path = get_function_path(callable_function)
 
     if not os.path.exists(input_path):
-        return get_empty_solution(callable_function, table)
+        return get_empty_solution(callable_function, conditions)
 
     input_file_list = read_file(input_path)
     line_number = get_function_line_number(callable_function, input_file_list)
@@ -239,13 +239,13 @@ def execute(unittest_object, callable_function, table):
 
         definition = input_file_list[line_number]
         inputs = get_function_inputs(callable_function)
-        table = get_truth_table(table, inputs)
-        expression = get_function_expression(table, inputs)
+        conditions = get_truth_table(conditions, inputs)
+        expression = get_function_expression(conditions, inputs)
         implementation = []
 
         if len(expression) > 0:
             # test, before writing.
-            test_expression(unittest_object, expression, table, inputs)
+            test_expression(unittest_object, expression, conditions, inputs)
 
             implementation = get_function_implementation(expression, definition)
 
@@ -255,6 +255,6 @@ def execute(unittest_object, callable_function, table):
         return Solution(expression=expression,
                         implementation=implementation,
                         callable_function=callable_function,
-                        conditions=table)
+                        conditions=conditions)
 
-    return get_empty_solution(callable_function, table)
+    return get_empty_solution(callable_function, conditions)

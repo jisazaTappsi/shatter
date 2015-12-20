@@ -14,31 +14,29 @@ class MyTest(unittest.TestCase):
     """
     def test_AND_function(self):
 
-        #                  b1     b0   output
-        truth_table = {((True, True), True)}
-
-        solver.execute(self, start_sample.and_function, truth_table)
+        # The output is explicitly set to true
+        cond = solver.Conditions(a=True, b=True, output=True)
+        solver.execute(self, start_sample.and_function, cond)
 
     def test_OR_function(self):
 
-        truth_table = {((False, True), True),
-                       ((True, False), True),
-                       ((True, True), True)}
+        # The output is implicitly set to true
+        cond = solver.Conditions(a=False, b=True)
+        cond.add(a=True, b=False)
+        cond.add(a=True, b=True)
 
-        solver.execute(self, start_sample.or_function, truth_table)
+        solver.execute(self, start_sample.or_function, cond)
 
     def test_XOR_function(self):
 
-        truth_table = {((False, True), True),
-                       ((True, False), True),
-                       ((True, True), False)}
+        cond = solver.Conditions(a=False, b=True)
+        cond.add(a=True, b=False)
 
-        solver.execute(self, start_sample.xor_function, truth_table)
+        solver.execute(self, start_sample.xor_function, cond)
 
     def test_AND_3_VARIABLES_function(self):
 
-        truth_table = {((True, True, True), True)}
-
-        solver.execute(self, start_sample.and_function_3_variables, truth_table)
+        cond = solver.Conditions(a=True, b=True, c=True)
+        solver.execute(self, start_sample.and_function_3_variables, cond)
 
 print "We have solved the riddle, go run start_sample.py, again!!!"

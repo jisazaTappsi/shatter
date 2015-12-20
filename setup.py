@@ -4,6 +4,11 @@ from setuptools import setup
 import setuptools
 import pypandoc
 
+# To publish do:
+# Empty dist folder
+# $ python setup.py sdist bdist_wheel
+# $ twine upload dist/*
+
 setup(
     name='Boolean Solver',
     version='0.2.0',

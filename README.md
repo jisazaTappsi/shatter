@@ -32,20 +32,16 @@ Add a unittest(test.py) with specs:
     
     class MyTest(unittest.TestCase):
         """
-        1. Set the truth table of your boolean function (at least for rows where output=True)
-        2. run solver.execute(self, callable, table) where callable is the boolean function
+        1. Set conditions of your boolean function (for True outputs)
+        2. Run solver.execute(self, callable, table) where callable is the boolean function
          with the decorator=@solve_boolean() in functions1.
          See examples below:
         """
         def test_AND_function(self):
 
-        #                  b1     b0    output
-        truth_table = {((False, False), False),
-                       ((False, True), False),
-                       ((True, False), False),
-                       ((True, True), True)}
-
-        solver.execute(self, start.and_function, truth_table)
+            # The output is explicitly set to true
+            cond = solver.Conditions(a=True, b=True, output=True)
+            solver.execute(self, start.and_function, cond)
 
 Then run `$ python -m unittest test` and see the result below `def and_function(a, b)`.
 
@@ -60,7 +56,7 @@ Setup with source code
 Intro Example with source code
 ------------------------------
 1.  Enter `boolean_solver`:
-    `$ cd boolean_solver/`
+    `$ cd boolean_solver`
 
 2.  Run:
     `$ python start_sample.py`
@@ -95,15 +91,31 @@ How does Boolean Solver works?
 ------------------------------
 Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@boolean_solver()`.
 
-Arguments of `solver.execute(test, callable_function, truth_table)`
+Arguments of `solver.execute(test, callable_function, conditions)`
 -------------------------------------------------------------------
 1. The test case itself, to be able to perform tests, eg: `self`
 
 2. A function to optimize, passed as a callable (with no arguments). This function needs a 3 mock line definition with:
     line 1: decorator = `@solve_boolean()`
-    line 2: signature eg: `def myfunction(a, b)`
+    line 2: signature eg: `def my_function(a, b)`
     line 3: body: only one line, eg: `return False`. This line will be replaced by the boolean expression.
 
-3. truth table is a set containing tuples. Where each row is a tuple the general form is:
+3. a. `solver.Conditions()` instance: An object that can handle logical conditions with named arguments eg:
 
-    `{tuple_row(tuple_inputs(a, b, ...), output), ...}`
+        cond = solver.Conditions(a=True, b=False)
+    
+        cond.add(a=True, b=True)
+
+    The reserved word `output` allows:
+    
+        cond.add(a=False, b=False, output=False)
+    
+    Meaning that when `a=False, b=False` I want the `output` to be `False`
+
+    b. Truth table: Alternatively a truth table can be specified (as a set containing tuples). Where each row is a tuple, the general form is:
+    
+        {tuple_row(tuple_inputs(a, b, ...), output), ...}
+    
+    or with a implicit `True` output:
+     
+        {tuple_inputs(a, b, ...), ...}
