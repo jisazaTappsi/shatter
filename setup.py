@@ -5,13 +5,12 @@ import setuptools
 import pypandoc
 
 # To publish do:
-# Empty dist folder
-# $ python setup.py sdist bdist_wheel
-# $ twine upload dist/*
+# $ python publish_update.py
+# or execute manual commands.
 
 setup(
     name='Boolean Solver',
-    version='0.2.0',
+    version='0.2.1',
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Fast development with generated boolean expressions.',
