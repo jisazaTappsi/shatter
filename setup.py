@@ -6,7 +6,7 @@ import pypandoc
 
 setup(
     name='Boolean Solver',
-    version='0.1.11',
+    version='0.2.0',
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Fast development with generated boolean expressions.',
