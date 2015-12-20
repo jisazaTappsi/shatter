@@ -5,10 +5,13 @@ import warnings
 
 class Conditions(list):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         list.__init__(list())
 
-    def add_condition(self, **kwargs):
+        if len(kwargs) > 0:
+            self.add(**kwargs)
+
+    def add(self, **kwargs):
         self.append(kwargs)
 
     @staticmethod
@@ -76,7 +79,7 @@ class Conditions(list):
         # add explicit output to tuples, if necessary.
         return get_explicit_tuples(tuples, row)
 
-    def get_set_with_tuples(self, inputs):
+    def get_truth_table(self, inputs):
         """
         Gets the truth table for all cases, in the form af a set with tuples.
         :param inputs: variables.
@@ -92,11 +95,24 @@ class Conditions(list):
         return truth_table
 
 
+def get_truth_table(conditions, inputs):
+    """
+    This is the 'public' version of the class method with the same name.
+    :param conditions: either a truth table or a conditions object.
+    :return: truth table (ie set with tuples).
+    """
+    if isinstance(conditions, Conditions):
+        return conditions.get_truth_table(inputs)
+
+    return conditions
+
+
 def valid_conditions(conditions):
     """
-    Valid tables must be sets or inherit from set. And all rows have to be tuples or inherit from tuple.
+    Valid conditions must be sets, inherit from set or be a Conditions object.
+    If conditions is a set: all rows have to be tuples or inherit from tuple.
     :param conditions: truth table or a conditions object.
-    :return: boolean. true=valid, false=invalid
+    :return: boolean.
     """
     if not isinstance(conditions, set) and not isinstance(conditions, Conditions):
         warnings.warn('Truth table is not a set or a Conditions object', UserWarning)
