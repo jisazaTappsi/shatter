@@ -1,15 +1,12 @@
 __author__ = 'juan pablo isaza'
-import re
 import qm
 
 #  TODO: from boolean_solver import solver as prod_solver
 from util import *
 from conditions import *
+import constants as cts
 
 FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*(\w+)(,\s*(\w+))+\)")
-DEF_PATTERN = re.compile(r"\s*def\s*")
-FUNCTION_PATTERN_DEFINITION = re.compile(DEF_PATTERN.pattern + FUNCTION_PATTERN.pattern)
-WORD_PATTERN = re.compile(r"\w+")
 INDENT = re.compile(r"^\s*")
 
 # TODO: do the comment section of functions.
@@ -24,20 +21,13 @@ def solve_boolean():
 
         def wrapped_f(*args):
             #  TODO: run test and implement and run function.
-            """
-            if hasattr(output.generated_code, f.__name__):
-                function_to_call = getattr(output.generated_code, f.__name__)
-                return function_to_call(*args)
-            else:
-                warnings.warn('function name: ' + str(f.__name__) +
-                              ' is still a mock function, please run test to generate it')
-            """
-
             return f(*args)
 
+        # Meta data transfer enables introspection of decorated functions.
         wrapped_f.__name__ = f.__name__
         wrapped_f.__module__ = f.__module__
         wrapped_f.internal_func_code = f.func_code
+
         return wrapped_f
     return wrap
 
@@ -60,7 +50,7 @@ def execute_mc_algorithm(ones):
 def translate_to_python_expression(bool_variables, mc_output):
     """
     Converts the algorithm output to friendlier python code.
-    :param bool_variables: array with the names of the boolean inputs.
+    :param bool_variables: tuple with the names of the boolean inputs.
     :param mc_output: set containing strings. see "execute_mc_algorithm" for details.
     :return: python boolean expression
     """
@@ -89,24 +79,16 @@ def translate_to_python_expression(bool_variables, mc_output):
     return final_bool
 
 
-def get_function_name(signature):
+def get_function_inputs(f):
     """
     Given function signatures gets the name of the function.
-    :param signature: exp: sum(a,b)
-    :return: name as a string.
+    :param f: a callable function
+    :return: input names on a tuple.
     """
-    word_match = re.findall(WORD_PATTERN, signature)
-    return word_match[0]
-
-
-def get_function_inputs(signature):
-    """
-    Given function signatures gets the name of the function.
-    :param signature: exp: sum(a,b)
-    :return: input names on a list.
-    """
-    word_match = re.findall(WORD_PATTERN, signature)
-    return word_match[1:]
+    if hasattr(f, cts.INTERNAL_FUNC_CODE):
+        return f.internal_func_code.co_varnames
+    else:
+        return f.func_code.co_varnames
 
 
 def get_signature(definition):
@@ -250,38 +232,29 @@ def execute(unittest_object, callable_function, table):
         return get_empty_solution(callable_function, table)
 
     input_file_list = read_file(input_path)
+    line_number = get_function_line_number(callable_function, input_file_list)
 
-    # iterate over the file and find annotation and definition.
-    for line_number, line in enumerate(input_file_list):
+    # enters only if the function source code was found.
+    if line_number > 0:
 
-        match_def = re.search(FUNCTION_PATTERN_DEFINITION, line)
+        definition = input_file_list[line_number]
+        inputs = get_function_inputs(callable_function)
+        table = get_truth_table(table, inputs)
+        expression = get_function_expression(table, inputs)
+        implementation = []
 
-        if match_def:
+        if len(expression) > 0:
+            # test, before writing.
+            test_expression(unittest_object, expression, table, inputs)
 
-            definition = match_def.group()
+            implementation = get_function_implementation(expression, definition)
 
-            if definition:
+            alter_file(line_number, input_file_list, implementation, input_path)
+            print "Solved and tested " + callable_function.__name__
 
-                signature = get_signature(definition)
-
-                if signature and get_function_name(signature) == callable_function.__name__:
-
-                    inputs = get_function_inputs(signature)
-                    expression = get_function_expression(table, inputs)
-                    implementation = []
-
-                    if len(expression) > 0:
-                        # test, before writing.
-                        test_expression(unittest_object, expression, table, inputs)
-
-                        implementation = get_function_implementation(expression, definition)
-
-                        alter_file(line_number, input_file_list, implementation, input_path)
-                        print "Solved and tested " + callable_function.__name__
-
-                    return Solution(expression=expression,
-                                    implementation=implementation,
-                                    callable_function=callable_function,
-                                    conditions=table)
+        return Solution(expression=expression,
+                        implementation=implementation,
+                        callable_function=callable_function,
+                        conditions=table)
 
     return get_empty_solution(callable_function, table)

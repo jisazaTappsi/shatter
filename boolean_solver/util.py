@@ -2,26 +2,8 @@ __author__ = 'juan pablo isaza'
 
 import warnings
 import os
-import imp
-import sys
-
-#import imp
-#import site
-#from boolean_solver import solver as prod_solver
-#p = site.getsitepackages()[1]
-#prod_solver = imp.load_source('boolean_solver.solver', '/Library/Python/2.7/site-packages')
-#m = prod_solver.execute
-
-
-def import_non_local_package(name, alias=None):
-
-    alias = alias or name
-
-    f, pathname, desc = imp.find_module(name, sys.path[1:])
-    module = imp.load_module(alias, f, pathname, desc)
-    f.close()
-
-    return module
+import re
+import constants as cts
 
 
 def read_file(filename):
@@ -107,7 +89,7 @@ def get_function_path(f):
     :return: path
     """
     # does the wrapper is defining the new attribute, to expose internal func_code? or use std func_code if no decorator
-    code = f.internal_func_code if hasattr(f, 'internal_func_code') else f.func_code
+    code = f.internal_func_code if hasattr(f, cts.INTERNAL_FUNC_CODE) else f.func_code
     return code.co_filename
 
 
@@ -121,7 +103,29 @@ def valid_function(f):
         warnings.warn('callable_function argument is NOT a function.')
         return False
 
-    if not hasattr(f, 'internal_func_code'):
+    if not hasattr(f, cts.INTERNAL_FUNC_CODE):
         warnings.warn('Function ' + f.func_name + ' has no decorator, reading can be harder!!!', UserWarning)
 
     return True
+
+
+def get_function_line_number(f, input_file_list):
+    """
+    This method has borrowed source code from inspect package. Because their solution
+    didn't worked for decorated methods. Also the line number was off by 1.
+    :param f: function.
+    :param input_file_list: a file source code, each line is an array element.
+    :return: the line of the file(starting in zero), 0 if not found!
+    """
+
+    if hasattr(f, cts.INTERNAL_FUNC_CODE):
+        line = f.internal_func_code.co_firstlineno
+    else:
+        line = f.func_code.co_firstlineno
+
+    function_def = re.compile(r'^(\s*def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)')
+    while line > 0:
+        if function_def.match(input_file_list[line]):
+            break
+        line -= 1
+    return line
