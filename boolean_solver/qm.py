@@ -16,7 +16,7 @@
 #
 #  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 #  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
 #  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
@@ -48,12 +48,10 @@ class QuineMcCluskey:
     The QuineMcCluskey class minimises boolean functions using the Quine
     McCluskey algorithm.
 
-    If the class was instantiiated with the use_xor set to True, then the
+    If the class was instantiated with the use_xor set to True, then the
     resulting boolean function may contain XOR and XNOR operators.
     """
     __version__ = "0.2"
-
-
 
     def __init__(self, use_xor = False):
         """The class constructor.
@@ -64,8 +62,6 @@ class QuineMcCluskey:
         """
         self.use_xor = use_xor  # Whether or not to use XOR and XNOR operations.
         self.n_bits = 0         # number of bits (i.e. self.n_bits == len(ones[i]) for every i).
-
-
 
     def __num2str(self, i):
         """
@@ -80,9 +76,7 @@ class QuineMcCluskey:
         x = ['1' if i & (1 << k) else '0' for k in range(self.n_bits - 1, -1, -1)]
         return "".join(x)
 
-
-
-    def simplify(self, ones, dc = []):
+    def simplify(self, ones, dc=[]):
         """Simplify a list of terms.
 
         Args:
@@ -124,9 +118,7 @@ class QuineMcCluskey:
 
         return self.simplify_los(ones, dc)
 
-
-
-    def simplify_los(self, ones, dc = []):
+    def simplify_los(self, ones, dc=[]):
         """The simplification algorithm for a list of string-encoded inputs.
 
         Args:
@@ -188,8 +180,6 @@ class QuineMcCluskey:
 
         return essential_implicants
 
-
-
     def __reduce_simple_xor_terms(self, t1, t2):
         """Try to reduce two terms t1 and t2, by combining them as XOR terms.
 
@@ -218,8 +208,6 @@ class QuineMcCluskey:
             return "".join(ret)
         return None
 
-
-
     def __reduce_simple_xnor_terms(self, t1, t2):
         """Try to reduce two terms t1 and t2, by combining them as XNOR terms.
 
@@ -247,8 +235,6 @@ class QuineMcCluskey:
         if (difft10 == 2 and difft20 == 0) or (difft10 == 0 and difft20 == 2):
             return "".join(ret)
         return None
-
-
 
     def __get_prime_implicants(self, terms):
         """Simplify the set 'terms'.
@@ -383,8 +369,6 @@ class QuineMcCluskey:
             pi |= g
         return pi
 
-
-
     def __get_essential_implicants(self, terms):
         """Simplify the set 'terms'.
 
@@ -425,8 +409,6 @@ class QuineMcCluskey:
                     ei_range |= perms[g]
         return ei
 
-
-
     def __get_term_rank(self, term, term_range):
         """Calculate the "rank" of a term.
 
@@ -460,9 +442,7 @@ class QuineMcCluskey:
                 n += 1
         return 4*term_range + n
 
-
-
-    def permutations(self, value = ''):
+    def permutations(self, value=''):
         """Iterator to generate all possible values out of a string.
 
         Args:

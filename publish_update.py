@@ -1,11 +1,10 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""setup the python package.py"""
 
 import subprocess
 
-# To publish do:
-# Empty dist folder
-# $ python setup.py sdist bdist_wheel
-# $ twine upload dist/*
+__author__ = 'juan pablo isaza'
 
 empty_folder = 'rm dist/*'
 subprocess.call(empty_folder, shell=True, executable="/bin/bash")

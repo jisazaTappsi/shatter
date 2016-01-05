@@ -40,8 +40,8 @@ Add a unittest(test.py) with specs:
         def test_AND_function(self):
 
             # The output is explicitly set to true
-            cond = solver.Conditions(a=True, b=True, output=True)
-            solver.execute(self, start.and_function, cond)
+            `cond = solver.Conditions(a=True, b=True, output=True)`
+            `solver.execute(self, start.and_function, cond)`
 
 Then run `$ python -m unittest test` and see the result below `def and_function(a, b)`.
 

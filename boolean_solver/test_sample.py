@@ -1,8 +1,12 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""Example of a use case."""
 
 import unittest
 import solver
 import start_sample
+
+__author__ = 'juan pablo isaza'
 
 
 class MyTest(unittest.TestCase):

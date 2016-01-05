@@ -1,6 +1,10 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""Example of a use case."""
 
 from solver import *
+
+__author__ = 'juan pablo isaza'
 
 
 @solve_boolean()

@@ -1,9 +1,17 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""Defines a more user friendly way of entering data."""
 
 import warnings
+import util
+
+__author__ = 'juan pablo isaza'
 
 
 class Conditions(list):
+    """
+    It is a list that contains conditions, each being a dictionary with the inputs.
+    """
 
     def __init__(self, **kwargs):
         list.__init__(list())
@@ -12,12 +20,15 @@ class Conditions(list):
             self.add(**kwargs)
 
     def add(self, **kwargs):
-        self.append(kwargs)
+        if len(kwargs) > 0:
+            self.append(kwargs)
+        else:
+            warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 
     @staticmethod
     def get_tuples_from_indices(row, inputs):
         """
-        Get a set containing tuples (with implicit or explicit rows). Each
+        Get a set containing tuples (with implicit or explicit rows).
         :param row: dict with index as key and value as input value.
         :param inputs: the output of the row.
         :return: set containing tuples.
@@ -36,25 +47,6 @@ class Conditions(list):
                 new_tuples.add(tuple_element + (new_element,))
 
             return new_tuples
-
-        def get_explicit_tuples(implicit_tuples, the_row):
-            """
-            gets set with tuples with explicit output.
-            :param implicit_tuples: tuples only with inputs. No explicit output.
-            :param the_row: the row containing all info.
-            :return: set
-            """
-            if out_str in the_row:
-                row_output = the_row[out_str]
-                if not isinstance(row_output, bool):
-                    new_tuples = set()
-
-                    for a_tuple in implicit_tuples:
-                        new_tuples.add((a_tuple, row_output))
-
-                    return new_tuples
-
-            return implicit_tuples
 
         #  -------------------------------------------------------
 
@@ -77,33 +69,111 @@ class Conditions(list):
                 tuples = true_tuples.union(false_tuples)
 
         # add explicit output to tuples, if necessary.
-        return get_explicit_tuples(tuples, row)
+        return tuples
 
-    def get_truth_table(self, inputs):
+    @staticmethod
+    def is_explicit(row):
         """
-        Gets the truth table for all cases, in the form af a set with tuples.
+        Does the output is explicitly named on this table row. Has 2 elements the first is tuple.
+        :param row: table row, or a condition.
+        :return: boolean
+        """
+        return len(row) == 2 and isinstance(row[0], tuple)
+
+    @staticmethod
+    def get_output(row):
+
+        out_str = 'output'
+        if out_str in row:
+            return row[out_str]
+
+        return True
+
+    def get_truth_tables(self, inputs):
+        """
+        Factor Truth tables by output.
+        This is the 'private' version.
         :param inputs: variables.
-        :return: set containing tuples.
+        :return: dict(), where key=output and value=implicit truth table.
         """
-        truth_table = set()
+        def change_keys_from_bool_to_int(d, new_key):
+            """
+            Changes the keys from booleans (True or False) to int(0 or 1)
+            if a int(0 or 1) is present.
+            :param d: dict
+            :param new_key: a new key to be added to dict.
+            :return: new dict
+            """
+            if util.var_is_1(new_key) and util.has_true_key(d):
+                d[1] = d.pop(True, None)
+            return d
+
+
+        # dict where outputs are the keys, values are the rows.
+        truth_tables = dict()
 
         for row in self:
 
+            output = self.get_output(row)
+            truth_tables = change_keys_from_bool_to_int(truth_tables, output)
+
+            if output in truth_tables:
+                truth_table = truth_tables[output]
+            else:
+                truth_table = set()
+
             condition_rows = self.get_tuples_from_indices(row, inputs)
             truth_table = truth_table.union(condition_rows)
+            truth_tables[output] = truth_table  # add to tables dict.
 
-        return truth_table
+        return truth_tables
 
 
-def get_truth_table(conditions, inputs):
+def add_to_dict_table(table, key, value):
+    """
+    Converts the table from tuples (explicit or implicit) to a dict().
+    Where the key is the output.
+    :param table: dict
+    :return: modified table
+    """
+    # will ignore key=False
+    if key:
+        if key in table:
+            table[key] = table[key].union({value})
+        else:
+            table[key] = {value}
+
+    return table
+
+
+def from_raw_set_to_dict_table(conditions):
+    """
+    Convert raw case to general format.
+    :param conditions: obj
+    :return: dict where key is output and value is implicit truth table.
+    """
+    table = dict()
+    for row in conditions:
+        if Conditions.is_explicit(row):
+            table = add_to_dict_table(table, row[1], row[0])
+        else:
+            table = add_to_dict_table(table, True, row)
+
+    return table
+
+
+def get_truth_tables(conditions, inputs):
     """
     This is the 'public' version of the class method with the same name.
     :param conditions: either a truth table or a conditions object.
     :return: truth table (ie set with tuples).
     """
     if isinstance(conditions, Conditions):
-        return conditions.get_truth_table(inputs)
-
+        return conditions.get_truth_tables(inputs)
+    elif isinstance(conditions, set):  # raw set case.
+        return from_raw_set_to_dict_table(conditions)
+    else:
+        warnings.warn('Found conditions that is not a set nor a Conditions object', UserWarning)
     return conditions
 
 

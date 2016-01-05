@@ -1,8 +1,12 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""setup the python package.py"""
 
 from setuptools import setup
 import setuptools
 import pypandoc
+
+__author__ = 'juan pablo isaza'
 
 # To publish do:
 # $ python publish_update.py

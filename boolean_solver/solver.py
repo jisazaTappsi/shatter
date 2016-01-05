@@ -1,13 +1,16 @@
-__author__ = 'juan pablo isaza'
-import qm
+#!/usr/bin/env python
 
-#  TODO: from boolean_solver import solver as prod_solver
+"""This is the main file. Calls QM algorithm and code generation functions."""
+
+import inspect
 from util import *
 from conditions import *
-import constants as cts
+from code_generator import *
+import qm
+#  TODO: from boolean_solver import solver as production_solver
 
-FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*(\w+)(,\s*(\w+))+\)")
-INDENT = re.compile(r"^\s*")
+__author__ = 'juan pablo isaza'
+
 
 # TODO: do the comment section of functions.
 
@@ -47,59 +50,6 @@ def execute_mc_algorithm(ones):
     return qm_obj.simplify_los(ones, set([]))
 
 
-def translate_to_python_expression(bool_variables, mc_output):
-    """
-    Converts the algorithm output to friendlier python code.
-    :param bool_variables: tuple with the names of the boolean inputs.
-    :param mc_output: set containing strings. see "execute_mc_algorithm" for details.
-    :return: python boolean expression
-    """
-    final_bool = ""
-
-    for i, str_bits in enumerate(mc_output):
-
-        factor = ""
-
-        if i > 0:  # when more than one element on list, join by "or"
-            final_bool += " or "
-
-        for j, c in enumerate(str_bits):
-
-            if string_has_bits_for_and(str_bits, j):
-                factor += " and "
-
-            if c == "1":
-                factor += bool_variables[j]
-
-            if c == "0":
-                factor += "not " + bool_variables[j]
-
-        final_bool += factor
-
-    return final_bool
-
-
-def get_function_inputs(f):
-    """
-    Given function signatures gets the name of the function.
-    :param f: a callable function
-    :return: input names on a tuple.
-    """
-    if hasattr(f, cts.INTERNAL_FUNC_CODE):
-        return f.internal_func_code.co_varnames
-    else:
-        return f.func_code.co_varnames
-
-
-def get_signature(definition):
-    """
-    Gets the signature of a function given the definition ie: from:'    def sum(a, b):  #bla bla bla' to 'sum(a,b)'
-    :param definition:
-    :return: string signature.
-    """
-    return re.search(FUNCTION_PATTERN, definition).group()
-
-
 def get_function_expression(table, inputs):
     """
     Get boolean expression. Can return empty string.
@@ -115,22 +65,6 @@ def get_function_expression(table, inputs):
         return ''
 
 
-def get_function_implementation(expression, definition):
-    """
-    Given definition and expression gets the function implementation.
-    :param expression: truth table.
-    :param definition:   def function(input1, input2, ...).
-    :return: string list with implementation.
-    """
-    signature = get_signature(definition)
-    indent = re.search(INDENT, definition).group()
-    if expression and len(expression) > 0:
-        return [indent + "def " + signature + ":", indent + "    return " + expression]
-    else:
-        warnings.warn('Function: ' + signature + ' has no boolean expression; cannot be implemented', UserWarning)
-        return []
-
-
 def from_table_to_ones(table):
     """
     Gets the ones as a list of strings from a truth table like set, containing tuples.
@@ -141,8 +75,8 @@ def from_table_to_ones(table):
     for row in table:
 
         # case 1: when the output is explicit.
-        if isinstance(row[0], tuple):
-            if row[1]:  # only do it for true outputs.
+        if Conditions.is_explicit(row):
+            if row[1]:  # only do it for true outputs.# TODO change for non booleans.
                 ones.append(''.join(list(map(from_bool_to_bit, list(row[0])))))
 
         else:  # case 2: The output is a implicit True. inputs are in the row.
@@ -203,58 +137,93 @@ def alter_file(line_number, input_file_list, implementation, input_path):
     :param input_path: source file path.
     :return: void
     """
-    input_file_list[line_number] = implementation[0]
-    input_file_list[line_number+1] = implementation[1]
+    source = get_function_code(line_number, input_file_list)
+
+    input_file_list = input_file_list[:line_number] + implementation + input_file_list[line_number + len(source):]
     rewrite_file(input_path, input_file_list)
 
 
 def get_empty_solution(callable_function, conditions):
-    return Solution(expression='',
+    return Solution(expression=[],
                     implementation=[],
                     callable_function=callable_function,
                     conditions=conditions)
 
 
-def execute(unittest_object, callable_function, conditions):
+def return_solution(unittest, f, conditions):
     """
     Solves the riddle, Writes it and tests it.
-    :param conditions: a partial truth table (explicit or implicit) or conditions object
+    :param conditions: condition or object or partial truth table (explicit, implicit or mix).
     :return: True for successful operation, False if not.
     """
+    f_path = get_function_path(f)
+    file_code = read_file(f_path)
+    f_line = get_function_line_number(f)
 
+    # enters only if the function source code was found.
+    if f_line > 0:
+
+        definition = file_code[f_line]
+        inputs = get_function_inputs(f)
+
+        # init variables
+        implementation = INITIAL_IMPLEMENTATION
+        tables = get_truth_tables(conditions, inputs)
+        expressions = []
+
+        for the_output, table in tables.iteritems():
+
+            expression = get_function_expression(table, inputs)
+            if len(expression) > 0:
+
+                # TODO: change testing to include the whole function.
+                # test, before writing.
+                test_expression(unittest, expression, table, inputs)
+                expressions.append(expression)
+
+                implementation = get_function_implementation(current_implementation=implementation,
+                                                             bool_expression=expression,
+                                                             definition=definition,
+                                                             the_output=the_output)
+
+        indent = re.search(INDENT, definition).group()
+        if not(has_true_key(tables)):
+            implementation = implementation + ['', indent + '    return False']
+
+        alter_file(f_line, file_code, implementation, f_path)
+        print "Solved and tested " + f.__name__
+
+        return Solution(expression=expressions,
+                        implementation=implementation,
+                        callable_function=f,
+                        conditions=conditions)
+
+    return get_empty_solution(f, conditions)
+
+
+def execute(unittest, callable_function, conditions):
+    """
+    Solves the riddle, Writes it and tests it.
+    :param unittest: the current test being run eg: 'self'.
+    :param callable_function: the function to be coded.
+    :param conditions: condition or object or partial truth table (explicit, implicit or mix).
+    :return: Solution object, empty object if operation unsuccessful.
+    """
     # input validation
     if not valid_function(callable_function) or not valid_conditions(conditions):
         return get_empty_solution(callable_function, conditions)
 
-    input_path = get_function_path(callable_function)
+    # module reloaded to have up to date metadata always.
+    module = inspect.getmodule(callable_function)
+    reload(module)
+    # TODO: find any method anywhere within the module.
+    callable_function = getattr(module, callable_function.__name__)
 
-    if not os.path.exists(input_path):
+    f_path = get_function_path(callable_function)
+
+    if not os.path.exists(f_path):
         return get_empty_solution(callable_function, conditions)
 
-    input_file_list = read_file(input_path)
-    line_number = get_function_line_number(callable_function, input_file_list)
-
-    # enters only if the function source code was found.
-    if line_number > 0:
-
-        definition = input_file_list[line_number]
-        inputs = get_function_inputs(callable_function)
-        conditions = get_truth_table(conditions, inputs)
-        expression = get_function_expression(conditions, inputs)
-        implementation = []
-
-        if len(expression) > 0:
-            # test, before writing.
-            test_expression(unittest_object, expression, conditions, inputs)
-
-            implementation = get_function_implementation(expression, definition)
-
-            alter_file(line_number, input_file_list, implementation, input_path)
-            print "Solved and tested " + callable_function.__name__
-
-        return Solution(expression=expression,
-                        implementation=implementation,
-                        callable_function=callable_function,
-                        conditions=conditions)
-
-    return get_empty_solution(callable_function, conditions)
+    return return_solution(unittest=unittest,
+                           f=callable_function,
+                           conditions=conditions)

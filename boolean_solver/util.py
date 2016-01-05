@@ -1,9 +1,13 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""Utility and General purpose functions."""
 
 import warnings
 import os
 import re
 import constants as cts
+
+__author__ = 'juan pablo isaza'
 
 
 def read_file(filename):
@@ -109,23 +113,100 @@ def valid_function(f):
     return True
 
 
-def get_function_line_number(f, input_file_list):
+def get_function_line_number(f):
     """
-    This method has borrowed source code from inspect package. Because their solution
-    didn't worked for decorated methods. Also the line number was off by 1.
+    Returns first line number for decorated and un-decorated methods.
     :param f: function.
-    :param input_file_list: a file source code, each line is an array element.
     :return: the line of the file(starting in zero), 0 if not found!
     """
-
+    # decorated
     if hasattr(f, cts.INTERNAL_FUNC_CODE):
+        # although co_firstlineno starts at 1 the decorator sums up 1.
         line = f.internal_func_code.co_firstlineno
-    else:
-        line = f.func_code.co_firstlineno
+    else:  # not decorated
+        # co_firstlineno starts at 1 instead of 0
+        line = f.func_code.co_firstlineno - 1
 
-    function_def = re.compile(r'^(\s*def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)')
-    while line > 0:
-        if function_def.match(input_file_list[line]):
-            break
-        line -= 1
+    #function_def = re.compile(r'^(\s*def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)')
+    #while line > 0:
+    #    if function_def.match(input_file_list[line]):
+    #        break
+    #    line -= 1
     return line
+
+
+def get_function_inputs(f):
+    """
+    Given function signatures gets the name of the function.
+    :param f: a callable function
+    :return: input names on a tuple.
+    """
+    if hasattr(f, cts.INTERNAL_FUNC_CODE):
+        return f.internal_func_code.co_varnames
+    else:
+        return f.func_code.co_varnames
+
+
+def get_function_code(start, lines):
+    """
+    Gets the source code of function. Opt for not using
+    inspect package because it doesn't work with decorators
+    :param start: the starting line, of the function
+    :param lines: the source file lines
+    :return: code.
+    """
+    def not_space_nor_comment(line):
+        return len(line.strip()) > 0 and line.strip()[0] != '#'
+
+    def inside_function(line_indent, f_indent):
+        return len(line_indent) > len(f_indent) + 3
+
+    base_indent = re.search(cts.INDENT, lines[start]).group()
+
+    end = start
+    for index, l in enumerate(lines[start + 1:]):
+        l_indent = re.search(cts.INDENT, l).group()
+
+        # decides if adding to function is required: no black space or comment
+        if not_space_nor_comment(l):
+            if inside_function(l_indent, base_indent):
+                end = index + start + 2  # only add code if non-comment or empty spaces are inside function
+            else:
+                # end of function if found lower indent that is not a blank space and not a comment
+                break
+
+    return lines[start:end]
+
+
+def var_is_true(var):
+    """
+    Returns True if var= True, else False. Remember here that 1 is a almost True value
+    but in this case should return False.
+    :param var: any variable.
+    :return: boolean
+    """
+    return var and isinstance(var, bool)
+
+
+def has_true_key(d):
+    """
+    Returns True only if it has a True value as key.
+    Has to be done this way because Python confuses '0' and '1' with False and True.
+    :param d: dict()
+    :return: boolean
+    """
+    for key in d:
+        if var_is_true(key):
+            return True
+    return False
+
+
+def var_is_1(var):
+    """
+    Assert if var is equal to 1 and not True.
+    :param var: variable
+    :return: boolean
+    """
+    if var and not isinstance(var, bool):
+        return True
+    return False
