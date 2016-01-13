@@ -8,6 +8,33 @@ import util
 __author__ = 'juan pablo isaza'
 
 
+class Output():
+    """
+    Contains any output properties.
+    """
+    @staticmethod
+    def valid_arguments(function, arguments):
+        """
+        Returns boolean indicating if all arguments are supplied.
+        :param function: object.
+        :param arguments: dict with arguments.
+        :return: Boolean.
+        """
+        # TODO: deal with optional arguments.
+        for var in util.get_function_inputs(function):
+            if var not in arguments:
+                return False
+
+        return True
+
+    def __init__(self, function, arguments):
+        if self.valid_arguments(function, arguments):
+            self.function = function
+            self.arguments = arguments
+        else:
+            warnings.warn('function: ' + function.__name__ + ' has wrong arguments', UserWarning)
+
+
 class Conditions(list):
     """
     It is a list that contains conditions, each being a dictionary with the inputs.
@@ -84,7 +111,10 @@ class Conditions(list):
     def get_output(row):
 
         out_str = 'output'
-        if out_str in row:
+        out_args = 'output_args'
+        if out_str in row and out_args in row:
+            return Output(function=row[out_str], arguments=row[out_args])
+        elif out_str in row:
             return row[out_str]
 
         return True
@@ -107,7 +137,6 @@ class Conditions(list):
             if util.var_is_1(new_key) and util.has_true_key(d):
                 d[1] = d.pop(True, None)
             return d
-
 
         # dict where outputs are the keys, values are the rows.
         truth_tables = dict()

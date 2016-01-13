@@ -4,7 +4,10 @@
 
 import warnings
 import os
+import time
 import re
+import calendar
+
 import constants as cts
 
 __author__ = 'juan pablo isaza'
@@ -113,26 +116,19 @@ def valid_function(f):
     return True
 
 
-def get_function_line_number(f):
+def get_function_line_number(f, file_code):
     """
-    Returns first line number for decorated and un-decorated methods.
+    Returns first line number for decorated and un-decorated methods. -1 if not found.
     :param f: function.
     :return: the line of the file(starting in zero), 0 if not found!
     """
-    # decorated
-    if hasattr(f, cts.INTERNAL_FUNC_CODE):
-        # although co_firstlineno starts at 1 the decorator sums up 1.
-        line = f.internal_func_code.co_firstlineno
-    else:  # not decorated
-        # co_firstlineno starts at 1 instead of 0
-        line = f.func_code.co_firstlineno - 1
+    for index, line in enumerate(file_code):
 
-    #function_def = re.compile(r'^(\s*def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)')
-    #while line > 0:
-    #    if function_def.match(input_file_list[line]):
-    #        break
-    #    line -= 1
-    return line
+        definition = re.search(re.compile(r"^\s*def\s*" + f.__name__ + r"\(\s*\w*\s*(,\s*\w+\s*)*\)\s*:"), line)
+        if definition:
+            return index
+
+    return -1
 
 
 def get_function_inputs(f):
@@ -147,12 +143,12 @@ def get_function_inputs(f):
         return f.func_code.co_varnames
 
 
-def get_function_code(start, lines):
+def get_function_code(start, file_code):
     """
     Gets the source code of function. Opt for not using
     inspect package because it doesn't work with decorators
-    :param start: the starting line, of the function
-    :param lines: the source file lines
+    :param start: the starting line number, of the function
+    :param file_code: the source file lines
     :return: code.
     """
     def not_space_nor_comment(line):
@@ -161,10 +157,10 @@ def get_function_code(start, lines):
     def inside_function(line_indent, f_indent):
         return len(line_indent) > len(f_indent) + 3
 
-    base_indent = re.search(cts.INDENT, lines[start]).group()
+    base_indent = re.search(cts.INDENT, file_code[start]).group()
 
     end = start
-    for index, l in enumerate(lines[start + 1:]):
+    for index, l in enumerate(file_code[start + 1:]):
         l_indent = re.search(cts.INDENT, l).group()
 
         # decides if adding to function is required: no black space or comment
@@ -175,7 +171,7 @@ def get_function_code(start, lines):
                 # end of function if found lower indent that is not a blank space and not a comment
                 break
 
-    return lines[start:end]
+    return file_code[start:end]
 
 
 def var_is_true(var):
@@ -210,3 +206,21 @@ def var_is_1(var):
     if var and not isinstance(var, bool):
         return True
     return False
+
+
+def get_indent_from_definition(definition):
+    """
+    Uses regex to get the indent
+    :param definition: of a function
+    :return: indent as string
+    """
+    return re.search(cts.INDENT, definition).group()
+
+
+def is_function(f):
+    """
+    Is it a function?
+    :param f: function
+    :return: boolean
+    """
+    return hasattr(f, '__call__')

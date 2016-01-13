@@ -121,8 +121,8 @@ class Solution:
     """
     Contains the data describing the solution to the puzzle.
     """
-    def __init__(self, expression, implementation, callable_function, conditions):
-        self.expression = expression
+    def __init__(self, expressions, implementation, callable_function, conditions):
+        self.expressions = expressions
         self.implementation = implementation
         self.callable_function = callable_function
         self.conditions = conditions
@@ -144,10 +144,24 @@ def alter_file(line_number, input_file_list, implementation, input_path):
 
 
 def get_empty_solution(callable_function, conditions):
-    return Solution(expression=[],
+    return Solution(expressions=[],
                     implementation=[],
                     callable_function=callable_function,
                     conditions=conditions)
+
+
+def add_default_return(definition, tables, implementation):
+    """
+    Modify source code to include a default return if no True key is present.
+    :param definition: function def
+    :param tables: dict with tables.
+    :param implementation: source code
+    :return: source code
+    """
+    indent = re.search(INDENT, definition).group()
+    if not(has_true_key(tables)):
+        implementation = implementation + ['', indent + '    return False']
+    return implementation
 
 
 def return_solution(unittest, f, conditions):
@@ -158,10 +172,10 @@ def return_solution(unittest, f, conditions):
     """
     f_path = get_function_path(f)
     file_code = read_file(f_path)
-    f_line = get_function_line_number(f)
+    f_line = get_function_line_number(f, file_code)
 
     # enters only if the function source code was found.
-    if f_line > 0:
+    if f_line > 0 and get_signature(file_code[f_line]):
 
         definition = file_code[f_line]
         inputs = get_function_inputs(f)
@@ -181,24 +195,34 @@ def return_solution(unittest, f, conditions):
                 test_expression(unittest, expression, table, inputs)
                 expressions.append(expression)
 
-                implementation = get_function_implementation(current_implementation=implementation,
-                                                             bool_expression=expression,
-                                                             definition=definition,
-                                                             the_output=the_output)
+                implementation = add_code_to_implementation(current_implementation=implementation,
+                                                            bool_expression=expression,
+                                                            definition=definition,
+                                                            the_output=the_output)
 
-        indent = re.search(INDENT, definition).group()
-        if not(has_true_key(tables)):
-            implementation = implementation + ['', indent + '    return False']
+        implementation = add_default_return(definition, tables, implementation)
 
         alter_file(f_line, file_code, implementation, f_path)
         print "Solved and tested " + f.__name__
 
-        return Solution(expression=expressions,
+        return Solution(expressions=expressions,
                         implementation=implementation,
                         callable_function=f,
                         conditions=conditions)
 
     return get_empty_solution(f, conditions)
+
+
+def reload_function(f):
+    """
+    Reloads the function, to make sure that any metadata is up to date (such as func_code)
+    :param f: function
+    :return: updated function
+    """
+    module = inspect.getmodule(f)
+    reload(module)
+    # TODO: find any method anywhere within the module.
+    return getattr(module, f.__name__)
 
 
 def execute(unittest, callable_function, conditions):
@@ -213,12 +237,7 @@ def execute(unittest, callable_function, conditions):
     if not valid_function(callable_function) or not valid_conditions(conditions):
         return get_empty_solution(callable_function, conditions)
 
-    # module reloaded to have up to date metadata always.
-    module = inspect.getmodule(callable_function)
-    reload(module)
-    # TODO: find any method anywhere within the module.
-    callable_function = getattr(module, callable_function.__name__)
-
+    callable_function = reload_function(callable_function)
     f_path = get_function_path(callable_function)
 
     if not os.path.exists(f_path):

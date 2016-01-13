@@ -7,6 +7,7 @@ import re
 __author__ = 'juan pablo isaza'
 
 INTERNAL_FUNC_CODE = 'internal_func_code'
-FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*(\w*)(,\s*(\w+))*\)")
+DEFINITION_PATTERN = re.compile(r"^\s*def\s*(\w+)\(\s*\w*\s*(,\s*\w+\s*)*\)\s*:")
+FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*\w*\s*(,\s*\w+\s*)*\)")
 INDENT = re.compile(r"^\s*")
 INITIAL_IMPLEMENTATION = []

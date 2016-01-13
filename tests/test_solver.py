@@ -5,7 +5,7 @@
 import unittest
 from boolean_solver import solver as s, conditions as c
 from boolean_solver.code_generator import translate_to_python_expression
-import cts_for_tests as cts
+import constants as cts
 import solver_functions as f
 
 __author__ = 'juan pablo isaza'
@@ -85,7 +85,7 @@ class TestSolver(unittest.TestCase):
         :return: passes or not
         """
         non_callable = ''
-        self.assertEqual(s.execute(self, non_callable, cts.and_table).expression, [])
+        self.assertEqual(s.execute(self, non_callable, cts.and_table).expressions, [])
 
     def test_wrong_table(self):
         """
@@ -95,15 +95,15 @@ class TestSolver(unittest.TestCase):
         # case 1: table not set
         wrong_table = ''
         v = s.execute(self, f.any_method, wrong_table)
-        self.assertEqual(s.execute(self, f.any_method, wrong_table).expression, [])
+        self.assertEqual(s.execute(self, f.any_method, wrong_table).expressions, [])
 
         # case 2: at least 1 row not a tuple
         wrong_table = {(), True}
-        self.assertEqual(s.execute(self, f.any_method, wrong_table).expression, [])
+        self.assertEqual(s.execute(self, f.any_method, wrong_table).expressions, [])
 
         # case 3: more than one explicit output.
         wrong_table = {((True, True), True, True)}
-        self.assertEqual(s.execute(self, f.any_method, wrong_table).expression, [])
+        self.assertEqual(s.execute(self, f.any_method, wrong_table).expressions, [])
 
     def test_implicit_table_output(self):
         """
