@@ -62,15 +62,15 @@ class GeneratorTest(unittest.TestCase):
         self.get_function_code(cts.sig_or, cts.exp_or, cts.or_table, f.or_function)
         self.get_function_code(cts.sig_xor, cts.exp_xor, cts.xor_table, f.xor_function)
 
-    def test_boolean_and_quasi_boolean_mix(self):
+    def test_boolean_and_quasi_boolean_mix_true_values(self):
         """
         Tests weather changing inputs for True and 1 outputs affect the final result.
         BY DEFAULT IF 1 AND TRUE are present will choose 1 as output.
         Test with both a boolean and quasi-boolean output.
-        I python True == 1. Therefore output=1 is the same as output=True.
+        In python True == 1. Therefore output=1 is the same as output=True.
         :return: passes or not
         """
-        code = ['def fun(a, b):',
+        code = ['def mix_true_values(a, b):',
                 '',
                 '    if a and not b or not a and b:',
                 '        return 1',
@@ -79,15 +79,35 @@ class GeneratorTest(unittest.TestCase):
 
         cond = s.Conditions(a=False, b=True, output=1)  # non-boolean output
         cond.add(a=True, b=False, output=True)  # boolean condition
-        solution = s.execute(self, f.fun, cond)
+        solution = s.execute(self, f.mix_true_values, cond)
         self.assertEqual(solution.implementation, code)
 
         cond = s.Conditions(a=True, b=False, output=True)  # non-boolean output
         cond.add(a=False, b=True, output=1)  # boolean condition
-        solution = s.execute(self, f.fun, cond)
+        solution = s.execute(self, f.mix_true_values, cond)
         self.assertEqual(solution.implementation, code)
 
-    # TODO: add test for False and 0 value
+    def test_boolean_and_quasi_boolean_mix_false_values(self):
+        """
+        Will make an if for the 0 case, while it will ignore the False case.
+        :return: passes or not
+        """
+        code = ['def mix_false_values(a, b):',
+                '',
+                '    if not a and b:',
+                '        return 0',
+                '',
+                '    return False']
+
+        cond = s.Conditions(a=False, b=True, output=0)  # non-boolean output
+        cond.add(a=True, b=False, output=False)  # boolean condition
+        solution = s.execute(self, f.mix_false_values, cond)
+        self.assertEqual(solution.implementation, code)
+
+        cond = s.Conditions(a=True, b=False, output=False)  # non-boolean output
+        cond.add(a=False, b=True, output=0)  # boolean condition
+        solution = s.execute(self, f.mix_false_values, cond)
+        self.assertEqual(solution.implementation, code)
 
     def multiple_value_test(self, out1, out2, function):
         """
@@ -124,7 +144,7 @@ class GeneratorTest(unittest.TestCase):
                          (3j, 2j, f.fun6),
                          ((3, 3), (2, 2), f.fun7),
                          (2, '3', f.fun8),
-                         (3.12345, (3, 3), f.fun9),]
+                         (3.12345, (3, 3), f.fun9)]
                          # TODO: include lists dictionaries and sets.
                          #([1, 2, 3], {4, 5, 6}, f.fun10)]
 
@@ -172,8 +192,8 @@ class GeneratorTest(unittest.TestCase):
         Invoke function with no arguments.
         :return: passes or not
         """
-        function = f.call_another_function
-        out = f.no_args_function
+        function = f.another_call
+        out = f.no_args
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
                 '    if not a and b:',
@@ -191,9 +211,9 @@ class GeneratorTest(unittest.TestCase):
         :return: passes or not
         """
         # TODO: differentiate between strings and code input.
-        function = f.call_another_function2
+        function = f.another_call2
         args = {'a': 'a', 'b': 'b'}
-        out_f = f.call_another_function
+        out_f = f.another_call
         out = s.Output(out_f, args)
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
@@ -206,14 +226,14 @@ class GeneratorTest(unittest.TestCase):
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
 
-    def test_our_first_recursive_function(self):
+    def test_first_recursive_function(self):
         """
         Will do recursion, extremely cool!!!
         :return: passes or not
         """
-        function = f.recursive_function
+        function = f.recursive
         args = {'a': 'not a'}
-        out = s.Output(f.recursive_function, args)
+        out = s.Output(f.recursive, args)
         code = ['def ' + function.__name__ + '(a):',
                 '',
                 '    if not a:',
@@ -222,5 +242,29 @@ class GeneratorTest(unittest.TestCase):
                 '    return False'
                 ]
         cond = s.Conditions(a=False, output=out, arguments=args)  # non-boolean output
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_default_keyword(self):
+        """
+        default keyword changes the last return from False to determined value.
+        :return: passes or not
+        """
+        function = f.with_default_value
+        out = 3
+        default = 5
+        code = ['def ' + function.__name__ + '(a, b):',
+                '',
+                '    if not a and b:',
+                '        return ' + str(out),
+                '',
+                '    return ' + str(default)]
+
+        cond = s.Conditions(a=False, b=True, output=out, default=default)
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+        cond = s.Conditions(a=False, b=True, output=out)
+        cond.add(default=default)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)

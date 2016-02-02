@@ -4,35 +4,10 @@
 
 import warnings
 import util
+from boolean_solver.ouput import Output
+from boolean_solver.constants import *
 
 __author__ = 'juan pablo isaza'
-
-
-class Output():
-    """
-    Contains any output properties.
-    """
-    @staticmethod
-    def valid_arguments(function, arguments):
-        """
-        Returns boolean indicating if all arguments are supplied.
-        :param function: object.
-        :param arguments: dict with arguments.
-        :return: Boolean.
-        """
-        # TODO: deal with optional arguments.
-        for var in util.get_function_inputs(function):
-            if var not in arguments:
-                return False
-
-        return True
-
-    def __init__(self, function, arguments):
-        if self.valid_arguments(function, arguments):
-            self.function = function
-            self.arguments = arguments
-        else:
-            warnings.warn('function: ' + function.__name__ + ' has wrong arguments', UserWarning)
 
 
 class Conditions(list):
@@ -60,7 +35,6 @@ class Conditions(list):
         :param inputs: the output of the row.
         :return: set containing tuples.
         """
-        out_str = 'output'
 
         def add_element_to_tuples(tuples_set, new_element):
             """
@@ -77,8 +51,8 @@ class Conditions(list):
 
         #  -------------------------------------------------------
 
-        if out_str in row:
-            output = row[out_str]
+        if OUTPUT_KEYWORD in row:
+            output = row[OUTPUT_KEYWORD]
             if isinstance(output, bool) and not output:
                 return set()
 
@@ -110,12 +84,10 @@ class Conditions(list):
     @staticmethod
     def get_output(row):
 
-        out_str = 'output'
-        out_args = 'output_args'
-        if out_str in row and out_args in row:
-            return Output(function=row[out_str], arguments=row[out_args])
-        elif out_str in row:
-            return row[out_str]
+        if OUTPUT_KEYWORD in row and OUTPUT_ARGS_KEYWORD in row:
+            return Output(function=row[OUTPUT_KEYWORD], arguments=row[OUTPUT_ARGS_KEYWORD])
+        elif OUTPUT_KEYWORD in row:
+            return row[OUTPUT_KEYWORD]
 
         return True
 
@@ -136,6 +108,10 @@ class Conditions(list):
             """
             if util.var_is_1(new_key) and util.has_true_key(d):
                 d[1] = d.pop(True, None)
+
+            if util.var_is_0(new_key) and util.has_false_key(d):
+                d[0] = d.pop(False, None)
+
             return d
 
         # dict where outputs are the keys, values are the rows.
@@ -144,7 +120,6 @@ class Conditions(list):
         for row in self:
 
             output = self.get_output(row)
-            truth_tables = change_keys_from_bool_to_int(truth_tables, output)
 
             if output in truth_tables:
                 truth_table = truth_tables[output]
@@ -154,6 +129,8 @@ class Conditions(list):
             condition_rows = self.get_tuples_from_indices(row, inputs)
             truth_table = truth_table.union(condition_rows)
             truth_tables[output] = truth_table  # add to tables dict.
+
+            truth_tables = change_keys_from_bool_to_int(truth_tables, output)
 
         return truth_tables
 

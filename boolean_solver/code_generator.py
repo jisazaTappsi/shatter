@@ -73,7 +73,6 @@ def get_code_piece(bool_expression, indent, the_output):
     if isinstance(the_output, bool):
         return [indent + "    return " + bool_expression]
     else:
-        # TODO include returning and non returning inputs.
         return get_if_code(indent, bool_expression, the_output, True)
 
 

@@ -11,7 +11,7 @@ import solver_functions as f
 __author__ = 'juan pablo isaza'
 
 
-class TestSolver(unittest.TestCase):
+class SolverTest(unittest.TestCase):
 
     def mc_algorithm_and_translate(self, var_names, mc_input, expected_mc_output, expected_exp):
         """
@@ -85,7 +85,7 @@ class TestSolver(unittest.TestCase):
         :return: passes or not
         """
         non_callable = ''
-        self.assertEqual(s.execute(self, non_callable, cts.and_table).expressions, [])
+        self.assertEqual(len(s.execute(self, non_callable, cts.and_table).ast.body), 0)
 
     def test_wrong_table(self):
         """
@@ -94,16 +94,16 @@ class TestSolver(unittest.TestCase):
         """
         # case 1: table not set
         wrong_table = ''
-        v = s.execute(self, f.any_method, wrong_table)
-        self.assertEqual(s.execute(self, f.any_method, wrong_table).expressions, [])
+        x=s.execute(self, f.any_method, wrong_table)
+        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
         # case 2: at least 1 row not a tuple
         wrong_table = {(), True}
-        self.assertEqual(s.execute(self, f.any_method, wrong_table).expressions, [])
+        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
         # case 3: more than one explicit output.
         wrong_table = {((True, True), True, True)}
-        self.assertEqual(s.execute(self, f.any_method, wrong_table).expressions, [])
+        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
     def test_implicit_table_output(self):
         """

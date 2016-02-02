@@ -184,6 +184,16 @@ def var_is_true(var):
     return var and isinstance(var, bool)
 
 
+def var_is_false(var):
+    """
+    Returns True if var = False, else False. Remember here that 1 is a almost True value
+    but in this case should return False.
+    :param var: any variable.
+    :return: boolean
+    """
+    return not var and isinstance(var, bool)
+
+
 def has_true_key(d):
     """
     Returns True only if it has a True value as key.
@@ -197,6 +207,19 @@ def has_true_key(d):
     return False
 
 
+def has_false_key(d):
+    """
+    Returns True only if it has a False value as key.
+    Has to be done this way because Python confuses '0' and '1' with False and True.
+    :param d: dict()
+    :return: boolean
+    """
+    for key in d:
+        if var_is_false(key):
+            return True
+    return False
+
+
 def var_is_1(var):
     """
     Assert if var is equal to 1 and not True.
@@ -204,6 +227,17 @@ def var_is_1(var):
     :return: boolean
     """
     if var and not isinstance(var, bool):
+        return True
+    return False
+
+
+def var_is_0(var):
+    """
+    Assert if var is equal to 0 and not False.
+    :param var: variable
+    :return: boolean
+    """
+    if not var and not isinstance(var, bool):
         return True
     return False
 

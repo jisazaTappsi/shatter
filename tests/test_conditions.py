@@ -8,7 +8,7 @@ from boolean_solver import conditions as c
 __author__ = 'juan pablo isaza'
 
 
-class MyTest(unittest.TestCase):
+class ConditionsTest(unittest.TestCase):
 
     def test_get_truth_table(self):
         """

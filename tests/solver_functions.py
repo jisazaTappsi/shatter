@@ -1,6 +1,3 @@
-def test_f():
-    return False
-
 #!/usr/bin/env python
 
 """Functions for solver.py tests"""
@@ -11,46 +8,46 @@ __author__ = 'juan pablo isaza'
 
 
 # Mock functions
-@s.solve_boolean()
+@s.solve()
 def and_function(a, b):
-    return a and b
+    pass
 
 
-@s.solve_boolean()
+@s.solve()
 def or_function(a, b):
-    return a or b
+    pass
 
 
-@s.solve_boolean()
+@s.solve()
 def xor_function(a, b):
-    return a and not b or not a and b
+    pass
 
 
-@s.solve_boolean()
+@s.solve()
 def nand_function(a, b):
-    return not b or not a
+    pass
 
 
-@s.solve_boolean()
+@s.solve()
 def and3_function(a, b, c):
-    return a and b and c
+    pass
 
 
 def and_missing_decorator(a, b):
-    return a and b
+    pass
 
 
-@s.solve_boolean()
+@s.solve()
 def any_method(a, b):
-    return False
+    pass
 
 
-@s.solve_boolean()
+@s.solve()
 def implicit_xor_function(a, b):
-    return a and not b or not a and b
+    pass
 
 
-@s.solve_boolean()
+@s.solve()
 def mix_xor_function(a, b):
-    return a and not b or not a and b
+    pass
 

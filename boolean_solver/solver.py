@@ -4,18 +4,24 @@
 
 import inspect
 from util import *
-from conditions import *
+from processed_conditions import *
 from code_generator import *
 import qm
+import ast
 #  TODO: from boolean_solver import solver as production_solver
 
 __author__ = 'juan pablo isaza'
 
-
+# TODO: add a decorator when function optimization is to be ignored. @ignore_solver()
+# Maybe the programmer modified the original version and wants it to be manually specified.
 # TODO: do the comment section of functions.
+# TODO: Non specified output should be type dependant upon other outputs. For example:
+# if outputs are of type string then non-specified default output should be ''.
+# TODO: change testing to include the whole function.
+# TODO: Add non returning outputs on ifs etc.
 
 
-def solve_boolean():
+def solve():
     """
     This defines a Decorator, that will wrap the generated functions.
     :return: boolean value of generated function.
@@ -23,7 +29,7 @@ def solve_boolean():
     def wrap(f):
 
         def wrapped_f(*args):
-            #  TODO: run test and implement and run function.
+            #  TODO: can run test and implement and run function.
             return f(*args)
 
         # Meta data transfer enables introspection of decorated functions.
@@ -121,11 +127,11 @@ class Solution:
     """
     Contains the data describing the solution to the puzzle.
     """
-    def __init__(self, expressions, implementation, callable_function, conditions):
-        self.expressions = expressions
+    def __init__(self, implementation, callable_function, conditions):
         self.implementation = implementation
         self.callable_function = callable_function
         self.conditions = conditions
+        self.ast = ast.parse("\n".join(implementation))
 
 
 def alter_file(line_number, input_file_list, implementation, input_path):
@@ -144,23 +150,36 @@ def alter_file(line_number, input_file_list, implementation, input_path):
 
 
 def get_empty_solution(callable_function, conditions):
-    return Solution(expressions=[],
-                    implementation=[],
+    return Solution(implementation=[],
                     callable_function=callable_function,
                     conditions=conditions)
 
 
-def add_default_return(definition, tables, implementation):
+def get_returning_implementation(implementation, definition, returning_value):
     """
-    Modify source code to include a default return if no True key is present.
-    :param definition: function def
-    :param tables: dict with tables.
-    :param implementation: source code
+    gets the code with the last default return.
+    :param implementation: code
+    :param definition: function definition
+    :param returning_value: value to be returned
     :return: source code
     """
     indent = re.search(INDENT, definition).group()
-    if not(has_true_key(tables)):
-        implementation = implementation + ['', indent + '    return False']
+    return implementation + ['', indent + '    return ' + get_output(returning_value)]
+
+
+def add_default_return(definition, processed_conditions, implementation):
+    """
+    Modify source code to include a default return if no True key is present.
+    :param definition: function def
+    :param processed_conditions: obj containing dict with tables.
+    :param implementation: source code
+    :return: source code
+    """
+    if processed_conditions.default:
+        return get_returning_implementation(implementation, definition, processed_conditions.default)
+    elif not(has_true_key(processed_conditions.tables)):
+        return get_returning_implementation(implementation, definition, False)
+
     return implementation
 
 
@@ -182,15 +201,15 @@ def return_solution(unittest, f, conditions):
 
         # init variables
         implementation = INITIAL_IMPLEMENTATION
-        tables = get_truth_tables(conditions, inputs)
+        processed_conditions = get_processed_conditions(conditions, inputs)
+
         expressions = []
 
-        for the_output, table in tables.iteritems():
+        for the_output, table in processed_conditions.tables.iteritems():
 
             expression = get_function_expression(table, inputs)
             if len(expression) > 0:
 
-                # TODO: change testing to include the whole function.
                 # test, before writing.
                 test_expression(unittest, expression, table, inputs)
                 expressions.append(expression)
@@ -200,13 +219,12 @@ def return_solution(unittest, f, conditions):
                                                             definition=definition,
                                                             the_output=the_output)
 
-        implementation = add_default_return(definition, tables, implementation)
+        implementation = add_default_return(definition, processed_conditions, implementation)
 
         alter_file(f_line, file_code, implementation, f_path)
         print "Solved and tested " + f.__name__
 
-        return Solution(expressions=expressions,
-                        implementation=implementation,
+        return Solution(implementation=implementation,
                         callable_function=f,
                         conditions=conditions)
 
