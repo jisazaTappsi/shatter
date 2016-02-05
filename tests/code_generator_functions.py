@@ -78,21 +78,6 @@ def fun9(a, b):
 
 
 @s.solve()
-def fun10(a, b):
-    pass
-
-
-@s.solve()
-def fun11(a, b):
-    pass
-
-
-@s.solve()
-def fun12(a, b):
-    pass
-
-
-@s.solve()
 def output_function_obj(a, b):
     pass
 

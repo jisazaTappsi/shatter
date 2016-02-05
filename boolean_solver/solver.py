@@ -19,6 +19,7 @@ __author__ = 'juan pablo isaza'
 # if outputs are of type string then non-specified default output should be ''.
 # TODO: change testing to include the whole function.
 # TODO: Add non returning outputs on ifs etc.
+# TODO: Add code adding capabilities. Very important use code.py
 
 
 def solve():
@@ -164,7 +165,7 @@ def get_returning_implementation(implementation, definition, returning_value):
     :return: source code
     """
     indent = re.search(INDENT, definition).group()
-    return implementation + ['', indent + '    return ' + get_output(returning_value)]
+    return implementation + ['', indent + '    return ' + print_object(returning_value)]
 
 
 def add_default_return(definition, processed_conditions, implementation):

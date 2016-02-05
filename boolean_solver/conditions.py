@@ -4,7 +4,7 @@
 
 import warnings
 import util
-from boolean_solver.ouput import Output
+from boolean_solver.output import Output
 from boolean_solver.constants import *
 
 __author__ = 'juan pablo isaza'

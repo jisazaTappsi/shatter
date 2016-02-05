@@ -7,24 +7,24 @@ from solver import *
 __author__ = 'juan pablo isaza'
 
 
-@solve_boolean()
+@solve()
 def and_function(a, b):
-    return False
+    pass
 
 
-@solve_boolean()
+@solve()
 def or_function(a, b):
-    return False
+    pass
 
 
-@solve_boolean()
+@solve()
 def xor_function(a, b):
-    return False
+    pass
 
 
-@solve_boolean()
+@solve()
 def and_function_3_variables(a, b, c):
-    return False
+    pass
 
 txt_fail = '''Sorry, run:
 $ python -m unittest test_sample

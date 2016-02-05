@@ -5,6 +5,7 @@
 import warnings
 from boolean_solver import util, conditions as c
 from constants import *
+from boolean_solver.code import Code
 
 __author__ = 'juan pablo isaza'
 
@@ -20,34 +21,37 @@ def print_invoked_function(output):
         args_str = ''
         for var in util.get_function_inputs(output.function):
             if args_str == '':
-                args_str += args_dict[var]
+                args_str += print_object(args_dict[var])
             else:
-                args_str += ', ' + args_dict[var]
+                args_str += ', ' + print_object(args_dict[var])
 
         return output.function.__name__ + '(' + args_str + ')'
     else:
         warnings.warn('method is not receiving correct data type', UserWarning)
 
 
-def get_output(output):
+def print_object(instance):
     """
     Modify output in special cases
-    :param output: anything to be printed as output code.
+    :param instance: anything to be printed as output code.
     :return: string with code representing the output
     """
-    if isinstance(output, str):
-        return "\"{0}\"".format(str(output))  # add ""
+    if isinstance(instance, str):
+        return "\"{0}\"".format(str(instance))  # add ""
 
-    if isinstance(output, tuple):
-        return str(output)[1:-1]  # remove parenthesis.
+    if isinstance(instance, tuple):
+        return str(instance)[1:-1]  # remove parenthesis.
 
-    if util.is_function(output):
-        return output.__name__  # when the function is passed as object; not invoked.
+    if util.is_function(instance):
+        return instance.__name__  # when the function is passed as object; not invoked.
 
-    if isinstance(output, c.Output):
-        return print_invoked_function(output)
+    if isinstance(instance, Code):
+        return str(instance.code_as_str)
 
-    return str(output)
+    if isinstance(instance, c.Output):
+        return print_invoked_function(instance)
+
+    return str(instance)
 
 
 def get_if_code(indent, boolean_exp, output, returning):
@@ -65,7 +69,7 @@ def get_if_code(indent, boolean_exp, output, returning):
 
     return ['',
             indent + '    if ' + boolean_exp + ':',
-            indent + '        ' + r + get_output(output)]
+            indent + '        ' + r + print_object(output)]
 
 
 def get_code_piece(bool_expression, indent, the_output):

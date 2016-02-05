@@ -120,10 +120,10 @@ class GeneratorTest(unittest.TestCase):
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
                 '    if a and not b:',
-                '        return ' + c.get_output(out2),
+                '        return ' + c.print_object(out2),
                 '',
                 '    if not a and b:',
-                '        return ' + c.get_output(out1),
+                '        return ' + c.print_object(out1),
                 '',
                 '    return False']
 
@@ -161,7 +161,7 @@ class GeneratorTest(unittest.TestCase):
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
                 '    if not a and b:',
-                '        return ' + c.get_output(out1),
+                '        return ' + c.print_object(out1),
                 '',
                 '    return False']
 
@@ -179,7 +179,7 @@ class GeneratorTest(unittest.TestCase):
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
                 '    if not a and b:',
-                '        return ' + c.get_output(out),
+                '        return ' + c.print_object(out),
                 '    return a and b']
 
         cond = s.Conditions(a=False, b=True, output=out)  # non-boolean output
@@ -212,36 +212,16 @@ class GeneratorTest(unittest.TestCase):
         """
         # TODO: differentiate between strings and code input.
         function = f.another_call2
-        args = {'a': 'a', 'b': 'b'}
+        args = {'a': s.Code('a'), 'b': s.Code('b')}
         out_f = f.another_call
-        out = s.Output(out_f, args)
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
                 '    if not a and b:',
-                '        return ' + c.get_output(out),
+                '        return ' + out_f.__name__ + '(a, b)',
                 '',
                 '    return False']
 
         cond = s.Conditions(a=False, b=True, output=out_f, output_args=args)  # non-boolean output
-        solution = s.execute(self, function, cond)
-        self.assertEqual(solution.implementation, code)
-
-    def test_first_recursive_function(self):
-        """
-        Will do recursion, extremely cool!!!
-        :return: passes or not
-        """
-        function = f.recursive
-        args = {'a': 'not a'}
-        out = s.Output(f.recursive, args)
-        code = ['def ' + function.__name__ + '(a):',
-                '',
-                '    if not a:',
-                '        return ' + c.get_output(out),
-                '',
-                '    return False'
-                ]
-        cond = s.Conditions(a=False, output=out, arguments=args)  # non-boolean output
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
 
@@ -266,5 +246,24 @@ class GeneratorTest(unittest.TestCase):
 
         cond = s.Conditions(a=False, b=True, output=out)
         cond.add(default=default)
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_recursive_function(self):
+        """
+        Will do recursion, extremely cool!!!
+        :return: passes or not
+        """
+        function = f.recursive
+        args = {'a': s.Code('not a')}
+        out = s.Output(f.recursive, args)
+        code = ['def ' + function.__name__ + '(a):',
+                '',
+                '    if not a:',
+                '        return 0',
+                '',
+                '    return ' + function.__name__ + '(not a)']
+
+        cond = s.Conditions(a=False, output=0, default=out)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)

@@ -8,7 +8,5 @@ __author__ = 'juan pablo isaza'
 
 class Code():
 
-    #def evaluates_to_boolean(self):
-
-    def __init__(self, str_code):
-        self.str_code = str_code
+    def __init__(self, code_as_str):
+        self.code_as_str = code_as_str
