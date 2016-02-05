@@ -1,8 +1,12 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""setup the python package.py"""
 
 from setuptools import setup
 import setuptools
 import pypandoc
+
+__author__ = 'juan pablo isaza'
 
 # To publish do:
 # $ python publish_update.py
@@ -10,7 +14,7 @@ import pypandoc
 
 setup(
     name='Boolean Solver',
-    version='0.2.1',
+    version='0.3.0',
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Fast development with generated boolean expressions.',

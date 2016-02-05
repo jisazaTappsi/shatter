@@ -1,9 +1,16 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""Utility and General purpose functions."""
 
 import warnings
 import os
+import time
 import re
+import calendar
+
 import constants as cts
+
+__author__ = 'juan pablo isaza'
 
 
 def read_file(filename):
@@ -109,23 +116,145 @@ def valid_function(f):
     return True
 
 
-def get_function_line_number(f, input_file_list):
+def get_function_line_number(f, file_code):
     """
-    This method has borrowed source code from inspect package. Because their solution
-    didn't worked for decorated methods. Also the line number was off by 1.
+    Returns first line number for decorated and un-decorated methods. -1 if not found.
     :param f: function.
-    :param input_file_list: a file source code, each line is an array element.
     :return: the line of the file(starting in zero), 0 if not found!
     """
+    for index, line in enumerate(file_code):
 
+        definition = re.search(re.compile(r"^\s*def\s*" + f.__name__ + r"\(\s*\w*\s*(,\s*\w+\s*)*\)\s*:"), line)
+        if definition:
+            return index
+
+    return -1
+
+
+def get_function_inputs(f):
+    """
+    Given function signatures gets the name of the function.
+    :param f: a callable function
+    :return: input names on a tuple.
+    """
     if hasattr(f, cts.INTERNAL_FUNC_CODE):
-        line = f.internal_func_code.co_firstlineno
+        return f.internal_func_code.co_varnames
     else:
-        line = f.func_code.co_firstlineno
+        return f.func_code.co_varnames
 
-    function_def = re.compile(r'^(\s*def\s)|(.*(?<!\w)lambda(:|\s))|^(\s*@)')
-    while line > 0:
-        if function_def.match(input_file_list[line]):
-            break
-        line -= 1
-    return line
+
+def get_function_code(start, file_code):
+    """
+    Gets the source code of function. Opt for not using
+    inspect package because it doesn't work with decorators
+    :param start: the starting line number, of the function
+    :param file_code: the source file lines
+    :return: code.
+    """
+    def not_space_nor_comment(line):
+        return len(line.strip()) > 0 and line.strip()[0] != '#'
+
+    def inside_function(line_indent, f_indent):
+        return len(line_indent) > len(f_indent) + 3
+
+    base_indent = re.search(cts.INDENT, file_code[start]).group()
+
+    end = start
+    for index, l in enumerate(file_code[start + 1:]):
+        l_indent = re.search(cts.INDENT, l).group()
+
+        # decides if adding to function is required: no black space or comment
+        if not_space_nor_comment(l):
+            if inside_function(l_indent, base_indent):
+                end = index + start + 2  # only add code if non-comment or empty spaces are inside function
+            else:
+                # end of function if found lower indent that is not a blank space and not a comment
+                break
+
+    return file_code[start:end]
+
+
+def var_is_true(var):
+    """
+    Returns True if var= True, else False. Remember here that 1 is a almost True value
+    but in this case should return False.
+    :param var: any variable.
+    :return: boolean
+    """
+    return var and isinstance(var, bool)
+
+
+def var_is_false(var):
+    """
+    Returns True if var = False, else False. Remember here that 1 is a almost True value
+    but in this case should return False.
+    :param var: any variable.
+    :return: boolean
+    """
+    return not var and isinstance(var, bool)
+
+
+def has_true_key(d):
+    """
+    Returns True only if it has a True value as key.
+    Has to be done this way because Python confuses '0' and '1' with False and True.
+    :param d: dict()
+    :return: boolean
+    """
+    for key in d:
+        if var_is_true(key):
+            return True
+    return False
+
+
+def has_false_key(d):
+    """
+    Returns True only if it has a False value as key.
+    Has to be done this way because Python confuses '0' and '1' with False and True.
+    :param d: dict()
+    :return: boolean
+    """
+    for key in d:
+        if var_is_false(key):
+            return True
+    return False
+
+
+def var_is_1(var):
+    """
+    Assert if var is equal to 1 and not True.
+    :param var: variable
+    :return: boolean
+    """
+    if var and not isinstance(var, bool):
+        return True
+    return False
+
+
+def var_is_0(var):
+    """
+    Assert if var is equal to 0 and not False.
+    :param var: variable
+    :return: boolean
+    """
+    if not var and not isinstance(var, bool):
+        return True
+    return False
+
+
+def get_indent_from_definition(definition):
+    """
+    Uses regex to get the indent
+    :param definition: of a function
+    :return: indent as string
+    """
+    return re.search(cts.INDENT, definition).group()
+
+
+def is_function(f):
+    """
+    Is it a function?
+    :param f: function
+    :return: boolean
+    """
+    return hasattr(f, '__call__')

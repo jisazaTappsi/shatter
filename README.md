@@ -19,9 +19,9 @@ Add new script(start.py) with a mock function:
 
     from boolean_solver import solver as s
 
-    @s.solve_boolean()
+    @s.solve()
     def and_function(a, b):
-        return False
+        pass
 
 Add a unittest(test.py) with specs:
 
@@ -34,16 +34,83 @@ Add a unittest(test.py) with specs:
         """
         1. Set conditions of your boolean function (for True outputs)
         2. Run solver.execute(self, callable, table) where callable is the boolean function
-         with the decorator=@solve_boolean() in functions1.
+         with the decorator=@solve() in functions1.
          See examples below:
         """
         def test_AND_function(self):
 
             # The output is explicitly set to true
-            cond = solver.Conditions(a=True, b=True, output=True)
-            solver.execute(self, start.and_function, cond)
+            `cond = solver.Conditions(a=True, b=True, output=True)`
+            `solver.execute(self, start.and_function, cond)`
 
-Then run `$ python -m unittest test` and see the result below `def and_function(a, b)`.
+Then run `$ python -m unittest test`. In start.py the result should be:
+
+    def and_function(a, b):
+        return a and b
+
+Non-Boolean outputs
+-------------------
+
+What if the output for a given logical condition is not a boolean. In that case a programmer would use an if. In the next example this package solves this case automatically:
+
+Modify start.py to look like this:
+
+    from boolean_solver import solver as s
+
+    @s.solve()
+    def if_function(a, b):
+        pass
+        
+Change test.py to:
+
+    import unittest
+    from boolean_solver import solver
+    import start
+    
+    
+    class MyTest(unittest.TestCase):
+    
+        def test_ifs(self):
+            """
+            Testing ifs.
+            """
+            `cond = solver.Conditions(a=False, b=True, output=1)  # non-boolean output`
+            `cond.add(a=True, b=False, output=0)  # non-boolean output`
+            `solver.execute(self, start.if_function, cond)`
+
+Then run `$ python -m unittest test`.
+
+
+Now, some cool coding
+---------------------
+Modify start.py to look like this:
+
+    from boolean_solver import solver as s
+
+    @s.solve()
+    def recursive(a):
+        pass
+
+Change test.py to:
+
+    import unittest
+    from boolean_solver import solver
+    import start
+    
+    
+    class MyTest(unittest.TestCase):
+    
+        def test_recursive_function(self):
+            """
+            Will do recursion, extremely cool!!!
+            """
+            `args = {'a': solver.Code('not a')}`
+            `out = solver.Output(start.recursive, args)`
+    
+            `cond = solver.Conditions(a=False, output=0, default=out)`
+            `solver.execute(self, start.recursive, cond)`
+
+The result this time will be a recursive function :)
 
 Source Code
 -----------
@@ -96,7 +163,7 @@ Arguments of `solver.execute(test, callable_function, conditions)`
 1. The test case itself, to be able to perform tests, eg: `self`
 
 2. A function to optimize, passed as a callable (with no arguments). This function needs a 3 mock line definition with:
-    line 1: decorator = `@solve_boolean()`
+    line 1: decorator = `@solve()`
     line 2: signature eg: `def my_function(a, b)`
     line 3: body: only one line, eg: `return False`. This line will be replaced by the boolean expression.
 
@@ -119,3 +186,24 @@ Arguments of `solver.execute(test, callable_function, conditions)`
     or with a implicit `True` output:
      
         {tuple_inputs(a, b, ...), ...}
+
+Arguments of `solver.Conditions() and cond.add()`
+-------------------------------------------------------------------
+
+These are specified as a dictionary containing certain keywords as well as the function inputs.
+
+Keywords are:
+
+`output`: Determines the value to be returned when the given condition is True.
+
+`output_args`: Dictionary with the values for the arguments when output is a function.
+ 
+`default`: Value returned when non of the conditions are True.
+
+
+Helper Classes
+--------------
+
+`solver.Output`: Class that helps define a function with arguments as an output. Has fields `function`(to assign a callable) and `arguments` to enter a dictionary with the inputs.
+
+`solver.Code`: Class that helps output pieces of code. The code is given as a String.

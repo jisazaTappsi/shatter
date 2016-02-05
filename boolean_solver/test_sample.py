@@ -1,15 +1,19 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""Example of a use case."""
 
 import unittest
 import solver
 import start_sample
+
+__author__ = 'juan pablo isaza'
 
 
 class MyTest(unittest.TestCase):
     """
     1. Set the truth table of your boolean function (at least for rows where output=True)
     2. run solver.execute(self, callable, table) where callable is the boolean function
-     with the decorator=@solve_boolean() in functions1.
+     with the decorator=@solve() in functions1.
      See examples below:
     """
     def test_AND_function(self):

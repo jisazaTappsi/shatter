@@ -1,10 +1,17 @@
-__author__ = 'juan pablo isaza'
+#!/usr/bin/env python
+
+"""Test for solver.py"""
 
 import unittest
 from boolean_solver import solver as s, conditions as c
+from boolean_solver.code_generator import translate_to_python_expression
+import constants as cts
+import solver_functions as f
+
+__author__ = 'juan pablo isaza'
 
 
-class MyTest(unittest.TestCase):
+class SolverTest(unittest.TestCase):
 
     def mc_algorithm_and_translate(self, var_names, mc_input, expected_mc_output, expected_exp):
         """
@@ -18,7 +25,7 @@ class MyTest(unittest.TestCase):
         mc_set = s.execute_mc_algorithm(mc_input)
         self.assertSetEqual(mc_set, expected_mc_output)
 
-        exp = s.translate_to_python_expression(var_names, mc_set)
+        exp = translate_to_python_expression(var_names, mc_set)
         self.assertEqual(exp, expected_exp)
 
     def test_mc_algorithm_and_translate(self):
@@ -46,84 +53,12 @@ class MyTest(unittest.TestCase):
                                         expected_mc_output={'10', '01'},
                                         expected_exp='a and not b or not a and b')
 
-    def get_function_code(self, signature, exp_expected, table, f):
-        """
-        Tests that a right function definition is generated.
-        :param signature: of the function eg: sum(a,b).
-        :param table: truth table.
-        :return: passes or not
-        """
-        expected_code = ["def " + signature + ":", "    return " + exp_expected]
-
-        inputs = s.get_function_inputs(f)
-        expression = s.get_function_expression(table, inputs)
-        code = s.get_function_implementation(expression, 'def ' + signature)
-
-        self.assertListEqual(code, expected_code)
-
-    #                b1     b0   output
-    and_table = {((False, False), False),
-                 ((False, True), False),
-                 ((True, False), False),
-                 ((True, True), True)}
-
-    or_table = {((False, False), False),
-                ((False, True), True),
-                ((True, False), True),
-                ((True, True), True)}
-
-    xor_table = {((False, False), False),
-                 ((False, True), True),
-                 ((True, False), True),
-                 ((True, True), False)}
-
-    nand_truth_table = {((False, False), True),
-                        ((False, True), True),
-                        ((True, False), True),
-                        ((True, True), False)}
-
-    and3_table = {((True, True, True), True)}
-
-    sig_and = "and_function(a, b)"
-    exp_and = "a and b"
-    sig_or = "or_function(a, b)"
-    exp_or = "a or b"
-    sig_xor = "xor_function(a, b)"
-    exp_xor = "a and not b or not a and b"
-    sig_nand = "nand_function(a, b)"
-    exp_nand = "not b or not a"
-    sig_and3 = "and3_function(a, b, c)"
-    exp_and3 = "a and b and c"
-
-    def test_get_function_implementation(self):
-        """
-        Testing for and, or & xor the "get_function_implementation".
-        :return: passes or not
-        """
-
-        # Mock functions
-        @s.solve_boolean()
-        def and_function(a, b):
-            return False
-
-        @s.solve_boolean()
-        def or_function(a, b):
-            return False
-
-        @s.solve_boolean()
-        def xor_function(a, b):
-            return False
-
-        self.get_function_code(self.sig_and, self.exp_and, self.and_table, and_function)
-        self.get_function_code(self.sig_or, self.exp_or, self.or_table, or_function)
-        self.get_function_code(self.sig_xor, self.exp_xor, self.xor_table, xor_function)
-
     def factor_execute(self, conditions, a_callable, signature, expression):
         """
         Factoring test.
         """
         solution = s.execute(self, a_callable, conditions)
-        expected_code = ["        def " + signature + ":", "            return " + expression]
+        expected_code = ["def " + signature + ":", "    return " + expression]
         self.assertListEqual(solution.implementation, expected_code)
 
     def test_execute(self):
@@ -131,76 +66,44 @@ class MyTest(unittest.TestCase):
         Important test: checking that it can solve simple functions.
         :return: passes or not.
         """
-
-        # Mock functions
-        @s.solve_boolean()
-        def and_function(a, b):
-            return False
-
-        @s.solve_boolean()
-        def or_function(a, b):
-            return False
-
-        @s.solve_boolean()
-        def xor_function(a, b):
-            return False
-
-        @s.solve_boolean()
-        def nand_function(a, b):
-            return False
-
-        @s.solve_boolean()
-        def and3_function(a, b, c):
-            return False
-
-        self.factor_execute(self.and_table, and_function, self.sig_and, self.exp_and)
-        self.factor_execute(self.or_table, or_function, self.sig_or, self.exp_or)
-        self.factor_execute(self.xor_table, xor_function, self.sig_xor, self.exp_xor)
-        self.factor_execute(self.nand_truth_table, nand_function, self.sig_nand, self.exp_nand)
-        self.factor_execute(self.and3_table, and3_function, self.sig_and3, self.exp_and3)
+        self.factor_execute(cts.and_table, f.and_function, cts.sig_and, cts.exp_and)
+        self.factor_execute(cts.or_table, f.or_function, cts.sig_or, cts.exp_or)
+        self.factor_execute(cts.xor_table, f.xor_function, cts.sig_xor, cts.exp_xor)
+        self.factor_execute(cts.nand_truth_table, f.nand_function, cts.sig_nand, cts.exp_nand)
+        self.factor_execute(cts.and3_table, f.and3_function, cts.sig_and3, cts.exp_and3)
 
     def test_and_missing_decorator(self):
         """
         Should solve it correctly but show a warning, because of the missing decorator.
         :return: passes or not
         """
-        def and_missing_decorator(a, b):
-            return False
-
-        self.factor_execute(self.and_table, and_missing_decorator, 'and_missing_decorator(a, b)', self.exp_and)
+        self.factor_execute(cts.and_table, f.and_missing_decorator, 'and_missing_decorator(a, b)', cts.exp_and)
 
     def test_non_callable(self):
         """
         Checks that the function passed is valid.
         :return: passes or not
         """
-        @s.solve_boolean()
-        def any_method(a, b):
-            return False
-        
         non_callable = ''
-        self.assertEqual(s.execute(self, non_callable, self.and_table).expression, '')
+        self.assertEqual(len(s.execute(self, non_callable, cts.and_table).ast.body), 0)
 
     def test_wrong_table(self):
         """
         Checks that the table is a set and that the rows are all tuples
         :return: passes or not
         """
-        @s.solve_boolean()
-        def any_method(a, b):
-            return False
-
         # case 1: table not set
         wrong_table = ''
-        self.assertEqual(s.execute(self, any_method, wrong_table).expression, '')
+        x=s.execute(self, f.any_method, wrong_table)
+        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
         # case 2: at least 1 row not a tuple
         wrong_table = {(), True}
-        self.assertEqual(s.execute(self, any_method, wrong_table).expression, '')
+        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
         # case 3: more than one explicit output.
         wrong_table = {((True, True), True, True)}
-        self.assertEqual(s.execute(self, any_method, wrong_table).expression, '')
+        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
     def test_implicit_table_output(self):
         """
@@ -211,26 +114,18 @@ class MyTest(unittest.TestCase):
         # case 1: all rows are implicit
         implicit_output_xor_table = {(True, False), (False, True)}
 
-        @s.solve_boolean()
-        def implicit_xor_function(a, b):
-            return False
-
         self.factor_execute(conditions=implicit_output_xor_table,
-                            a_callable=implicit_xor_function,
-                            signature=implicit_xor_function.__name__ + '(a, b)',
-                            expression=self.exp_xor)
+                            a_callable=f.implicit_xor_function,
+                            signature=f.implicit_xor_function.__name__ + '(a, b)',
+                            expression=cts.exp_xor)
 
         # case 2: some rows are explicit and some implicit.
         mix_output_xor_table = {((True, False), True), (False, True), ((True, True), False)}
 
-        @s.solve_boolean()
-        def mix_xor_function(a, b):
-            return False
-
         self.factor_execute(conditions=mix_output_xor_table,
-                            a_callable=mix_xor_function,
-                            signature=mix_xor_function.__name__ + '(a, b)',
-                            expression=self.exp_xor)
+                            a_callable=f.mix_xor_function,
+                            signature=f.mix_xor_function.__name__ + '(a, b)',
+                            expression=cts.exp_xor)
 
     def test_conditions_input(self):
         """
@@ -241,24 +136,16 @@ class MyTest(unittest.TestCase):
         # case 1: simple 2 argument and.
         cond = c.Conditions(a=True, b=True)
 
-        @s.solve_boolean()
-        def and_function(a, b):
-            return False
-
         self.factor_execute(conditions=cond,
-                            a_callable=and_function,
-                            signature=and_function.__name__ + '(a, b)',
-                            expression=self.exp_and)
+                            a_callable=f.and_function,
+                            signature=f.and_function.__name__ + '(a, b)',
+                            expression=cts.exp_and)
 
         # case 2: multiple adds() with mix output: xor.
         cond = c.Conditions(a=True, b=False, output=True)
         cond.add(a=False, b=True)
 
-        @s.solve_boolean()
-        def mix_xor_function(a, b):
-            return False
-
         self.factor_execute(conditions=cond,
-                            a_callable=mix_xor_function,
-                            signature=mix_xor_function.__name__ + '(a, b)',
-                            expression=self.exp_xor)
+                            a_callable=f.mix_xor_function,
+                            signature=f.mix_xor_function.__name__ + '(a, b)',
+                            expression=cts.exp_xor)
