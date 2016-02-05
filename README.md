@@ -40,8 +40,8 @@ Add a unittest(test.py) with specs:
         def test_AND_function(self):
 
             # The output is explicitly set to true
-            `cond = solver.Conditions(a=True, b=True, output=True)`
-            `solver.execute(self, start.and_function, cond)`
+            cond = solver.Conditions(a=True, b=True, output=True)
+            solver.execute(self, start.and_function, cond)
 
 Then run `$ python -m unittest test`. In start.py the result should be:
 
@@ -74,9 +74,9 @@ Change test.py to:
             """
             Testing ifs.
             """
-            `cond = solver.Conditions(a=False, b=True, output=1)  # non-boolean output`
-            `cond.add(a=True, b=False, output=0)  # non-boolean output`
-            `solver.execute(self, start.if_function, cond)`
+            cond = solver.Conditions(a=False, b=True, output=1)  # non-boolean output
+            cond.add(a=True, b=False, output=0)  # non-boolean output
+            solver.execute(self, start.if_function, cond)
 
 Then run `$ python -m unittest test`.
 
@@ -104,11 +104,11 @@ Change test.py to:
             """
             Will do recursion, extremely cool!!!
             """
-            `args = {'a': solver.Code('not a')}`
-            `out = solver.Output(start.recursive, args)`
+            args = {'a': solver.Code('not a')}
+            out = solver.Output(start.recursive, args)
     
-            `cond = solver.Conditions(a=False, output=0, default=out)`
-            `solver.execute(self, start.recursive, cond)`
+            cond = solver.Conditions(a=False, output=0, default=out)
+            solver.execute(self, start.recursive, cond)
 
 The result this time will be a recursive function :)
 
