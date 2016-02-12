@@ -16,12 +16,22 @@ class Conditions(list):
     """
 
     def __init__(self, **kwargs):
+        """
+        init and add new parameters if provided.
+        :param kwargs:
+        :return:
+        """
         list.__init__(list())
 
         if len(kwargs) > 0:
             self.add(**kwargs)
 
     def add(self, **kwargs):
+        """
+        Adds a new row condition.
+        :param kwargs: dictionary like parameters.
+        :return: void
+        """
         if len(kwargs) > 0:
             self.append(kwargs)
         else:
@@ -49,16 +59,24 @@ class Conditions(list):
 
             return new_tuples
 
+        def get_possible_inputs(c_row, f_inputs):
+            """
+            :param c_row: The **kwargs given in a add(self, **kwargs) call.
+            :param f_inputs: function inputs.
+            :return: All possible inputs that are not keywords.
+            """
+            return set(f_inputs).union(c_row.keys()).difference(KEYWORDS.values())
+
         #  -------------------------------------------------------
 
-        if OUTPUT_KEYWORD in row:
-            output = row[OUTPUT_KEYWORD]
+        if KEYWORDS[OUTPUT] in row:
+            output = row[KEYWORDS[OUTPUT]]
             if isinstance(output, bool) and not output:
                 return set()
 
         # starts with 1 tuple
         tuples = {()}
-        for variable in inputs:
+        for variable in get_possible_inputs(row, inputs):
 
             if variable in row:
                 tuples = add_element_to_tuples(tuples, row[variable])
@@ -84,10 +102,12 @@ class Conditions(list):
     @staticmethod
     def get_output(row):
 
-        if OUTPUT_KEYWORD in row and OUTPUT_ARGS_KEYWORD in row:
-            return Output(function=row[OUTPUT_KEYWORD], arguments=row[OUTPUT_ARGS_KEYWORD])
-        elif OUTPUT_KEYWORD in row:
-            return row[OUTPUT_KEYWORD]
+        out_key = KEYWORDS[OUTPUT]
+        args_key = KEYWORDS[OUTPUT_ARGS]
+        if out_key in row and args_key in row:
+            return Output(function=row[out_key], arguments=row[args_key])
+        elif out_key in row:
+            return row[out_key]
 
         return True
 

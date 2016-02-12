@@ -96,6 +96,18 @@ def insert_code_into_implementation(current_implementation, code, the_output):
         return [current_implementation[0]] + code + current_implementation[1:]
 
 
+def get_initial_implementation(definition):
+    """
+    Always starts implementation with definition
+    :param definition: function definition.
+    :return: code
+    """
+    signature = get_signature(definition)
+    indent = util.get_indent_from_definition(definition)
+
+    return [indent + "def " + signature + ":"]
+
+
 def add_code_to_implementation(current_implementation, bool_expression, definition, the_output):
     """
     Given definition and expression gets the function implementation.
@@ -108,8 +120,8 @@ def add_code_to_implementation(current_implementation, bool_expression, definiti
     if bool_expression and len(bool_expression) > 0:
 
         new_code = get_code_piece(bool_expression, indent, the_output)
-        if current_implementation == INITIAL_IMPLEMENTATION:
-            return [indent + "def " + signature + ":"] + new_code
+        if current_implementation == get_initial_implementation(definition):
+            return current_implementation + new_code
         else:
             return insert_code_into_implementation(current_implementation, new_code, the_output)
 
@@ -132,21 +144,36 @@ def get_signature(definition):
     return signature_obj.group()
 
 
-def translate_to_python_expression(bool_variables, mc_output):
+def print_input(instance):
+    """
+    Modify input in special cases
+    :param instance: anything to be printed as output code.
+    :return: string with code representing the input
+    """
+    if isinstance(instance, str):
+        return instance
+
+    if isinstance(instance, Code):
+        return str(instance.code_as_str)
+
+    return str(instance)
+
+
+def translate_to_python_expression(all_inputs, qm_output):
     """
     Converts the algorithm output to friendlier python code.
-    :param bool_variables: tuple with the names of the boolean inputs.
-    :param mc_output: set containing strings. see "execute_mc_algorithm" for details.
+    :param all_inputs: tuple with the names of the boolean inputs.
+    :param qm_output: set containing strings. see "execute_qm_algorithm" for details.
     :return: python boolean expression
     """
-    final_bool = ""
+    final_expression = ""
 
-    for i, str_bits in enumerate(mc_output):
+    for i, str_bits in enumerate(qm_output):
 
         factor = ""
 
         if i > 0:  # when more than one element on list, join by "or"
-            final_bool += " or "
+            final_expression += " or "
 
         for j, c in enumerate(str_bits):
 
@@ -154,11 +181,11 @@ def translate_to_python_expression(bool_variables, mc_output):
                 factor += " and "
 
             if c == "1":
-                factor += bool_variables[j]
+                factor += print_input(all_inputs[j])
 
             if c == "0":
-                factor += "not " + bool_variables[j]
+                factor += "not " + print_input(all_inputs[j])
 
-        final_bool += factor
+        final_expression += factor
 
-    return final_bool
+    return final_expression

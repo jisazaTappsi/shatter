@@ -23,8 +23,8 @@ def get_default(conditions):
     """
     if isinstance(conditions, Conditions) and conditions:
         for row in conditions:
-            if DEFAULT_KEYWORD in row:
-                return row[DEFAULT_KEYWORD]
+            if KEYWORDS[DEFAULT] in row:
+                return row[KEYWORDS[DEFAULT]]
 
         return False
     else:

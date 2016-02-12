@@ -47,9 +47,10 @@ class GeneratorTest(unittest.TestCase):
 
         inputs = get_function_inputs(fun)
         expression = s.get_function_expression(table, inputs)
-        code = s.add_code_to_implementation(current_implementation=[],
+        definition = 'def ' + signature
+        code = s.add_code_to_implementation(current_implementation=s.get_initial_implementation(definition),
                                             bool_expression=expression,
-                                            definition='def ' + signature,
+                                            definition=definition,
                                             the_output=True)
         self.assertListEqual(code, expected_code)
 
@@ -189,7 +190,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_calling_another_function_no_args(self):
         """
-        Invoke function with no arguments.
+        Invoke function with NO arguments.
         :return: passes or not
         """
         function = f.another_call
@@ -207,10 +208,9 @@ class GeneratorTest(unittest.TestCase):
 
     def test_calling_another_function_with_args(self):
         """
-        Invoke function with no arguments.
+        Invoke function with arguments.
         :return: passes or not
         """
-        # TODO: differentiate between strings and code input.
         function = f.another_call2
         args = {'a': s.Code('a'), 'b': s.Code('b')}
         out_f = f.another_call
@@ -265,5 +265,40 @@ class GeneratorTest(unittest.TestCase):
                 '    return ' + function.__name__ + '(not a)']
 
         cond = s.Conditions(a=False, output=0, default=out)
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_calling_nested_functions(self):
+        """
+        call nested functions.
+        :return: passes or not
+        """
+        function = f.nested_call
+        out_obj = s.Output(f.f, {'a': s.Output(f.g, {'a': s.Code('a')})})
+        code = ['def ' + function.__name__ + '(a):',
+                '',
+                '    if not a:',
+                '        return ' + f.f.__name__ + '(' + f.g.__name__ + '(a))',
+                '',
+                '    return False']
+
+        cond = s.Conditions(a=False, output=out_obj)
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_internal_code_arguments(self):
+        """
+        Do logic with pieces of code that evaluate to boolean.
+        :return: passes or not
+        """
+        function = f.with_internal_code_arg
+        code = ['def ' + function.__name__ + '(a):',
+                '',
+                '    if isinstance(a, str):',
+                '        return 2',
+                '',
+                '    return False']
+
+        cond = s.Conditions(any_non_input_name=s.Code('isinstance(a, str)'), output=2)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
