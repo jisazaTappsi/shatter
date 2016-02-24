@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 
 """Utility and General purpose functions."""
-
+import inspect
 import warnings
 import os
-import time
 import re
-import calendar
 
 import constants as cts
 
@@ -107,7 +105,7 @@ def valid_function(f):
     :return: boolean
     """
     if not hasattr(f, '__call__'):
-        warnings.warn('callable_function argument is NOT a function.')
+        warnings.warn('A valid function was not provided.')
         return False
 
     if not hasattr(f, cts.INTERNAL_FUNC_CODE):
@@ -258,3 +256,15 @@ def is_function(f):
     :return: boolean
     """
     return hasattr(f, '__call__')
+
+
+def reload_function(f):
+    """
+    Reloads the function, to make sure that any metadata is up to date (such as func_code)
+    :param f: function
+    :return: updated function
+    """
+    module = inspect.getmodule(f)
+    reload(module)
+    # TODO: find any method anywhere within the module.
+    return getattr(module, f.__name__)

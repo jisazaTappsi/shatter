@@ -166,25 +166,25 @@ def translate_to_python_expression(all_inputs, qm_output):
     :param qm_output: set containing strings. see "execute_qm_algorithm" for details.
     :return: python boolean expression
     """
-    final_expression = ""
+    final_expression = ''
 
     for i, str_bits in enumerate(qm_output):
 
-        factor = ""
+        factor = ''
 
         if i > 0:  # when more than one element on list, join by "or"
-            final_expression += " or "
+            final_expression += ' or '
 
-        for j, c in enumerate(str_bits):
+        for j, character in enumerate(str_bits):
 
             if util.string_has_bits_for_and(str_bits, j):
-                factor += " and "
+                factor += ' and '
 
-            if c == "1":
+            if character == '1':
                 factor += print_input(all_inputs[j])
 
-            if c == "0":
-                factor += "not " + print_input(all_inputs[j])
+            if character == '0':
+                factor += 'not ' + print_input(all_inputs[j])
 
         final_expression += factor
 

@@ -114,3 +114,24 @@ def with_string_args():
 @s.solve()
 def with_default_value(a, b):
     pass
+
+
+@s.solve()
+def f(a):
+    pass
+
+
+@s.solve()
+def g(a):
+    pass
+
+
+@s.solve()
+def nested_call(a):
+    pass
+
+
+@s.solve()
+def with_internal_code_arg(a):
+    pass
+

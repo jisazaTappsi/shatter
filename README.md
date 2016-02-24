@@ -78,8 +78,17 @@ Change test.py to:
             cond.add(a=True, b=False, output=0)  # non-boolean output
             solver.execute(self, start.if_function, cond)
 
-Then run `$ python -m unittest test`.
+Then run `$ python -m unittest test`, the result should be:
 
+    def if_function(a, b):
+    
+        if not a and b:
+            return 1
+    
+        if a and not b:
+            return 0
+    
+        return False
 
 Now, some cool coding
 ---------------------
@@ -111,6 +120,13 @@ Change test.py to:
             solver.execute(self, start.recursive, cond)
 
 The result this time will be a recursive function :)
+
+    def recursive(a):
+    
+        if not a:
+            return 0
+    
+        return recursive(not a)
 
 Source Code
 -----------
@@ -158,7 +174,7 @@ How does Boolean Solver works?
 ------------------------------
 Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@boolean_solver()`.
 
-Arguments of `solver.execute(test, callable_function, conditions)`
+Arguments of `solver.execute(test, function, conditions)`
 -------------------------------------------------------------------
 1. The test case itself, to be able to perform tests, eg: `self`
 
@@ -204,6 +220,15 @@ Keywords are:
 Helper Classes
 --------------
 
-`solver.Output`: Class that helps define a function with arguments as an output. Has fields `function`(to assign a callable) and `arguments` to enter a dictionary with the inputs.
+`solver.Output`: Class that helps define a function with arguments as an output. Has fields:
+  
+  - `function`: A callable object.
+  - `arguments` Dictionary with the function inputs.
 
 `solver.Code`: Class that helps output pieces of code. The code is given as a String.
+
+`solver.Solution`: Class that contains the solution of the problem it includes:
+    
+  - `conditions`: The information given by the user.
+  - `implementation`: Plain code.
+  - `ast`: Abstract syntax tree

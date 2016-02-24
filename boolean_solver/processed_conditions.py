@@ -4,13 +4,14 @@
 
 from boolean_solver.conditions import *
 from boolean_solver.constants import *
+from boolean_solver.frozen_dict import FrozenDict
 
 __author__ = 'juan pablo isaza'
 
 
 class ProcessedConditions():
 
-    def __init__(self, tables, default):
+    def __init__(self, tables=FrozenDict(), default=False):
         self.tables = tables
         self.default = default
 
