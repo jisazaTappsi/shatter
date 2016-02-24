@@ -8,6 +8,8 @@ A picture is worth a thousand words and a vid is worth a thousand pictures, so w
 
 This is a [python 2 project](https://pypi.python.org/pypi/Boolean-Solver) to speed up boolean expression coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, specially when expressions get big. But there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your specs in a test and set a dummy function on your code. When you run your tests a solver will take your specs and code them into a simple boolean expression, enjoy :).
 
+This same boolean logic is being expanded to a broader range of problems check other coding capabilities below.
+
 Package Setup
 -------------
 1.  Install Boolean-Solver package:
@@ -15,7 +17,7 @@ Package Setup
 
 Short Example
 -------------
-Add new script(start.py) with a mock function:
+Add new script(`start.py`) with a mock function:
 
     from boolean_solver import solver as s
 
@@ -23,7 +25,7 @@ Add new script(start.py) with a mock function:
     def and_function(a, b):
         pass
 
-Add a unittest(test.py) with specs:
+Add a unittest(`test.py`) with specs:
 
     import unittest
     from boolean_solver import solver
@@ -34,7 +36,7 @@ Add a unittest(test.py) with specs:
         """
         1. Set conditions of your boolean function (for True outputs)
         2. Run solver.execute(self, callable, table) where callable is the boolean function
-         with the decorator=@solve() in functions1.
+         with the decorator=@solve().
          See examples below:
         """
         def test_AND_function(self):
@@ -53,64 +55,92 @@ Non-Boolean outputs
 
 What if the output for a given logical condition is not a boolean. In that case a programmer would use an if. In the next example this package solves this case automatically:
 
-Modify start.py to look like this:
-
-    from boolean_solver import solver as s
+Add `if_function(a, b)` to `start.py`:
 
     @s.solve()
     def if_function(a, b):
         pass
         
-Change test.py to:
-
-    import unittest
-    from boolean_solver import solver
-    import start
+Add `test_ifs(self)` to `MyTest(unittest.TestCase)` class in `test.py`:
     
-    
-    class MyTest(unittest.TestCase):
-    
-        def test_ifs(self):
-            """
-            Testing ifs.
-            """
-            cond = solver.Conditions(a=False, b=True, output=1)  # non-boolean output
-            cond.add(a=True, b=False, output=0)  # non-boolean output
-            solver.execute(self, start.if_function, cond)
+    def test_ifs(self):
+        """
+        Testing ifs.
+        """
+        cond = solver.Conditions(a=False, b=True, output=1)  # non-boolean output
+        cond.add(a=True, b=False, output=0)  # non-boolean output
+        solver.execute(self, start.if_function, cond)
 
-Then run `$ python -m unittest test`.
+Then run `$ python -m unittest test`, the result should be:
 
+    def if_function(a, b):
+    
+        if not a and b:
+            return 1
+    
+        if a and not b:
+            return 0
+    
+        return False
 
 Now, some cool coding
 ---------------------
-Modify start.py to look like this:
 
-    from boolean_solver import solver as s
+Add `recursive(a)` to `start.py`:
 
     @s.solve()
     def recursive(a):
         pass
 
-Change test.py to:
+Add `test_recursive_function(self)` to `MyTest(unittest.TestCase)` class in `test.py`:
+    
+    def test_recursive_function(self):
+        """
+        Will do recursion, extremely cool!!!
+        """
+        args = {'a': solver.Code('not a')}
+        out = solver.Output(start.recursive, args)
 
-    import unittest
-    from boolean_solver import solver
-    import start
-    
-    
-    class MyTest(unittest.TestCase):
-    
-        def test_recursive_function(self):
-            """
-            Will do recursion, extremely cool!!!
-            """
-            args = {'a': solver.Code('not a')}
-            out = solver.Output(start.recursive, args)
-    
-            cond = solver.Conditions(a=False, output=0, default=out)
-            solver.execute(self, start.recursive, cond)
+        cond = solver.Conditions(a=False, output=0, default=out)
+        solver.execute(self, start.recursive, cond)
 
 The result this time will be a recursive function :)
+
+    def recursive(a):
+    
+        if not a:
+            return 0
+    
+        return recursive(not a)
+
+Expression behaving like boolean inputs
+---------------------
+
+Say you want a piece of code that evaluates to boolean be an input in conditions for example:
+
+Add `with_internal_code(a)` to `start.py`:
+
+    @s.solve()
+    def with_internal_code(a):
+        pass
+
+Add `test_internal_code(self)` to `MyTest(unittest.TestCase)` class in `test.py`:
+    
+    def test_internal_code(self):
+        """
+        Testing internal pieces of code
+        """
+        cond = solver.Conditions(any_non_input_name=solver.Code('isinstance(a, str)'), output=2)
+        solver.execute(self, start.internal_code, cond)
+
+The result should be:
+
+    def internal_code(a):
+    
+        if isinstance(a, str):
+            return 2
+    
+        return False
 
 Source Code
 -----------
@@ -158,7 +188,7 @@ How does Boolean Solver works?
 ------------------------------
 Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@boolean_solver()`.
 
-Arguments of `solver.execute(test, callable_function, conditions)`
+Arguments of `solver.execute(test, function, conditions)`
 -------------------------------------------------------------------
 1. The test case itself, to be able to perform tests, eg: `self`
 
@@ -204,6 +234,15 @@ Keywords are:
 Helper Classes
 --------------
 
-`solver.Output`: Class that helps define a function with arguments as an output. Has fields `function`(to assign a callable) and `arguments` to enter a dictionary with the inputs.
+`solver.Output`: Class that helps define a function with arguments as an output. Has fields:
+  
+  - `function`: A callable object.
+  - `arguments` Dictionary with the function inputs.
 
 `solver.Code`: Class that helps output pieces of code. The code is given as a String.
+
+`solver.Solution`: Class that contains the solution of the problem it includes:
+    
+  - `conditions`: The information given by the user.
+  - `implementation`: Plain code.
+  - `ast`: Abstract syntax tree

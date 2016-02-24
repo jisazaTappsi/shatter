@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 """This is the main file. Calls QM algorithm and code generation functions."""
-
-import inspect
+from boolean_solver.solution import Solution
+from boolean_solver.tester import test_implementation
 from util import *
 from processed_conditions import *
 from code_generator import *
 import qm
-import ast
+
 #  TODO: from boolean_solver import solver as production_solver
 
 __author__ = 'juan pablo isaza'
@@ -17,9 +17,10 @@ __author__ = 'juan pablo isaza'
 # TODO: do the comment section of functions.
 # TODO: Non specified output should be type dependant upon other outputs. For example:
 # if outputs are of type string then non-specified default output should be ''.
-# TODO: change testing to include the whole function.
 # TODO: Add non returning outputs on ifs etc.
-# TODO: Add code adding capabilities. Very important use code.py
+# TODO: Add internal code adding capabilities. Very important use code.py
+# TODO: Add ast code verification to strings in Code.py
+# TODO: missing a better tester test for table combination of arguments and Code objects
 
 
 def solve():
@@ -30,7 +31,6 @@ def solve():
     def wrap(f):
 
         def wrapped_f(*args):
-            #  TODO: can run test and implement and run function.
             return f(*args)
 
         # Meta data transfer enables introspection of decorated functions.
@@ -42,7 +42,7 @@ def solve():
     return wrap
 
 
-def execute_mc_algorithm(ones):
+def execute_qm_algorithm(ones):
     """
     Quine McCluskey algorithm.
     outputs the minimal boolean expression. Assumes that all none ones have a False output.
@@ -57,6 +57,28 @@ def execute_mc_algorithm(ones):
     return qm_obj.simplify_los(ones, set([]))
 
 
+def get_all_possible_inputs(inputs, table):
+
+    if len(table) == 0:
+        return inputs
+    else:
+
+        any_tuple = next(iter(table))
+
+        if Conditions.is_explicit(any_tuple):
+            return inputs
+
+        new_inputs = []
+        inputs_counter = 0
+        for e in any_tuple:
+            if isinstance(e, bool):
+                new_inputs += (inputs[inputs_counter],)
+                inputs_counter += 1
+            else:
+                new_inputs.append(e)
+    return new_inputs
+
+
 def get_function_expression(table, inputs):
     """
     Get boolean expression. Can return empty string.
@@ -66,8 +88,8 @@ def get_function_expression(table, inputs):
     """
     ones = from_table_to_ones(table)
     if len(ones) > 0:
-        mc_output = execute_mc_algorithm(ones)
-        return translate_to_python_expression(inputs, mc_output)
+        qm_output = execute_qm_algorithm(ones)
+        return translate_to_python_expression(get_all_possible_inputs(inputs, table), qm_output)
     else:
         return ''
 
@@ -92,49 +114,6 @@ def from_table_to_ones(table):
     return set(ones)
 
 
-def test_expression(test_class, expression, table, inputs):
-    """
-    Tests function for all table outcomes.
-    :param test_class: the self in the unittest.
-    :param expression: boolean.
-    :param table: truth table.
-    :param inputs: name of variables.
-    :return: pass or not pass
-    """
-    for row in table:
-        if isinstance(row[0], tuple):
-            r = eval(replace_expression(expression, inputs, row[0]))
-            test_class.assertEqual(r, row[1])
-        else:
-            r = eval(replace_expression(expression, inputs, row))
-            test_class.assertEqual(r, True)
-
-
-def replace_expression(expression, inputs, values):
-    """
-    Replace variables for boolean values.
-    :param expression: boolean.
-    :param inputs: variable names.
-    :param values:
-    :return: expression that can be evaluated.
-    """
-    for n, var in enumerate(inputs):
-        regex = "(^|\s+)" + var + "(\s+|$)"
-        expression = re.sub(re.compile(regex), " " + str(values[n]) + " ", expression)
-    return expression
-
-
-class Solution:
-    """
-    Contains the data describing the solution to the puzzle.
-    """
-    def __init__(self, implementation, callable_function, conditions):
-        self.implementation = implementation
-        self.callable_function = callable_function
-        self.conditions = conditions
-        self.ast = ast.parse("\n".join(implementation))
-
-
 def alter_file(line_number, input_file_list, implementation, input_path):
     """
     Changes source file, when valid implementation found.
@@ -150,10 +129,11 @@ def alter_file(line_number, input_file_list, implementation, input_path):
     rewrite_file(input_path, input_file_list)
 
 
-def get_empty_solution(callable_function, conditions):
+def get_empty_solution(function, conditions):
     return Solution(implementation=[],
-                    callable_function=callable_function,
-                    conditions=conditions)
+                    function=function,
+                    conditions=conditions,
+                    processed_conditions=ProcessedConditions())
 
 
 def get_returning_implementation(implementation, definition, returning_value):
@@ -201,67 +181,50 @@ def return_solution(unittest, f, conditions):
         inputs = get_function_inputs(f)
 
         # init variables
-        implementation = INITIAL_IMPLEMENTATION
+        implementation = get_initial_implementation(definition)
         processed_conditions = get_processed_conditions(conditions, inputs)
-
-        expressions = []
 
         for the_output, table in processed_conditions.tables.iteritems():
 
             expression = get_function_expression(table, inputs)
             if len(expression) > 0:
-
-                # test, before writing.
-                test_expression(unittest, expression, table, inputs)
-                expressions.append(expression)
-
                 implementation = add_code_to_implementation(current_implementation=implementation,
                                                             bool_expression=expression,
                                                             definition=definition,
                                                             the_output=the_output)
 
         implementation = add_default_return(definition, processed_conditions, implementation)
+        solution = Solution(implementation=implementation,
+                            function=f,
+                            conditions=conditions,
+                            processed_conditions=processed_conditions)
+        test_implementation(unittest, solution)
 
         alter_file(f_line, file_code, implementation, f_path)
         print "Solved and tested " + f.__name__
-
-        return Solution(implementation=implementation,
-                        callable_function=f,
-                        conditions=conditions)
+        return solution
 
     return get_empty_solution(f, conditions)
 
 
-def reload_function(f):
-    """
-    Reloads the function, to make sure that any metadata is up to date (such as func_code)
-    :param f: function
-    :return: updated function
-    """
-    module = inspect.getmodule(f)
-    reload(module)
-    # TODO: find any method anywhere within the module.
-    return getattr(module, f.__name__)
-
-
-def execute(unittest, callable_function, conditions):
+def execute(unittest, function, conditions):
     """
     Solves the riddle, Writes it and tests it.
     :param unittest: the current test being run eg: 'self'.
-    :param callable_function: the function to be coded.
+    :param function: the function to be coded.
     :param conditions: condition or object or partial truth table (explicit, implicit or mix).
     :return: Solution object, empty object if operation unsuccessful.
     """
     # input validation
-    if not valid_function(callable_function) or not valid_conditions(conditions):
-        return get_empty_solution(callable_function, conditions)
+    if not valid_function(function) or not valid_conditions(conditions):
+        return get_empty_solution(function, conditions)
 
-    callable_function = reload_function(callable_function)
-    f_path = get_function_path(callable_function)
+    function = reload_function(function)
+    f_path = get_function_path(function)
 
     if not os.path.exists(f_path):
-        return get_empty_solution(callable_function, conditions)
+        return get_empty_solution(function, conditions)
 
     return return_solution(unittest=unittest,
-                           f=callable_function,
+                           f=function,
                            conditions=conditions)

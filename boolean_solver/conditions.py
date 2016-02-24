@@ -16,12 +16,22 @@ class Conditions(list):
     """
 
     def __init__(self, **kwargs):
+        """
+        init and add new parameters if provided.
+        :param kwargs:
+        :return:
+        """
         list.__init__(list())
 
         if len(kwargs) > 0:
             self.add(**kwargs)
 
     def add(self, **kwargs):
+        """
+        Adds a new row condition.
+        :param kwargs: dictionary like parameters.
+        :return: void
+        """
         if len(kwargs) > 0:
             self.append(kwargs)
         else:
@@ -49,16 +59,24 @@ class Conditions(list):
 
             return new_tuples
 
+        def get_possible_inputs(c_row, f_inputs):
+            """
+            :param c_row: The **kwargs given in a add(self, **kwargs) call.
+            :param f_inputs: function inputs.
+            :return: All possible inputs that are not keywords.
+            """
+            return set(f_inputs).union(c_row.keys()).difference(KEYWORDS.values())
+
         #  -------------------------------------------------------
 
-        if OUTPUT_KEYWORD in row:
-            output = row[OUTPUT_KEYWORD]
+        if KEYWORDS[OUTPUT] in row:
+            output = row[KEYWORDS[OUTPUT]]
             if isinstance(output, bool) and not output:
                 return set()
 
         # starts with 1 tuple
         tuples = {()}
-        for variable in inputs:
+        for variable in get_possible_inputs(row, inputs):
 
             if variable in row:
                 tuples = add_element_to_tuples(tuples, row[variable])
@@ -83,13 +101,68 @@ class Conditions(list):
 
     @staticmethod
     def get_output(row):
-
-        if OUTPUT_KEYWORD in row and OUTPUT_ARGS_KEYWORD in row:
-            return Output(function=row[OUTPUT_KEYWORD], arguments=row[OUTPUT_ARGS_KEYWORD])
-        elif OUTPUT_KEYWORD in row:
-            return row[OUTPUT_KEYWORD]
+        """
+        Gets the output from a row.
+        :param row: dict.
+        :return: output function or output or True if not specified.
+        """
+        out_key = KEYWORDS[OUTPUT]
+        args_key = KEYWORDS[OUTPUT_ARGS]
+        if out_key in row and args_key in row:
+            return Output(function=row[out_key], arguments=row[args_key])
+        elif out_key in row:
+            return row[out_key]
 
         return True
+
+    @staticmethod
+    def row_has_non_keyword_keys(row):
+        """
+        Boolean output indicating whether a row (dict) has non keyword keys.
+        :param row: dict.
+        :return: True if there is at least 1 input different from a keyword.
+        """
+        row_keys = set(row.keys())
+        keyword_keys = set(KEYWORDS.values())
+        return len(row_keys.difference(keyword_keys)) > 0
+
+    @staticmethod
+    def change_keys_from_bool_to_int(d, new_key):
+        """
+        Changes the keys from booleans (True or False) to int(0 or 1)
+        if a int(0 or 1) is present.
+        :param d: dict
+        :param new_key: a new key to be added to dict.
+        :return: new dict
+        """
+        if util.var_is_1(new_key) and util.has_true_key(d):
+            d[1] = d.pop(True, None)
+
+        if util.var_is_0(new_key) and util.has_false_key(d):
+            d[0] = d.pop(False, None)
+
+        return d
+
+    def add_truth_table(self, truth_tables, row, inputs):
+        """
+        Adds a new truth table to the dict of truth_tables.
+        :param truth_tables:
+        :param row:
+        :param inputs:
+        :return:
+        """
+        output = self.get_output(row)
+
+        if output in truth_tables:
+            truth_table = truth_tables[output]
+        else:
+            truth_table = set()
+
+        condition_rows = self.get_tuples_from_indices(row, inputs)
+        truth_table = truth_table.union(condition_rows)
+        truth_tables[output] = truth_table  # add to tables dict.
+
+        return self.change_keys_from_bool_to_int(truth_tables, output)
 
     def get_truth_tables(self, inputs):
         """
@@ -98,39 +171,12 @@ class Conditions(list):
         :param inputs: variables.
         :return: dict(), where key=output and value=implicit truth table.
         """
-        def change_keys_from_bool_to_int(d, new_key):
-            """
-            Changes the keys from booleans (True or False) to int(0 or 1)
-            if a int(0 or 1) is present.
-            :param d: dict
-            :param new_key: a new key to be added to dict.
-            :return: new dict
-            """
-            if util.var_is_1(new_key) and util.has_true_key(d):
-                d[1] = d.pop(True, None)
-
-            if util.var_is_0(new_key) and util.has_false_key(d):
-                d[0] = d.pop(False, None)
-
-            return d
 
         # dict where outputs are the keys, values are the rows.
         truth_tables = dict()
-
         for row in self:
-
-            output = self.get_output(row)
-
-            if output in truth_tables:
-                truth_table = truth_tables[output]
-            else:
-                truth_table = set()
-
-            condition_rows = self.get_tuples_from_indices(row, inputs)
-            truth_table = truth_table.union(condition_rows)
-            truth_tables[output] = truth_table  # add to tables dict.
-
-            truth_tables = change_keys_from_bool_to_int(truth_tables, output)
+            if self.row_has_non_keyword_keys(row):
+                truth_tables = self.add_truth_table(truth_tables, row, inputs)
 
         return truth_tables
 

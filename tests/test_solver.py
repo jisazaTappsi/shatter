@@ -13,22 +13,22 @@ __author__ = 'juan pablo isaza'
 
 class SolverTest(unittest.TestCase):
 
-    def mc_algorithm_and_translate(self, var_names, mc_input, expected_mc_output, expected_exp):
+    def qm_algorithm_and_translate(self, var_names, qm_input, expected_qm_output, expected_exp):
         """
         Heart of the program. inside goes bits, gets boolean python expression.
         :param var_names: bit variables, eg: [b0, b1].
-        :param mc_input: rows of truth table with True as output. eg:{'11'} for and.
-        :param expected_mc_output: minimal expression given by Quine McCluskey algorithm.
+        :param qm_input: rows of truth table with True as output. eg:{'11'} for and.
+        :param expected_qm_output: minimal expression given by Quine McCluskey algorithm.
         :param expected_exp: the expected expression in python.
         :return: passes or not
         """
-        mc_set = s.execute_mc_algorithm(mc_input)
-        self.assertSetEqual(mc_set, expected_mc_output)
+        qm_set = s.execute_qm_algorithm(qm_input)
+        self.assertSetEqual(qm_set, expected_qm_output)
 
-        exp = translate_to_python_expression(var_names, mc_set)
+        exp = translate_to_python_expression(var_names, qm_set)
         self.assertEqual(exp, expected_exp)
 
-    def test_mc_algorithm_and_translate(self):
+    def test_qm_algorithm_and_translate(self):
         """
         Testing for and, or & xor the "process_for_function".
         :return: passes or not
@@ -36,21 +36,21 @@ class SolverTest(unittest.TestCase):
         var_names = ['a', 'b']
 
         #  and. True values specified
-        self.mc_algorithm_and_translate(var_names=var_names,
-                                        mc_input={'11'},
-                                        expected_mc_output={'11'},
+        self.qm_algorithm_and_translate(var_names=var_names,
+                                        qm_input={'11'},
+                                        expected_qm_output={'11'},
                                         expected_exp='a and b')
 
         #  or. True values specified
-        self.mc_algorithm_and_translate(var_names=var_names,
-                                        mc_input={'11', '10', '01'},
-                                        expected_mc_output={'1-', '-1'},
+        self.qm_algorithm_and_translate(var_names=var_names,
+                                        qm_input={'11', '10', '01'},
+                                        expected_qm_output={'1-', '-1'},
                                         expected_exp='a or b')
 
         #  xor only with ands and or. True values specified
-        self.mc_algorithm_and_translate(var_names=var_names,
-                                        mc_input={'10', '01'},
-                                        expected_mc_output={'10', '01'},
+        self.qm_algorithm_and_translate(var_names=var_names,
+                                        qm_input={'10', '01'},
+                                        expected_qm_output={'10', '01'},
                                         expected_exp='a and not b or not a and b')
 
     def factor_execute(self, conditions, a_callable, signature, expression):
