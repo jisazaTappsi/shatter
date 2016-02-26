@@ -116,7 +116,7 @@ The result this time will be a recursive function :)
 Expression behaving like boolean inputs
 ---------------------
 
-Say you want a piece of code that evaluates to boolean be an input in conditions for example:
+Say you want to add a piece of code that evaluates to boolean, then:
 
 Add `with_internal_code(a)` to `start.py`:
 
