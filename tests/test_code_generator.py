@@ -120,11 +120,11 @@ class GeneratorTest(unittest.TestCase):
         """
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
-                '    if a and not b:',
-                '        return ' + c.print_object(out2),
-                '',
                 '    if not a and b:',
                 '        return ' + c.print_object(out1),
+                '',
+                '    if a and not b:',
+                '        return ' + c.print_object(out2),
                 '',
                 '    return False']
 
