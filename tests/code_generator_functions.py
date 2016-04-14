@@ -38,6 +38,11 @@ def mix_false_values(a, b):
 
 
 @s.solve()
+def ordered_expression(a, b):
+    pass
+
+
+@s.solve()
 def fun2(a, b):
     pass
 

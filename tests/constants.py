@@ -2,30 +2,34 @@
 
 """cts to use on the tests"""
 
+from boolean_solver.ordered_set import OrderedSet
+
 __author__ = 'juan pablo isaza'
 
 #                b1     b0   output
-and_table = {((False, False), False),
-             ((False, True), False),
-             ((True, False), False),
-             ((True, True), True)}
+and_table = OrderedSet([((False, False), False),
+                        ((False, True), False),
+                        ((True, False), False),
+                        ((True, True), True)])
 
-or_table = {((False, False), False),
-            ((False, True), True),
-            ((True, False), True),
-            ((True, True), True)}
+# or table in reverse order, because of expression order and precedence (see test_conditions_input_order_is_respected
+# in code generator tests)
+or_table = OrderedSet([((True, True), True),
+                       ((True, False), True),
+                       ((False, True), True),
+                       ((False, False), False)])
 
-xor_table = {((False, False), False),
-             ((False, True), True),
-             ((True, False), True),
-             ((True, True), False)}
+xor_table = OrderedSet([((True, True), False),
+                        ((True, False), True),
+                        ((False, True), True),
+                        ((False, False), False)])
 
-nand_truth_table = {((False, False), True),
-                    ((False, True), True),
-                    ((True, False), True),
-                    ((True, True), False)}
+nand_truth_table = OrderedSet([((False, False), True),
+                               ((False, True), True),
+                               ((True, False), True),
+                               ((True, True), False)])
 
-and3_table = {((True, True, True), True)}
+and3_table = OrderedSet([((True, True, True), True)])
 
 sig_and = "and_function(a, b)"
 exp_and = "a and b"

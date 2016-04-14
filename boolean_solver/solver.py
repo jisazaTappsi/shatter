@@ -54,7 +54,7 @@ def execute_qm_algorithm(ones):
     # TODO: cannot solve ones = ['00'] or a not(or(b0,b1))
     # TODO: change to True, add XOR logic
     qm_obj = qm.QuineMcCluskey(use_xor=False)
-    return qm_obj.simplify_los(ones, set([]))
+    return qm_obj.simplify_los(ones)
 
 
 def get_all_possible_inputs(inputs, table):
@@ -111,7 +111,7 @@ def from_table_to_ones(table):
         else:  # case 2: The output is a implicit True. inputs are in the row.
             ones.append(''.join(list(map(from_bool_to_bit, list(row)))))
 
-    return set(ones)
+    return ones
 
 
 def alter_file(line_number, input_file_list, implementation, input_path):

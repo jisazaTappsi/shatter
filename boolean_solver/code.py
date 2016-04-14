@@ -6,7 +6,7 @@
 __author__ = 'juan pablo isaza'
 
 
-class Code():
+class Code:
 
     def __init__(self, code_as_str):
         self.code_as_str = code_as_str
