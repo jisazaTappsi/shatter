@@ -40,6 +40,7 @@ terms of complexity of the output.
 
 from __future__ import print_function
 import math
+from ordered_set import OrderedSet
 
 
 class QuineMcCluskey:
@@ -118,11 +119,12 @@ class QuineMcCluskey:
 
         return self.simplify_los(ones, dc)
 
-    def simplify_los(self, ones, dc=[]):
+    def simplify_los(self, terms):
+
         """The simplification algorithm for a list of string-encoded inputs.
 
         Args:
-            ones (list of str): list of strings that describe when the output
+            terms (list of str): list of strings that describe when the output
             function is '1', e.g. ['0001', '0010', '0110', '1000', '1111'].
 
         Kwargs:
@@ -161,7 +163,6 @@ class QuineMcCluskey:
         self.profile_xor = 0    # number of comparisons (for profiling)
         self.profile_xnor = 0   # number of comparisons (for profiling)
 
-        terms = ones | dc
         if len(terms) == 0:
             return None
 
@@ -253,14 +254,14 @@ class QuineMcCluskey:
 
         # Sort and remove duplicates.
         n_groups = self.n_bits + 1
-        marked = set()
+        marked = OrderedSet()
 
         # Group terms into the list groups.
         # groups is a list of length n_groups.
         # Each element of groups is a set of terms with the same number
         # of ones.  In other words, each term contained in the set
         # groups[i] contains exactly i ones.
-        groups = [set() for i in range(n_groups)]
+        groups = [OrderedSet() for i in range(n_groups)]
         for t in terms:
             n_bits = t.count('1')
             groups[n_bits].add(t)
@@ -298,11 +299,11 @@ class QuineMcCluskey:
 
                 key = (n_ones, n_xor, n_xnor)
                 if key not in groups:
-                    groups[key] = set()
+                    groups[key] = OrderedSet()
                 groups[key].add(t)
 
-            terms = set()           # The set of new created terms
-            used = set()            # The set of used terms
+            terms = OrderedSet()           # The set of new created terms
+            used = OrderedSet()            # The set of used terms
 
             # Find prime implicants
             for key in groups:
@@ -394,13 +395,13 @@ class QuineMcCluskey:
 
         # Now group the remaining terms and see if any term can be covered
         # by a combination of terms.
-        ei_range = set()
-        ei = set()
+        ei_range = OrderedSet()
+        ei = OrderedSet()
         groups = dict()
         for t in terms:
             n = self.__get_term_rank(t, len(perms[t]))
             if n not in groups:
-                groups[n] = set()
+                groups[n] = OrderedSet()
             groups[n].add(t)
         for t in sorted(list(groups.keys()), reverse=True):
             for g in groups[t]:

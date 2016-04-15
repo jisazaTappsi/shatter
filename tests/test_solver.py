@@ -4,6 +4,7 @@
 
 import unittest
 from boolean_solver import solver as s, conditions as c
+from boolean_solver.ordered_set import OrderedSet
 from boolean_solver.code_generator import translate_to_python_expression
 import constants as cts
 import solver_functions as f
@@ -22,10 +23,10 @@ class SolverTest(unittest.TestCase):
         :param expected_exp: the expected expression in python.
         :return: passes or not
         """
-        qm_set = s.execute_qm_algorithm(qm_input)
-        self.assertSetEqual(qm_set, expected_qm_output)
+        qm_ordered_set = s.execute_qm_algorithm(qm_input)
+        self.assertSetEqual(set(list(qm_ordered_set)), expected_qm_output)
 
-        exp = translate_to_python_expression(var_names, qm_set)
+        exp = translate_to_python_expression(var_names, qm_ordered_set)
         self.assertEqual(exp, expected_exp)
 
     def test_qm_algorithm_and_translate(self):
@@ -112,7 +113,7 @@ class SolverTest(unittest.TestCase):
         :return: passes or not.
         """
         # case 1: all rows are implicit
-        implicit_output_xor_table = {(True, False), (False, True)}
+        implicit_output_xor_table = OrderedSet([(True, False), (False, True)])
 
         self.factor_execute(conditions=implicit_output_xor_table,
                             a_callable=f.implicit_xor_function,
@@ -120,7 +121,7 @@ class SolverTest(unittest.TestCase):
                             expression=cts.exp_xor)
 
         # case 2: some rows are explicit and some implicit.
-        mix_output_xor_table = {((True, False), True), (False, True), ((True, True), False)}
+        mix_output_xor_table = OrderedSet([((True, False), True), (False, True), ((True, True), False)])
 
         self.factor_execute(conditions=mix_output_xor_table,
                             a_callable=f.mix_xor_function,

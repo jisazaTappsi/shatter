@@ -28,7 +28,7 @@ class GeneratorTest(unittest.TestCase):
         cond = s.Conditions(a=True, b=True, output=1)
         solution = s.execute(self, f.non_boolean_and, cond)
 
-        code = ['def non_boolean_and(a, b):',
+        code = ['def ' + f.non_boolean_and.__name__ + '(a, b):',
                 '',
                 '    if a and b:',
                 '        return 1',
@@ -65,7 +65,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_boolean_and_quasi_boolean_mix_true_values(self):
         """
-        Tests weather changing inputs for True and 1 outputs affect the final result.
+        Tests whether changing inputs for True and 1 outputs affect the final result.
         BY DEFAULT IF 1 AND TRUE are present will choose 1 as output.
         Test with both a boolean and quasi-boolean output.
         In python True == 1. Therefore output=1 is the same as output=True.
@@ -78,13 +78,8 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = s.Conditions(a=False, b=True, output=1)  # non-boolean output
-        cond.add(a=True, b=False, output=True)  # boolean condition
-        solution = s.execute(self, f.mix_true_values, cond)
-        self.assertEqual(solution.implementation, code)
-
-        cond = s.Conditions(a=True, b=False, output=True)  # non-boolean output
-        cond.add(a=False, b=True, output=1)  # boolean condition
+        cond = s.Conditions(a=True, b=False, output=1)  # non-boolean output
+        cond.add(a=False, b=True, output=True)  # boolean condition
         solution = s.execute(self, f.mix_true_values, cond)
         self.assertEqual(solution.implementation, code)
 
@@ -110,6 +105,29 @@ class GeneratorTest(unittest.TestCase):
         solution = s.execute(self, f.mix_false_values, cond)
         self.assertEqual(solution.implementation, code)
 
+    def test_conditions_input_order_is_respected(self):
+        """
+        First input has to be first on the final boolean expression.
+        So programmers can use precedence to their advantage ;). Very useful when validating data.
+        Changing input order will change expression order.
+        :return: passes or not
+        """
+        code = ['def ordered_expression(a, b):',
+                '    return a or b']
+
+        cond = s.Conditions(a=True, output=True)  # boolean output
+        cond.add(b=True, output=True)  # boolean condition
+        solution = s.execute(self, f.ordered_expression, cond)
+        self.assertEqual(solution.implementation, code)
+
+        code = ['def ordered_expression(a, b):',
+                '    return b or a']
+
+        cond = s.Conditions(b=True, output=True)  # boolean output
+        cond.add(a=True, output=True)  # boolean condition
+        solution = s.execute(self, f.ordered_expression, cond)
+        self.assertEqual(solution.implementation, code)
+
     def multiple_value_test(self, out1, out2, function):
         """
         Testing multiple output types.
@@ -120,11 +138,11 @@ class GeneratorTest(unittest.TestCase):
         """
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
-                '    if a and not b:',
-                '        return ' + c.print_object(out2),
-                '',
                 '    if not a and b:',
                 '        return ' + c.print_object(out1),
+                '',
+                '    if a and not b:',
+                '        return ' + c.print_object(out2),
                 '',
                 '    return False']
 

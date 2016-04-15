@@ -80,22 +80,6 @@ def get_code_piece(bool_expression, indent, the_output):
         return get_if_code(indent, bool_expression, the_output, True)
 
 
-# TODO: generalize to include different positions.
-def insert_code_into_implementation(current_implementation, code, the_output):
-    """
-    Inserts a piece of code(represented by a list) into the implementation.
-    :param current_implementation: list
-    :param code: list
-    :param the_output: the key from the dictionary.
-    :return: new code as list
-    """
-
-    if util.var_is_true(the_output):
-        return current_implementation + code
-    else:
-        return [current_implementation[0]] + code + current_implementation[1:]
-
-
 def get_initial_implementation(definition):
     """
     Always starts implementation with definition
@@ -120,11 +104,7 @@ def add_code_to_implementation(current_implementation, bool_expression, definiti
     if bool_expression and len(bool_expression) > 0:
 
         new_code = get_code_piece(bool_expression, indent, the_output)
-        if current_implementation == get_initial_implementation(definition):
-            return current_implementation + new_code
-        else:
-            return insert_code_into_implementation(current_implementation, new_code, the_output)
-
+        return current_implementation + new_code
     else:
         warnings.warn('Function: ' + signature + ' has no boolean expression; cannot be implemented', UserWarning)
         return current_implementation

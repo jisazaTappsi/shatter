@@ -6,6 +6,7 @@ import warnings
 import util
 from boolean_solver.output import Output
 from boolean_solver.constants import *
+from boolean_solver.ordered_set import OrderedSet
 
 __author__ = 'juan pablo isaza'
 
@@ -53,7 +54,7 @@ class Conditions(list):
             :param new_element: any element to add in last position.
             :return: tuple set
             """
-            new_tuples = set()
+            new_tuples = OrderedSet()
             for tuple_element in tuples_set:
                 new_tuples.add(tuple_element + (new_element,))
 
@@ -72,10 +73,10 @@ class Conditions(list):
         if KEYWORDS[OUTPUT] in row:
             output = row[KEYWORDS[OUTPUT]]
             if isinstance(output, bool) and not output:
-                return set()
+                return OrderedSet()
 
         # starts with 1 tuple
-        tuples = {()}
+        tuples = OrderedSet([()])
         for variable in get_possible_inputs(row, inputs):
 
             if variable in row:
@@ -85,7 +86,7 @@ class Conditions(list):
                 # All possible outcomes for undetermined boolean variable: duplicates number of tuples.
                 true_tuples = add_element_to_tuples(tuples, True)
                 false_tuples = add_element_to_tuples(tuples, False)
-                tuples = true_tuples.union(false_tuples)
+                tuples = true_tuples | false_tuples
 
         # add explicit output to tuples, if necessary.
         return tuples
@@ -156,10 +157,10 @@ class Conditions(list):
         if output in truth_tables:
             truth_table = truth_tables[output]
         else:
-            truth_table = set()
+            truth_table = OrderedSet()
 
         condition_rows = self.get_tuples_from_indices(row, inputs)
-        truth_table = truth_table.union(condition_rows)
+        truth_table = truth_table | condition_rows
         truth_tables[output] = truth_table  # add to tables dict.
 
         return self.change_keys_from_bool_to_int(truth_tables, output)
@@ -191,9 +192,9 @@ def add_to_dict_table(table, key, value):
     # will ignore key=False
     if key:
         if key in table:
-            table[key] = table[key].union({value})
+            table[key] = table[key] | OrderedSet([value])
         else:
-            table[key] = {value}
+            table[key] = OrderedSet([value])
 
     return table
 
@@ -222,7 +223,7 @@ def get_truth_tables(conditions, inputs):
     """
     if isinstance(conditions, Conditions):
         return conditions.get_truth_tables(inputs)
-    elif isinstance(conditions, set):  # raw set case.
+    elif isinstance(conditions, set) or isinstance(conditions, OrderedSet):  # raw set case.
         return from_raw_set_to_dict_table(conditions)
     else:
         warnings.warn('Found conditions that is not a set nor a Conditions object', UserWarning)
@@ -236,11 +237,11 @@ def valid_conditions(conditions):
     :param conditions: truth table or a conditions object.
     :return: boolean.
     """
-    if not isinstance(conditions, set) and not isinstance(conditions, Conditions):
+    if not isinstance(conditions, set) and not isinstance(conditions, Conditions) and not isinstance(conditions, OrderedSet):
         warnings.warn('Truth table is not a set or a Conditions object', UserWarning)
         return False
 
-    if isinstance(conditions, set):
+    if isinstance(conditions, set) or isinstance(conditions, OrderedSet):
         for row in conditions:
             if not isinstance(row, tuple):
                 warnings.warn('A row in truth table is not a tuple', UserWarning)
