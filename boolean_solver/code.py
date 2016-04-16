@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Generates pieces of code that are put together by solver.py"""
+"""A class that defines a code, with a string."""
 
 
 __author__ = 'juan pablo isaza'

@@ -4,9 +4,11 @@
 
 import warnings
 import util
+from collections import OrderedDict
 from boolean_solver.output import Output
 from boolean_solver.constants import *
 from boolean_solver.ordered_set import OrderedSet
+from boolean_solver.last_updated_ordered_dict import LastUpdatedOrderedDict
 
 __author__ = 'juan pablo isaza'
 
@@ -15,6 +17,21 @@ class Conditions(list):
     """
     It is a list that contains conditions, each being a dictionary with the inputs.
     """
+
+    @staticmethod
+    def get_ordered_dict(reversed_dict):
+        """
+        Big issue solved here. kwargs apparently has a dictionary which apparent order is the reverse of the input order
+        .Because it is a dictionary the order could be other. Reverting the order here
+        to have the appropriate order with a LastUpdatedOrderedDict, which preserves order.
+        :param reversed_dict: a common dict
+        :return: the right dict for the job a LastUpdatedOrderedDict.
+        """
+        ordered_dict = LastUpdatedOrderedDict()
+        for k in reversed(reversed_dict.keys()):
+            ordered_dict[k] = reversed_dict[k]
+
+        return ordered_dict
 
     def __init__(self, **kwargs):
         """
@@ -25,7 +42,7 @@ class Conditions(list):
         list.__init__(list())
 
         if len(kwargs) > 0:
-            self.add(**kwargs)
+            self.append(self.get_ordered_dict(kwargs))
 
     def add(self, **kwargs):
         """
@@ -34,7 +51,7 @@ class Conditions(list):
         :return: void
         """
         if len(kwargs) > 0:
-            self.append(kwargs)
+            self.append(self.get_ordered_dict(kwargs))
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 
@@ -66,7 +83,17 @@ class Conditions(list):
             :param f_inputs: function inputs.
             :return: All possible inputs that are not keywords.
             """
-            return set(f_inputs).union(c_row.keys()).difference(KEYWORDS.values())
+
+            f_inputs = list(f_inputs)
+
+            # inputs defined by the programmer on the conditions. For example code pieces.
+            new_inputs = util.remove_list_from_list(c_row.keys(), f_inputs)
+
+            all_elements = (f_inputs + new_inputs)
+            remove_elements = KEYWORDS.values()
+
+            return util.remove_list_from_list(all_elements, remove_elements)
+
 
         #  -------------------------------------------------------
 
@@ -174,7 +201,7 @@ class Conditions(list):
         """
 
         # dict where outputs are the keys, values are the rows.
-        truth_tables = dict()
+        truth_tables = OrderedDict()
         for row in self:
             if self.row_has_non_keyword_keys(row):
                 truth_tables = self.add_truth_table(truth_tables, row, inputs)

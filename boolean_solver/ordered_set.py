@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Generates pieces of code that are put together by solver.py"""
+"""Ordered set, depends on update order."""
 
 import collections
 
