@@ -268,3 +268,13 @@ def reload_function(f):
     reload(module)
     # TODO: find any method anywhere within the module.
     return getattr(module, f.__name__)
+
+
+def remove_list_from_list(all_list, list_to_remove):
+    """
+    :param all_list: original list
+    :param list_to_remove: elements that will be removed from the original list.
+    :return: subtracted list
+    """
+
+    return [value for value in all_list if value not in list_to_remove]

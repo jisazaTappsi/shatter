@@ -14,7 +14,7 @@ __author__ = 'juan pablo isaza'
 
 setup(
     name='Boolean Solver',
-    version='0.4.0',
+    version='0.5.0',
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Fast development with generated boolean expressions.',

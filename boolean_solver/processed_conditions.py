@@ -9,7 +9,7 @@ from boolean_solver.frozen_dict import FrozenDict
 __author__ = 'juan pablo isaza'
 
 
-class ProcessedConditions():
+class ProcessedConditions:
 
     def __init__(self, tables=FrozenDict(), default=False):
         self.tables = tables
