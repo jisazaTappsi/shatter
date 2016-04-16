@@ -27,8 +27,7 @@ class MyTest(unittest.TestCase):
 
     def test_get_next_2_throws(self):
 
-        # TODO: fix, if condition, first it should be first on if tree.
-        # TODO: fix, if rule first, it should go first on logical statement.
+        # TODO: fix, should factorize code, like this:
         # optimal solution:
         """
         @s.solve()
@@ -37,10 +36,10 @@ class MyTest(unittest.TestCase):
             if i == 9:
                 return game[i][1] + game[i][2]
 
-            if (i == 8 and is_strike(game[i+1])) or not is_strike(game[i+1]):
+            if i == 8 and is_strike(game[i+1]) or not is_strike(game[i+1]):
                 return game[i+1][0] + game[i+1][1]
 
-            if is_strike(game[i+1]) and i < 8:
+            if is_strike(game[i+1]):
                 return game[i+1][0] + game[i+2][0]
 
             return False
