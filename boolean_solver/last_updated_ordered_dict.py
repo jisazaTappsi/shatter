@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Generates pieces of code that are put together by solver.py"""
+"""Works on top of orderDict to define a dictionary which order depends on the order of last key update."""
 
 from collections import OrderedDict
 
