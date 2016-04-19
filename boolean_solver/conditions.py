@@ -19,21 +19,26 @@ class Conditions(list):
     """
 
     @staticmethod
-    def get_ordered_dict(reversed_dict):
+    def get_ordered_dict(args, kwargs):
         """
-        Big issue solved here. kwargs apparently has a dictionary which apparent order is the reverse of the input order
-        .Because it is a dictionary the order could be other. Reverting the order here
-        to have the appropriate order with a LastUpdatedOrderedDict, which preserves order.
-        :param reversed_dict: a common dict
+        Big issue solved here. Adds args, to have positional args always in the same order as the user inputs.
+        Therefore the user can have precedence for logical operators, by having inputs in the right order.
+        :param kwargs: a common dict
         :return: the right dict for the job a LastUpdatedOrderedDict.
         """
         ordered_dict = LastUpdatedOrderedDict()
-        for k in reversed(reversed_dict.keys()):
-            ordered_dict[k] = reversed_dict[k]
+
+        # Adds args
+        for idx, e in enumerate(args):
+            ordered_dict["positional_args_rule_" + str(idx)] = e
+
+        # Adds kwargs
+        for k in kwargs.keys():
+            ordered_dict[k] = kwargs[k]
 
         return ordered_dict
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         init and add new parameters if provided.
         :param kwargs:
@@ -42,16 +47,16 @@ class Conditions(list):
         list.__init__(list())
 
         if len(kwargs) > 0:
-            self.append(self.get_ordered_dict(kwargs))
+            self.append(self.get_ordered_dict(args, kwargs))
 
-    def add(self, **kwargs):
+    def add(self, *args, **kwargs):
         """
         Adds a new row condition.
         :param kwargs: dictionary like parameters.
         :return: void
         """
         if len(kwargs) > 0:
-            self.append(self.get_ordered_dict(kwargs))
+            self.append(self.get_ordered_dict(args, kwargs))
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 

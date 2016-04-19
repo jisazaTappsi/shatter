@@ -320,3 +320,54 @@ class GeneratorTest(unittest.TestCase):
         cond = s.Conditions(any_non_input_name=s.Code('isinstance(a, str)'), output=2)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
+
+    def test_right_code_input_order(self):
+        """
+        For programmer convenience and to be able to use precedence. Code pieces on expressions will follow the same
+        order as the input order.
+        :return: passes or not
+        """
+
+        function = f.right_expression_order
+        right_str = 'right order!!!'
+        code1_str = 'len(array) > 1'
+        code2_str = 'array[0]'
+        code3_str = 'isinstance(array[0], int)'
+
+        code = ['def ' + function.__name__ + '(array):',
+                '',
+                '    if ' + code1_str + ' and ' + code2_str + ' and ' + code3_str + ':',
+                '        return ' + "\"" + right_str + "\"",
+                '',
+                '    return False']
+
+        cond = s.Conditions(s.Code(code1_str),
+                            s.Code(code2_str),
+                            s.Code(code3_str),
+                            output=right_str)
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_factor_pieces_of_code(self):
+
+        function = f.factor_pieces_of_code
+        right_str = 'factoring!!!'
+        code1_str = 'len(array) > 1'
+        code2_str = 'array[0]'
+        code3_str = 'isinstance(array[0], int)'
+
+        code = ['def ' + function.__name__ + '(array):',
+                '',
+                '    if ' + code1_str + ' and ' + code2_str + ' and ' + code3_str + ':',
+                '        return ' + "\"" + right_str + "\"",
+                '',
+                '    return False']
+
+        cond = s.Conditions(s.Code(code1_str),
+                            s.Code(code2_str),
+                            output=right_str)
+
+        cond.add(s.Code(code3_str), output=right_str)
+
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)

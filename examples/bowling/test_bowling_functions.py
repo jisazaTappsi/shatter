@@ -46,8 +46,8 @@ class MyTest(unittest.TestCase):
         """
         cond = solver.Conditions(last_bonus_throw=solver.Code('i == 9'), output=solver.Code('game[i][1] + game[i][2]'))
 
-        cond.add(before_last=solver.Code('i == 8'),
-                 next_is_strike=solver.Code('is_strike(game[i+1])'),
+        cond.add(solver.Code('i == 8'),
+                 solver.Code('is_strike(game[i+1])'),
                  output=solver.Code('game[i+1][0] + game[i+1][1]'))
 
         cond.add(next_is_not_strike=solver.Code('not is_strike(game[i+1])'),

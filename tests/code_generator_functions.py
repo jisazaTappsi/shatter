@@ -12,6 +12,7 @@ __author__ = 'juan pablo isaza'
 def and_function(a, b):
     pass
 
+
 @s.solve()
 def or_function(a, b):
     pass
@@ -138,5 +139,15 @@ def nested_call(a):
 
 @s.solve()
 def with_internal_code_arg(a):
+    pass
+
+
+@s.solve()
+def right_expression_order(array):
+    pass
+
+
+@s.solve()
+def factor_pieces_of_code():
     pass
 
