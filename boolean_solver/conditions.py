@@ -19,18 +19,54 @@ class Conditions(list):
     """
 
     @staticmethod
-    def get_ordered_dict(args, kwargs):
+    def gets_start_positional_idx(dictionary):
+        """
+        Gets the biggest index for a dictionary and adds 1.
+        :param dictionary: any dict
+        :return: int
+        """
+        max_idx = 0
+        has_key = False
+        for key in dictionary:
+            if isinstance(key, str) and re.match("^" + POSITIONAL_ARGS_RULE + "\d+$", key) is not None:
+                has_key = True
+                r = re.search("\d+$", key)
+                candidate = int(r.group())
+                if candidate > max_idx:
+                    max_idx = candidate
+
+        if has_key:
+            return max_idx + 1
+        else:
+            return 0
+
+    def get_max_positional_arg(self):
+        """
+        Gets the index for the next positional argument to start.
+        :return: int.
+        """
+        max_arg = 0
+        for d in self:
+            candidate = self.gets_start_positional_idx(d)
+            if candidate > max_arg:
+                max_arg = candidate
+
+        return max_arg
+
+    def get_ordered_dict(self, args, kwargs):
         """
         Big issue solved here. Adds args, to have positional args always in the same order as the user inputs.
         Therefore the user can have precedence for logical operators, by having inputs in the right order.
+        :param args: positional args. Used when specific order required.
         :param kwargs: a common dict
         :return: the right dict for the job a LastUpdatedOrderedDict.
         """
         ordered_dict = LastUpdatedOrderedDict()
 
         # Adds args
+        start_idx = self.get_max_positional_arg()
         for idx, e in enumerate(args):
-            ordered_dict["positional_args_rule_" + str(idx)] = e
+            ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
 
         # Adds kwargs
         for k in kwargs.keys():
@@ -100,7 +136,7 @@ class Conditions(list):
             return util.remove_list_from_list(all_elements, remove_elements)
 
 
-        #  -------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
         if KEYWORDS[OUTPUT] in row:
             output = row[KEYWORDS[OUTPUT]]
@@ -185,7 +221,7 @@ class Conditions(list):
         :return:
         """
         output = self.get_output(row)
-
+        # gets a already worked on table.
         if output in truth_tables:
             truth_table = truth_tables[output]
         else:
@@ -193,6 +229,7 @@ class Conditions(list):
 
         condition_rows = self.get_tuples_from_indices(row, inputs)
         truth_table = truth_table | condition_rows
+
         truth_tables[output] = truth_table  # add to tables dict.
 
         return self.change_keys_from_bool_to_int(truth_tables, output)

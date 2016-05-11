@@ -4,7 +4,6 @@
 import traceback
 
 from boolean_solver.util import *
-from boolean_solver.code_generator import print_object
 from boolean_solver.code import Code
 
 __author__ = 'juan pablo isaza'

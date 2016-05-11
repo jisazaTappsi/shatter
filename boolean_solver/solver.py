@@ -29,8 +29,18 @@ def solve():
     :return: boolean value of generated function.
     """
     def wrap(f):
-
+        """
+        wrapper to be called at the end
+        :param f: function
+        :return: returns wrapped_f
+        """
+        # TODO: include optional **kwargs???
         def wrapped_f(*args):
+            """
+            same as wrap(f), but with *args
+            :param args: of function
+            :return: eval of f with args.
+            """
             return f(*args)
 
         # Meta data transfer enables introspection of decorated functions.
@@ -58,7 +68,12 @@ def execute_qm_algorithm(ones):
 
 
 def get_all_possible_inputs(inputs, table):
-
+    """
+    Adds all other inputs to the initial 'inputs'
+    :param inputs: declared function inputs
+    :param table: truth table.
+    :return: new inputs
+    """
     if len(table) == 0:
         return inputs
     else:
@@ -130,6 +145,12 @@ def alter_file(line_number, input_file_list, implementation, input_path):
 
 
 def get_empty_solution(function, conditions):
+    """
+    Wrapper to return an empty solution
+    :param function: any function
+    :param conditions: Conditions object.
+    :return : solution object.
+    """
     return Solution(implementation=[],
                     function=function,
                     conditions=conditions,
@@ -158,7 +179,7 @@ def add_default_return(definition, processed_conditions, implementation):
     """
     if processed_conditions.default:
         return get_returning_implementation(implementation, definition, processed_conditions.default)
-    elif not(has_true_key(processed_conditions.tables)):
+    elif not has_true_key(processed_conditions.tables):
         return get_returning_implementation(implementation, definition, False)
 
     return implementation

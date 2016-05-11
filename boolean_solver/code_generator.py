@@ -73,7 +73,13 @@ def get_if_code(indent, boolean_exp, output, returning):
 
 
 def get_code_piece(bool_expression, indent, the_output):
-
+    """
+    Gives a line of code with a boolean expression and its return keyword, or an if statement.
+    :param bool_expression: just booleans
+    :param indent: function indent
+    :param the_output: the value to be returned.
+    :return: string list with code.
+    """
     if isinstance(the_output, bool):
         return [indent + "    return " + bool_expression]
     else:
@@ -157,7 +163,7 @@ def translate_to_python_expression(all_inputs, qm_output):
 
         for j, character in enumerate(str_bits):
 
-            if util.string_has_bits_for_and(str_bits, j):
+            if character != '-' and util.string_has_bits_for_and(str_bits, j):
                 factor += ' and '
 
             if character == '1':

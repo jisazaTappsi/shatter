@@ -95,7 +95,6 @@ class SolverTest(unittest.TestCase):
         """
         # case 1: table not set
         wrong_table = ''
-        x=s.execute(self, f.any_method, wrong_table)
         self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
         # case 2: at least 1 row not a tuple
