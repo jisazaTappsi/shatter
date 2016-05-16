@@ -4,7 +4,7 @@
 import unittest
 
 from boolean_solver import solver as s
-from boolean_solver.util import get_function_inputs
+from boolean_solver.helpers import get_function_inputs
 from tests import constants as cts
 import code_generator_functions as f
 import functions
@@ -331,31 +331,76 @@ class GeneratorTest(unittest.TestCase):
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
 
-    # TODO: remove quotes when test is ready.
-    #def test_factor_pieces_of_code(self):
-    #    """
-    #    Tests that code output is factored.
-    #    """
-    #    function = f.factor_pieces_of_code
-    #    right_str = 'factoring!!!'
-    #    code1_str = 'len(array) > 1'
-    #    code2_str = 'array[0]'
-    #    code3_str = 'isinstance(array[0], int)'
-#
-    #    code = ['def ' + function.__name__ + '(array):',
-    #            '',
-    #            '    if ' + code1_str + ' and ' + code2_str + ' and ' + code3_str + ':',
-    #            '        return ' + "\"" + right_str + "\"",
-    #            '',
-    #            '    return False']
-#
-    #    cond = s.Conditions(s.Code(code1_str),
-    #                        s.Code(code2_str),
-    #                        output=right_str)
-#
-    #    cond.add(s.Code(code3_str), output=right_str)
-#
-    #    solution = s.execute(self, function, cond)
-    #    self.assertEqual(solution.implementation, code)
+    def test_factor_unordered_pieces_of_code(self):
+        """
+        Tests that string output is factored.
+        """
+        function = f.factor_pieces_of_code
+        right_str = 'factoring!!!'
+        code1_str = 'isinstance(array[0], int)'
+        code2_str = 'isinstance(array[1], int)'
+        code3_str = 'isinstance(array[2], int)'
 
-    # TODO: positional args with booleans are not working: see random_test
+        code = ['def ' + function.__name__ + '(array):',
+                '',
+                '    if ' + code3_str + ' or ' + code1_str + ' and ' + code2_str + ':',
+                '        return ' + "\"" + right_str + "\"",
+                '',
+                '    return False']
+
+        cond = s.Conditions(rule1=s.Code(code1_str),
+                            rule2=s.Code(code2_str),
+                            output=right_str)
+
+        cond.add(rule3=s.Code(code3_str), output=right_str)
+
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_factor_ordered_pieces_of_code(self):
+        """
+        Tests that string output is factored.
+        """
+        function = f.factor_ordered_pieces_of_code
+        right_str = 'factoring!!!'
+        code1_str = 'isinstance(array[0], int)'
+        code2_str = 'isinstance(array[1], int)'
+        code3_str = 'isinstance(array[2], int)'
+
+        code = ['def ' + function.__name__ + '(array):',
+                '',
+                '    if ' + code1_str + ' and ' + code2_str + ' or ' + code3_str + ':',
+                '        return ' + "\"" + right_str + "\"",
+                '',
+                '    return False']
+
+        cond = s.Conditions(s.Code(code1_str),
+                            s.Code(code2_str),
+                            output=right_str)
+
+        cond.add(s.Code(code3_str), output=right_str)
+
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_factor_code_output(self):
+        """
+        Tests that code output is factored.
+        """
+        function = f.factor_ordered_pieces_of_code
+        output_code = '2*2'
+        code1_str = 'isinstance(array[0], int)'
+        code2_str = 'isinstance(array[1], int)'
+
+        code = ['def ' + function.__name__ + '(array):',
+                '',
+                '    if ' + code1_str + ' or ' + code2_str + ':',
+                '        return ' + output_code,
+                '',
+                '    return False']
+
+        cond = s.Conditions(s.Code(code1_str), output=s.Code(output_code))
+        cond.add(s.Code(code2_str), output=s.Code(output_code))
+
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)

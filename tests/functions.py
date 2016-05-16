@@ -5,7 +5,7 @@
 import re
 import copy
 
-from boolean_solver import util as u
+from boolean_solver import helpers as h
 from boolean_solver import constants as boolean_cts
 
 __author__ = 'juan pablo isaza'
@@ -17,7 +17,7 @@ def reset_functions_file(path):
     :param path: of module
     :return: void
     """
-    file_code = u.read_file(path)
+    file_code = h.read_file(path)
     new_file_code = copy.copy(file_code)
 
     for index, line in enumerate(file_code):
@@ -25,12 +25,12 @@ def reset_functions_file(path):
         definition_obj = re.search(boolean_cts.DEFINITION_PATTERN, line)
         if definition_obj is not None:
 
-            indent = u.get_indent_from_definition(line)
-            f_length = len(u.get_function_code(index, file_code))
+            indent = h.get_indent_from_definition(line)
+            f_length = len(h.get_function_code(index, file_code))
             index = new_file_code.index(line)
             new_file_code = new_file_code[:index+1] + [indent + '    pass'] + new_file_code[index + f_length:]
 
-    u.rewrite_file(path, new_file_code)
+    h.rewrite_file(path, new_file_code)
 
 
 def get_source_path(path):

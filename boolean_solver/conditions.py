@@ -3,8 +3,8 @@
 """Defines a more user friendly way of entering data."""
 
 import warnings
-import util
-from collections import OrderedDict
+from util.TablesDict import TablesDict
+import helpers
 from boolean_solver.output import Output
 from boolean_solver.constants import *
 from boolean_solver.ordered_set import OrderedSet
@@ -96,12 +96,52 @@ class Conditions(list):
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 
-    @staticmethod
-    def get_tuples_from_indices(row, inputs):
+    def get_input_values(self, f_inputs, output):
+        """
+        Scans the whole conditions object looking for input values, adds them with the function inputs.
+        :param f_inputs: function inputs.
+        :param output: the output of the row.
+        :return: All possible inputs that are not keywords.
+        """
+        remove_elements = KEYWORDS.values()
+
+        f_inputs = list(f_inputs)
+        input_values = []
+        for row in self:
+            if KEYWORDS[OUTPUT] in row and row[KEYWORDS[OUTPUT]] == output:
+                keys = helpers.remove_list_from_list(row.keys(), f_inputs)
+                keys = helpers.remove_list_from_list(keys, remove_elements)
+                input_values += [row[k] for k in keys]
+
+        return f_inputs + input_values
+
+    def get_input_keys(self, f_inputs, output):
+        """
+        Scans the whole conditions object looking for input keys. Will add inputs such as code pieces, that are not
+        explicitly declared as function inputs.
+        :param f_inputs: function inputs.
+        :param output: the output of the row.
+        :return: All possible inputs that are not keywords.
+        """
+
+        f_inputs = list(f_inputs)
+
+        new_inputs = []
+        for row in self:
+            if KEYWORDS[OUTPUT] in row and row[KEYWORDS[OUTPUT]] == output:
+                new_inputs += helpers.remove_list_from_list(row.keys(), f_inputs)
+
+        all_elements = f_inputs + new_inputs
+        remove_elements = KEYWORDS.values()
+
+        return helpers.remove_list_from_list(all_elements, remove_elements)
+
+    def get_tuples_from_indices(self, row, inputs, output):
         """
         Get a set containing tuples (with implicit or explicit rows).
         :param row: dict with index as key and value as input value.
         :param inputs: the output of the row.
+        :param output:
         :return: set containing tuples.
         """
 
@@ -118,24 +158,6 @@ class Conditions(list):
 
             return new_tuples
 
-        def get_possible_inputs(c_row, f_inputs):
-            """
-            :param c_row: The **kwargs given in a add(self, **kwargs) call.
-            :param f_inputs: function inputs.
-            :return: All possible inputs that are not keywords.
-            """
-
-            f_inputs = list(f_inputs)
-
-            # inputs defined by the programmer on the conditions. For example code pieces.
-            new_inputs = util.remove_list_from_list(c_row.keys(), f_inputs)
-
-            all_elements = (f_inputs + new_inputs)
-            remove_elements = KEYWORDS.values()
-
-            return util.remove_list_from_list(all_elements, remove_elements)
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 
         if KEYWORDS[OUTPUT] in row:
@@ -145,7 +167,7 @@ class Conditions(list):
 
         # starts with 1 tuple
         tuples = OrderedSet([()])
-        for variable in get_possible_inputs(row, inputs):
+        for variable in self.get_input_keys(inputs, output):
 
             if variable in row:
                 tuples = add_element_to_tuples(tuples, row[variable])
@@ -204,10 +226,10 @@ class Conditions(list):
         :param new_key: a new key to be added to dict.
         :return: new dict
         """
-        if util.var_is_1(new_key) and util.has_true_key(d):
+        if helpers.var_is_1(new_key) and helpers.has_true_key(d):
             d[1] = d.pop(True, None)
 
-        if util.var_is_0(new_key) and util.has_false_key(d):
+        if helpers.var_is_0(new_key) and helpers.has_false_key(d):
             d[0] = d.pop(False, None)
 
         return d
@@ -215,19 +237,19 @@ class Conditions(list):
     def add_truth_table(self, truth_tables, row, inputs):
         """
         Adds a new truth table to the dict of truth_tables.
-        :param truth_tables:
-        :param row:
-        :param inputs:
-        :return:
+        :param truth_tables: orderDict, where the key is the output and the inputs are a orderSet of values.
+        :param row: 1 row of self.
+        :param inputs: function inputs.
+        :return: modified truth_tables.
         """
         output = self.get_output(row)
         # gets a already worked on table.
         if output in truth_tables:
-            truth_table = truth_tables[output]
+            truth_table = truth_tables[output]  # uses existing table.
         else:
-            truth_table = OrderedSet()
+            truth_table = OrderedSet()  # adds new truth table
 
-        condition_rows = self.get_tuples_from_indices(row, inputs)
+        condition_rows = self.get_tuples_from_indices(row, inputs, output)
         truth_table = truth_table | condition_rows
 
         truth_tables[output] = truth_table  # add to tables dict.
@@ -243,7 +265,8 @@ class Conditions(list):
         """
 
         # dict where outputs are the keys, values are the rows.
-        truth_tables = OrderedDict()
+        truth_tables = TablesDict()
+
         for row in self:
             if self.row_has_non_keyword_keys(row):
                 truth_tables = self.add_truth_table(truth_tables, row, inputs)
@@ -256,6 +279,8 @@ def add_to_dict_table(table, key, value):
     Converts the table from tuples (explicit or implicit) to a dict().
     Where the key is the output.
     :param table: dict
+    :param key: to be added to dict
+    :param value: to be added to dict
     :return: modified table
     """
     # will ignore key=False

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-"""Test for util.py"""
+"""Test for helpers.py"""
 
 import unittest
-from boolean_solver import util as u
+from boolean_solver.helpers import get_function_path, read_file, get_function_code, get_function_line_number
 
 __author__ = 'juan pablo isaza'
 
@@ -11,9 +11,9 @@ __author__ = 'juan pablo isaza'
 class UtilTest(unittest.TestCase):
 
     def get_code(self, f):
-        path = u.get_function_path(f)
-        file_code = u.read_file(path)
-        return u.get_function_code(u.get_function_line_number(f, file_code), u.read_file(path))
+        path = get_function_path(f)
+        file_code = read_file(path)
+        return get_function_code(get_function_line_number(f, file_code), read_file(path))
 
     def test_get_function_code(self):
         """

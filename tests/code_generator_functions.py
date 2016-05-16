@@ -148,7 +148,10 @@ def right_expression_order(array):
 
 
 @s.solve()
-def factor_pieces_of_code():
+def factor_pieces_of_code(array):
     pass
 
 
+@s.solve()
+def factor_ordered_pieces_of_code(array):
+    pass

@@ -220,7 +220,7 @@ def has_false_key(d):
 
 def var_is_1(var):
     """
-    Assert if var is equal to 1 and not True.
+    Boolean if var is equal to 1 and not True.
     :param var: variable
     :return: boolean
     """
@@ -231,7 +231,7 @@ def var_is_1(var):
 
 def var_is_0(var):
     """
-    Assert if var is equal to 0 and not False.
+    Boolean if var is equal to 0 and not False.
     :param var: variable
     :return: boolean
     """

@@ -3,7 +3,7 @@
 """This is the main file. Calls QM algorithm and code generation functions."""
 from boolean_solver.solution import Solution
 from boolean_solver.tester import test_implementation
-from util import *
+import helpers as h
 from processed_conditions import *
 from code_generator import *
 import qm
@@ -67,44 +67,18 @@ def execute_qm_algorithm(ones):
     return qm_obj.simplify_los(ones)
 
 
-def get_all_possible_inputs(inputs, table):
-    """
-    Adds all other inputs to the initial 'inputs'
-    :param inputs: declared function inputs
-    :param table: truth table.
-    :return: new inputs
-    """
-    if len(table) == 0:
-        return inputs
-    else:
-
-        any_tuple = next(iter(table))
-
-        if Conditions.is_explicit(any_tuple):
-            return inputs
-
-        new_inputs = []
-        inputs_counter = 0
-        for e in any_tuple:
-            if isinstance(e, bool):
-                new_inputs += (inputs[inputs_counter],)
-                inputs_counter += 1
-            else:
-                new_inputs.append(e)
-    return new_inputs
-
-
 def get_function_expression(table, inputs):
     """
     Get boolean expression. Can return empty string.
     solution provided by mc algorithm.
+    :param inputs: Function explicit inputs or implicit added rules.
     :param table: truth table.
     :return: string with boolean expression.
     """
     ones = from_table_to_ones(table)
     if len(ones) > 0:
         qm_output = execute_qm_algorithm(ones)
-        return translate_to_python_expression(get_all_possible_inputs(inputs, table), qm_output)
+        return translate_to_python_expression(inputs, qm_output)
     else:
         return ''
 
@@ -121,10 +95,10 @@ def from_table_to_ones(table):
         # case 1: when the output is explicit.
         if Conditions.is_explicit(row):
             if row[1]:  # only do it for true outputs.# TODO change for non booleans.
-                ones.append(''.join(list(map(from_bool_to_bit, list(row[0])))))
+                ones.append(''.join(list(map(h.from_bool_to_bit, list(row[0])))))
 
         else:  # case 2: The output is a implicit True. inputs are in the row.
-            ones.append(''.join(list(map(from_bool_to_bit, list(row)))))
+            ones.append(''.join(list(map(h.from_bool_to_bit, list(row)))))
 
     return ones
 
@@ -138,10 +112,10 @@ def alter_file(line_number, input_file_list, implementation, input_path):
     :param input_path: source file path.
     :return: void
     """
-    source = get_function_code(line_number, input_file_list)
+    source = h.get_function_code(line_number, input_file_list)
 
     input_file_list = input_file_list[:line_number] + implementation + input_file_list[line_number + len(source):]
-    rewrite_file(input_path, input_file_list)
+    h.rewrite_file(input_path, input_file_list)
 
 
 def get_empty_solution(function, conditions):
@@ -179,35 +153,53 @@ def add_default_return(definition, processed_conditions, implementation):
     """
     if processed_conditions.default:
         return get_returning_implementation(implementation, definition, processed_conditions.default)
-    elif not has_true_key(processed_conditions.tables):
+    elif not h.has_true_key(processed_conditions.tables):
         return get_returning_implementation(implementation, definition, False)
 
     return implementation
 
 
+def get_input_values(conditions, function_inputs, output):
+    """
+    Adds to the original inputs other possible implicit inputs, such as code.
+    :param conditions: Conditions obj
+    :param function_inputs: explicit function inputs
+    :param output: the output of the function.
+    :return: a list with all the inputs.
+    """
+    if isinstance(conditions, Conditions):
+        return conditions.get_input_values(function_inputs, output)
+    else:  # when there is no conditions obj, then all inputs are explicitly named in the function.
+        return list(function_inputs)
+
+
 def return_solution(unittest, f, conditions):
     """
     Solves the riddle, Writes it and tests it.
+    :param unittest: the unittest object that is passed to test stuff
+    :param f: any function object.
     :param conditions: condition or object or partial truth table (explicit, implicit or mix).
     :return: True for successful operation, False if not.
     """
-    f_path = get_function_path(f)
-    file_code = read_file(f_path)
-    f_line = get_function_line_number(f, file_code)
+    f_path = h.get_function_path(f)
+    file_code = h.read_file(f_path)
+    f_line = h.get_function_line_number(f, file_code)
 
     # enters only if the function source code was found.
     if f_line > 0 and get_signature(file_code[f_line]):
 
         definition = file_code[f_line]
-        inputs = get_function_inputs(f)
+        function_inputs = h.get_function_inputs(f)
 
         # init variables
         implementation = get_initial_implementation(definition)
-        processed_conditions = get_processed_conditions(conditions, inputs)
+        processed_conditions = get_processed_conditions(conditions, function_inputs)
 
         for the_output, table in processed_conditions.tables.iteritems():
 
-            expression = get_function_expression(table, inputs)
+            all_inputs = get_input_values(conditions, function_inputs, the_output)
+            expression = get_function_expression(table, all_inputs)
+
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,
                                                             bool_expression=expression,
@@ -237,13 +229,13 @@ def execute(unittest, function, conditions):
     :return: Solution object, empty object if operation unsuccessful.
     """
     # input validation
-    if not valid_function(function) or not valid_conditions(conditions):
+    if not h.valid_function(function) or not valid_conditions(conditions):
         return get_empty_solution(function, conditions)
 
-    function = reload_function(function)
-    f_path = get_function_path(function)
+    function = h.reload_function(function)
+    f_path = h.get_function_path(function)
 
-    if not os.path.exists(f_path):
+    if not h.os.path.exists(f_path):
         return get_empty_solution(function, conditions)
 
     return return_solution(unittest=unittest,

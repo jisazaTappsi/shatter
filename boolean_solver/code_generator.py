@@ -3,7 +3,7 @@
 """Generates pieces of code that are put together by solver.py"""
 
 import warnings
-from boolean_solver import util, conditions as c
+from boolean_solver import helpers, conditions as c
 from constants import *
 from boolean_solver.code import Code
 
@@ -19,7 +19,7 @@ def print_invoked_function(output):
     if isinstance(output, c.Output):
         args_dict = output.arguments
         args_str = ''
-        for var in util.get_function_inputs(output.function):
+        for var in helpers.get_function_inputs(output.function):
             if args_str == '':
                 args_str += print_object(args_dict[var])
             else:
@@ -42,7 +42,7 @@ def print_object(instance):
     if isinstance(instance, tuple):
         return str(instance)[1:-1]  # remove parenthesis.
 
-    if util.is_function(instance):
+    if helpers.is_function(instance):
         return instance.__name__  # when the function is passed as object; not invoked.
 
     if isinstance(instance, Code):
@@ -93,7 +93,7 @@ def get_initial_implementation(definition):
     :return: code
     """
     signature = get_signature(definition)
-    indent = util.get_indent_from_definition(definition)
+    indent = helpers.get_indent_from_definition(definition)
 
     return [indent + "def " + signature + ":"]
 
@@ -106,7 +106,7 @@ def add_code_to_implementation(current_implementation, bool_expression, definiti
     :return: string list with implementation.
     """
     signature = get_signature(definition)
-    indent = util.get_indent_from_definition(definition)
+    indent = helpers.get_indent_from_definition(definition)
     if bool_expression and len(bool_expression) > 0:
 
         new_code = get_code_piece(bool_expression, indent, the_output)
@@ -163,7 +163,7 @@ def translate_to_python_expression(all_inputs, qm_output):
 
         for j, character in enumerate(str_bits):
 
-            if character != '-' and util.string_has_bits_for_and(str_bits, j):
+            if character != '-' and helpers.string_has_bits_for_and(str_bits, j):
                 factor += ' and '
 
             if character == '1':
