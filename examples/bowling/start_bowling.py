@@ -33,7 +33,7 @@ def get_next_2_throws(i, game):
     if i == 9:
         return game[i][1] + game[i][2]
 
-    if not is_strike(game[i+1]) or i == 8 and is_strike(game[i+1]):
+    if i == 8 and is_strike(game[i+1]) or not is_strike(game[i+1]):
         return game[i+1][0] + game[i+1][1]
 
     if is_strike(game[i+1]):

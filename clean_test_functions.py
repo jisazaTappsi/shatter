@@ -2,9 +2,10 @@
 
 """setup the python package.py"""
 
-import os
 import fnmatch
-from tests import functions
+import os
+
+from tests.testing_helpers import common_testing_code
 
 __author__ = 'juan pablo isaza'
 
@@ -34,6 +35,6 @@ def clean_functions():
     res = find('*_functions.py', path)
 
     for a_file in res:
-        functions.reset_functions_file(a_file)
+        common_testing_code.reset_functions_file(a_file)
 
 clean_functions()

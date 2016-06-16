@@ -3,9 +3,11 @@
 """Generates pieces of code that are put together by solver.py"""
 
 import warnings
-from boolean_solver import helpers, conditions as c
-from constants import *
+
+from boolean_solver import conditions as c
 from boolean_solver.code import Code
+from boolean_solver.util import helpers
+from constants import *
 
 __author__ = 'juan pablo isaza'
 

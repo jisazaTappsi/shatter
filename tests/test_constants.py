@@ -15,7 +15,6 @@ class ConstantsTest(unittest.TestCase):
     def test_parse_definition(self):
         """
         Parse function.
-        :return: passes or not
         """
 
         # easy one.

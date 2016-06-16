@@ -13,7 +13,8 @@ This same boolean logic is being expanded to a broader range of problems check o
 Package Setup
 -------------
 1.  Install Boolean-Solver package:
-    `pip install Boolean-Solver`
+
+        $ pip install Boolean-Solver
 
 Short Example
 -------------
@@ -45,7 +46,7 @@ Add a unittest(`test.py`) with specs:
             cond = solver.Conditions(a=True, b=True, output=True)
             solver.execute(self, start.and_function, cond)
 
-Then run `python -m unittest test`. In start.py the result should be:
+Then run `$ python -m unittest test`. In `start.py` the result should be:
 
     def and_function(a, b):
         return a and b
@@ -71,7 +72,7 @@ Add `test_ifs(self)` to `MyTest(unittest.TestCase)` class in `test.py`:
         cond.add(a=True, b=False, output=0)  # non-boolean output
         solver.execute(self, start.if_function, cond)
 
-Then run `python -m unittest test`, the result should be:
+Then run `$ python -m unittest test`, the result should be:
 
     def if_function(a, b):
     

@@ -3,7 +3,8 @@
 """Test for solver.py"""
 
 import unittest
-from tester_functions import *
+
+from tests.generated_code.tester import *
 
 __author__ = 'juan pablo isaza'
 

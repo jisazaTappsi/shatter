@@ -3,13 +3,11 @@
 """Test for code_generator.py"""
 import unittest
 
-from boolean_solver import solver as s
-from boolean_solver.helpers import get_function_inputs
-from tests import constants as cts
-import code_generator_functions as f
-import functions
 from boolean_solver import code_generator as c
-
+from boolean_solver import solver as s
+from boolean_solver.util.helpers import get_function_inputs
+from tests.generated_code import code_generator as f
+from tests.testing_helpers import constants as cts, common_testing_code
 
 __author__ = 'juan pablo isaza'
 
@@ -18,7 +16,7 @@ class GeneratorTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        functions.reset_functions_file(functions.get_source_path(f.__file__))
+        common_testing_code.reset_functions_file(common_testing_code.get_source_path(f.__file__))
 
     def test_code_generation_with_if(self):
         """
@@ -103,7 +101,7 @@ class GeneratorTest(unittest.TestCase):
     def test_conditions_input_order_is_respected(self):
         """
         First input has to be first on the final boolean expression.
-        So programmers can use precedence to their advantage ;). Very useful when validating data.
+        So programmers can use short circuiting to their advantage ;). Very useful when validating data.
         Changing input order will change expression order.
         """
         code = ['def ordered_expression(a, b):',
@@ -115,7 +113,7 @@ class GeneratorTest(unittest.TestCase):
         self.assertEqual(solution.implementation, code)
 
         code = ['def ordered_expression(a, b):',
-                '    return b or a']
+                '    return a or b']
 
         cond = s.Conditions(b=True, output=True)  # boolean output
         cond.add(a=True, output=True)  # boolean condition
@@ -307,7 +305,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_right_code_input_order(self):
         """
-        For programmer convenience and to be able to use precedence.
+        For programmer convenience and to be able to use short circuiting.
         Code pieces on expressions will follow the same order as the input order.
         """
 
@@ -333,7 +331,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_factor_unordered_pieces_of_code(self):
         """
-        Tests that string output is factored.
+        Tests that string output is factored, when inputs are given all at once.
         """
         function = f.factor_pieces_of_code
         right_str = 'factoring!!!'
@@ -343,7 +341,7 @@ class GeneratorTest(unittest.TestCase):
 
         code = ['def ' + function.__name__ + '(array):',
                 '',
-                '    if ' + code3_str + ' or ' + code1_str + ' and ' + code2_str + ':',
+                '    if ' + code1_str + ' and ' + code2_str + ' or ' + code3_str + ':',
                 '        return ' + "\"" + right_str + "\"",
                 '',
                 '    return False']
@@ -359,7 +357,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_factor_ordered_pieces_of_code(self):
         """
-        Tests that string output is factored.
+        Tests that string output is factored, when inputs are given in more than one addition.
         """
         function = f.factor_ordered_pieces_of_code
         right_str = 'factoring!!!'
@@ -385,7 +383,7 @@ class GeneratorTest(unittest.TestCase):
 
     def test_factor_code_output(self):
         """
-        Tests that code output is factored.
+        Tests that code output can be factored.
         """
         function = f.factor_ordered_pieces_of_code
         output_code = '2*2'

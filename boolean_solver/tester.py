@@ -3,8 +3,8 @@
 """Implements the functions to test generated code."""
 import traceback
 
-from boolean_solver.helpers import *
 from boolean_solver.code import Code
+from boolean_solver.util.helpers import *
 
 __author__ = 'juan pablo isaza'
 

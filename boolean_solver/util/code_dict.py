@@ -9,7 +9,7 @@ from boolean_solver.code import Code
 __author__ = 'Juan Pablo Isaza'
 
 
-class TablesDict(MutableMapping):
+class CodeDict(MutableMapping):
     """Compare Code pieces by their content only"""
 
     def __init__(self, *args, **kwargs):

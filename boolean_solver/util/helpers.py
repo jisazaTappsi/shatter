@@ -6,14 +6,14 @@ import warnings
 import os
 import re
 
-import constants as cts
+import boolean_solver.constants as cts
 
 __author__ = 'juan pablo isaza'
 
 
 def read_file(filename):
     """
-    :param filename: relative path.
+    :param filename: absolute path.
     :return: list with lines of the file.
     """
     return [line.rstrip('\n') for line in open(filename)]
