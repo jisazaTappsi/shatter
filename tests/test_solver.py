@@ -3,11 +3,12 @@
 """Test for solver.py"""
 
 import unittest
+
 from boolean_solver import solver as s, conditions as c
-from boolean_solver.ordered_set import OrderedSet
 from boolean_solver.code_generator import translate_to_python_expression
-import constants as cts
-import solver_functions as f
+from boolean_solver.util.last_update_set import LastUpdateSet
+from tests.generated_code import solver as f
+from tests.testing_helpers import constants as cts
 
 __author__ = 'juan pablo isaza'
 
@@ -32,7 +33,6 @@ class SolverTest(unittest.TestCase):
     def test_qm_algorithm_and_translate(self):
         """
         Testing for and, or & xor the "process_for_function".
-        :return: passes or not
         """
         var_names = ['a', 'b']
 
@@ -65,7 +65,6 @@ class SolverTest(unittest.TestCase):
     def test_execute(self):
         """
         Important test: checking that it can solve simple functions.
-        :return: passes or not.
         """
         self.factor_execute(cts.and_table, f.and_function, cts.sig_and, cts.exp_and)
         self.factor_execute(cts.or_table, f.or_function, cts.sig_or, cts.exp_or)
@@ -76,14 +75,12 @@ class SolverTest(unittest.TestCase):
     def test_and_missing_decorator(self):
         """
         Should solve it correctly but show a warning, because of the missing decorator.
-        :return: passes or not
         """
         self.factor_execute(cts.and_table, f.and_missing_decorator, 'and_missing_decorator(a, b)', cts.exp_and)
 
     def test_non_callable(self):
         """
         Checks that the function passed is valid.
-        :return: passes or not
         """
         non_callable = ''
         self.assertEqual(len(s.execute(self, non_callable, cts.and_table).ast.body), 0)
@@ -91,11 +88,9 @@ class SolverTest(unittest.TestCase):
     def test_wrong_table(self):
         """
         Checks that the table is a set and that the rows are all tuples
-        :return: passes or not
         """
         # case 1: table not set
         wrong_table = ''
-        x=s.execute(self, f.any_method, wrong_table)
         self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
 
         # case 2: at least 1 row not a tuple
@@ -110,10 +105,9 @@ class SolverTest(unittest.TestCase):
         """
         Checks that implicit table outputs work. Instead of table = {((inputs),True), ...}
         it can work with table = {(inputs), ...}. As the output is redundant.
-        :return: passes or not.
         """
         # case 1: all rows are implicit
-        implicit_output_xor_table = OrderedSet([(True, False), (False, True)])
+        implicit_output_xor_table = LastUpdateSet([(True, False), (False, True)])
 
         self.factor_execute(conditions=implicit_output_xor_table,
                             a_callable=f.implicit_xor_function,
@@ -121,7 +115,7 @@ class SolverTest(unittest.TestCase):
                             expression=cts.exp_xor)
 
         # case 2: some rows are explicit and some implicit.
-        mix_output_xor_table = OrderedSet([((True, False), True), (False, True), ((True, True), False)])
+        mix_output_xor_table = LastUpdateSet([((True, False), True), (False, True), ((True, True), False)])
 
         self.factor_execute(conditions=mix_output_xor_table,
                             a_callable=f.mix_xor_function,
@@ -131,7 +125,6 @@ class SolverTest(unittest.TestCase):
     def test_conditions_input(self):
         """
         Test for different inputs given as a conditions object.
-        :return: passes or not.
         """
 
         # case 1: simple 2 argument and.

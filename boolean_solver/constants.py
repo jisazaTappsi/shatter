@@ -12,7 +12,6 @@ FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*\w*\s*(,\s*\w+\s*)*\)")
 INDENT = re.compile(r"^\s*")
 
 # reserved keywords
-
 DEFAULT = 'DEFAULT'
 OUTPUT = 'OUTPUT'
 OUTPUT_ARGS = 'OUTPUT_ARGS'
@@ -21,3 +20,4 @@ KEYWORDS = {DEFAULT: 'default',
             OUTPUT: 'output',
             OUTPUT_ARGS: 'output_args'}
 
+POSITIONAL_ARGS_RULE = "positional_args_rule_"

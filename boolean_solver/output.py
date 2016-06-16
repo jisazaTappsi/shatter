@@ -3,12 +3,13 @@
 """Defines a class containing possible outputs"""
 
 import warnings
-import util
+
+from boolean_solver.util import helpers
 
 __author__ = 'juan pablo isaza'
 
 
-class Output():
+class Output:
     """
     Contains any output properties.
     """
@@ -21,7 +22,7 @@ class Output():
         :return: Boolean.
         """
         # TODO: deal with optional arguments.
-        for var in util.get_function_inputs(function):
+        for var in helpers.get_function_inputs(function):
             if var not in arguments:
                 return False
 

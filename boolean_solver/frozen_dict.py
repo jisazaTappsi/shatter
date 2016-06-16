@@ -2,9 +2,9 @@
 
 """Defines immutable dictionary."""
 
-__author__ = 'juan pablo isaza'
-
 import collections
+
+__author__ = 'juan pablo isaza'
 
 
 class FrozenDict(collections.Mapping):

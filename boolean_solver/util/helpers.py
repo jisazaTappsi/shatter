@@ -6,14 +6,14 @@ import warnings
 import os
 import re
 
-import constants as cts
+import boolean_solver.constants as cts
 
 __author__ = 'juan pablo isaza'
 
 
 def read_file(filename):
     """
-    :param filename: relative path.
+    :param filename: absolute path.
     :return: list with lines of the file.
     """
     return [line.rstrip('\n') for line in open(filename)]
@@ -220,7 +220,7 @@ def has_false_key(d):
 
 def var_is_1(var):
     """
-    Assert if var is equal to 1 and not True.
+    Boolean if var is equal to 1 and not True.
     :param var: variable
     :return: boolean
     """
@@ -231,7 +231,7 @@ def var_is_1(var):
 
 def var_is_0(var):
     """
-    Assert if var is equal to 0 and not False.
+    Boolean if var is equal to 0 and not False.
     :param var: variable
     :return: boolean
     """

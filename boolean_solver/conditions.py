@@ -3,12 +3,13 @@
 """Defines a more user friendly way of entering data."""
 
 import warnings
-import util
-from collections import OrderedDict
-from boolean_solver.output import Output
+
 from boolean_solver.constants import *
-from boolean_solver.ordered_set import OrderedSet
-from boolean_solver.last_updated_ordered_dict import LastUpdatedOrderedDict
+from boolean_solver.output import Output
+from boolean_solver.util import helpers
+from boolean_solver.util.last_update_dict import LastUpdateDict
+from boolean_solver.util.last_update_set import LastUpdateSet
+from util.code_dict import CodeDict
 
 __author__ = 'juan pablo isaza'
 
@@ -19,21 +20,62 @@ class Conditions(list):
     """
 
     @staticmethod
-    def get_ordered_dict(reversed_dict):
+    def gets_start_positional_idx(dictionary):
         """
-        Big issue solved here. kwargs apparently has a dictionary which apparent order is the reverse of the input order
-        .Because it is a dictionary the order could be other. Reverting the order here
-        to have the appropriate order with a LastUpdatedOrderedDict, which preserves order.
-        :param reversed_dict: a common dict
+        Gets the biggest index for a dictionary and adds 1.
+        :param dictionary: any dict
+        :return: int
+        """
+        max_idx = 0
+        has_key = False
+        for key in dictionary:
+            if isinstance(key, str) and re.match("^" + POSITIONAL_ARGS_RULE + "\d+$", key) is not None:
+                has_key = True
+                r = re.search("\d+$", key)
+                candidate = int(r.group())
+                if candidate > max_idx:
+                    max_idx = candidate
+
+        if has_key:
+            return max_idx + 1
+        else:
+            return 0
+
+    def get_max_positional_arg(self):
+        """
+        Gets the index for the next positional argument to start.
+        :return: int.
+        """
+        max_arg = 0
+        for d in self:
+            candidate = self.gets_start_positional_idx(d)
+            if candidate > max_arg:
+                max_arg = candidate
+
+        return max_arg
+
+    def get_ordered_dict(self, args, kwargs):
+        """
+        Big issue solved here. Adds args, to have positional args always in the same order as the user inputs.
+        Therefore the user can have short circuiting for logical operators, by having inputs in the right order.
+        :param args: positional args. Used when specific order required.
+        :param kwargs: a common dict
         :return: the right dict for the job a LastUpdatedOrderedDict.
         """
-        ordered_dict = LastUpdatedOrderedDict()
-        for k in reversed(reversed_dict.keys()):
-            ordered_dict[k] = reversed_dict[k]
+        ordered_dict = LastUpdateDict()
+
+        # Adds args
+        start_idx = self.get_max_positional_arg()
+        for idx, e in enumerate(args):
+            ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
+
+        # Adds kwargs
+        for k in kwargs.keys():
+            ordered_dict[k] = kwargs[k]
 
         return ordered_dict
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
         init and add new parameters if provided.
         :param kwargs:
@@ -42,25 +84,65 @@ class Conditions(list):
         list.__init__(list())
 
         if len(kwargs) > 0:
-            self.append(self.get_ordered_dict(kwargs))
+            self.append(self.get_ordered_dict(args, kwargs))
 
-    def add(self, **kwargs):
+    def add(self, *args, **kwargs):
         """
         Adds a new row condition.
         :param kwargs: dictionary like parameters.
         :return: void
         """
         if len(kwargs) > 0:
-            self.append(self.get_ordered_dict(kwargs))
+            self.append(self.get_ordered_dict(args, kwargs))
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 
-    @staticmethod
-    def get_tuples_from_indices(row, inputs):
+    def get_input_values(self, f_inputs, output):
+        """
+        Scans the whole conditions object looking for input values, adds them with the function inputs.
+        :param f_inputs: function inputs.
+        :param output: the output of the row.
+        :return: All possible inputs that are not keywords.
+        """
+        remove_elements = KEYWORDS.values()
+
+        f_inputs = list(f_inputs)
+        input_values = []
+        for row in self:
+            if KEYWORDS[OUTPUT] in row and row[KEYWORDS[OUTPUT]] == output:
+                keys = helpers.remove_list_from_list(row.keys(), f_inputs)
+                keys = helpers.remove_list_from_list(keys, remove_elements)
+                input_values += [row[k] for k in keys]
+
+        return f_inputs + input_values
+
+    def get_input_keys(self, f_inputs, output):
+        """
+        Scans the whole conditions object looking for input keys. Will add inputs such as code pieces, that are not
+        explicitly declared as function inputs.
+        :param f_inputs: function inputs.
+        :param output: the output of the row.
+        :return: All possible inputs that are not keywords.
+        """
+
+        f_inputs = list(f_inputs)
+
+        new_inputs = []
+        for row in self:
+            if KEYWORDS[OUTPUT] in row and row[KEYWORDS[OUTPUT]] == output:
+                new_inputs += helpers.remove_list_from_list(row.keys(), f_inputs)
+
+        all_elements = f_inputs + new_inputs
+        remove_elements = KEYWORDS.values()
+
+        return helpers.remove_list_from_list(all_elements, remove_elements)
+
+    def get_tuples_from_indices(self, row, inputs, output):
         """
         Get a set containing tuples (with implicit or explicit rows).
         :param row: dict with index as key and value as input value.
         :param inputs: the output of the row.
+        :param output:
         :return: set containing tuples.
         """
 
@@ -71,40 +153,22 @@ class Conditions(list):
             :param new_element: any element to add in last position.
             :return: tuple set
             """
-            new_tuples = OrderedSet()
+            new_tuples = LastUpdateSet()
             for tuple_element in tuples_set:
                 new_tuples.add(tuple_element + (new_element,))
 
             return new_tuples
 
-        def get_possible_inputs(c_row, f_inputs):
-            """
-            :param c_row: The **kwargs given in a add(self, **kwargs) call.
-            :param f_inputs: function inputs.
-            :return: All possible inputs that are not keywords.
-            """
-
-            f_inputs = list(f_inputs)
-
-            # inputs defined by the programmer on the conditions. For example code pieces.
-            new_inputs = util.remove_list_from_list(c_row.keys(), f_inputs)
-
-            all_elements = (f_inputs + new_inputs)
-            remove_elements = KEYWORDS.values()
-
-            return util.remove_list_from_list(all_elements, remove_elements)
-
-
-        #  -------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
 
         if KEYWORDS[OUTPUT] in row:
             output = row[KEYWORDS[OUTPUT]]
             if isinstance(output, bool) and not output:
-                return OrderedSet()
+                return LastUpdateSet()
 
         # starts with 1 tuple
-        tuples = OrderedSet([()])
-        for variable in get_possible_inputs(row, inputs):
+        tuples = LastUpdateSet([()])
+        for variable in self.get_input_keys(inputs, output):
 
             if variable in row:
                 tuples = add_element_to_tuples(tuples, row[variable])
@@ -163,10 +227,10 @@ class Conditions(list):
         :param new_key: a new key to be added to dict.
         :return: new dict
         """
-        if util.var_is_1(new_key) and util.has_true_key(d):
+        if helpers.var_is_1(new_key) and helpers.has_true_key(d):
             d[1] = d.pop(True, None)
 
-        if util.var_is_0(new_key) and util.has_false_key(d):
+        if helpers.var_is_0(new_key) and helpers.has_false_key(d):
             d[0] = d.pop(False, None)
 
         return d
@@ -174,20 +238,21 @@ class Conditions(list):
     def add_truth_table(self, truth_tables, row, inputs):
         """
         Adds a new truth table to the dict of truth_tables.
-        :param truth_tables:
-        :param row:
-        :param inputs:
-        :return:
+        :param truth_tables: orderDict, where the key is the output and the inputs are a orderSet of values.
+        :param row: 1 row of self.
+        :param inputs: function inputs.
+        :return: modified truth_tables.
         """
         output = self.get_output(row)
-
+        # gets a already worked on table.
         if output in truth_tables:
-            truth_table = truth_tables[output]
+            truth_table = truth_tables[output]  # uses existing table.
         else:
-            truth_table = OrderedSet()
+            truth_table = LastUpdateSet()  # adds new truth table
 
-        condition_rows = self.get_tuples_from_indices(row, inputs)
+        condition_rows = self.get_tuples_from_indices(row, inputs, output)
         truth_table = truth_table | condition_rows
+
         truth_tables[output] = truth_table  # add to tables dict.
 
         return self.change_keys_from_bool_to_int(truth_tables, output)
@@ -201,7 +266,8 @@ class Conditions(list):
         """
 
         # dict where outputs are the keys, values are the rows.
-        truth_tables = OrderedDict()
+        truth_tables = CodeDict()
+
         for row in self:
             if self.row_has_non_keyword_keys(row):
                 truth_tables = self.add_truth_table(truth_tables, row, inputs)
@@ -214,14 +280,16 @@ def add_to_dict_table(table, key, value):
     Converts the table from tuples (explicit or implicit) to a dict().
     Where the key is the output.
     :param table: dict
+    :param key: to be added to dict
+    :param value: to be added to dict
     :return: modified table
     """
     # will ignore key=False
     if key:
         if key in table:
-            table[key] = table[key] | OrderedSet([value])
+            table[key] = table[key] | LastUpdateSet([value])
         else:
-            table[key] = OrderedSet([value])
+            table[key] = LastUpdateSet([value])
 
     return table
 
@@ -250,7 +318,7 @@ def get_truth_tables(conditions, inputs):
     """
     if isinstance(conditions, Conditions):
         return conditions.get_truth_tables(inputs)
-    elif isinstance(conditions, set) or isinstance(conditions, OrderedSet):  # raw set case.
+    elif isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):  # raw set case.
         return from_raw_set_to_dict_table(conditions)
     else:
         warnings.warn('Found conditions that is not a set nor a Conditions object', UserWarning)
@@ -264,11 +332,11 @@ def valid_conditions(conditions):
     :param conditions: truth table or a conditions object.
     :return: boolean.
     """
-    if not isinstance(conditions, set) and not isinstance(conditions, Conditions) and not isinstance(conditions, OrderedSet):
+    if not isinstance(conditions, set) and not isinstance(conditions, Conditions) and not isinstance(conditions, LastUpdateSet):
         warnings.warn('Truth table is not a set or a Conditions object', UserWarning)
         return False
 
-    if isinstance(conditions, set) or isinstance(conditions, OrderedSet):
+    if isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):
         for row in conditions:
             if not isinstance(row, tuple):
                 warnings.warn('A row in truth table is not a tuple', UserWarning)
