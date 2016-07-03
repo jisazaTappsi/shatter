@@ -4,18 +4,18 @@ http://code.joejag.com/coding-dojo/bowling-scores/
 """
 
 
-from boolean_solver import solver as s
+from boolean_solver.solver import solve
 
 
-@s.solve()
+@solve()
 def is_spare(frame):
     return frame[0] < 10 and frame[0] + frame[1] == 10
 
-@s.solve()
+@solve()
 def is_strike(frame):
     return frame[0] == 10
 
-@s.solve()
+@solve()
 def get_next_throw(i, game):
 
     if i < 9:
@@ -27,7 +27,7 @@ def get_next_throw(i, game):
     return False
 
 
-@s.solve()
+@solve()
 def get_next_2_throws(i, game):
 
     if i == 9:
@@ -42,7 +42,7 @@ def get_next_2_throws(i, game):
     return False
 
 
-@s.solve()
+@solve()
 def get_frame_score(frame, game, i):
 
     if not is_spare(frame) and not is_strike(frame):
