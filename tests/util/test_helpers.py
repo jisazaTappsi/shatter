@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-"""Test for helpers.py"""
+"""Test for util/helpers.py"""
 
 import unittest
-from boolean_solver.helpers import get_function_path, read_file, get_function_code, get_function_line_number
+
+from boolean_solver.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number
 
 __author__ = 'juan pablo isaza'
 
@@ -18,7 +19,6 @@ class UtilTest(unittest.TestCase):
     def test_get_function_code(self):
         """
         Make sure that we can find the right piece of code always.
-        :return: passes or not
         """
 
         def easy(a, b):

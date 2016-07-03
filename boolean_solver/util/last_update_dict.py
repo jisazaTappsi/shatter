@@ -6,7 +6,7 @@ from collections import OrderedDict, MutableMapping
 __author__ = 'Juan Pablo Isaza'
 
 
-class LastUpdatedOrderedDict(MutableMapping):
+class LastUpdateDict(MutableMapping):
     """Store items in the order the keys were last added"""
 
     def __init__(self, *args, **kwargs):

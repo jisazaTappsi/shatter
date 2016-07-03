@@ -3,7 +3,8 @@
 """Defines a class containing possible outputs"""
 
 import warnings
-import helpers
+
+from boolean_solver.util import helpers
 
 __author__ = 'juan pablo isaza'
 

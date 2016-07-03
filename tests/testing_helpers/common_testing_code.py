@@ -2,11 +2,11 @@
 
 """Common functions to several tests."""
 
-import re
 import copy
+import re
 
-from boolean_solver import helpers as h
 from boolean_solver import constants as boolean_cts
+from boolean_solver.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 

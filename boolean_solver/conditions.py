@@ -3,12 +3,13 @@
 """Defines a more user friendly way of entering data."""
 
 import warnings
-from util.TablesDict import TablesDict
-import helpers
-from boolean_solver.output import Output
+
 from boolean_solver.constants import *
-from boolean_solver.ordered_set import OrderedSet
-from boolean_solver.last_updated_ordered_dict import LastUpdatedOrderedDict
+from boolean_solver.output import Output
+from boolean_solver.util import helpers
+from boolean_solver.util.last_update_dict import LastUpdateDict
+from boolean_solver.util.last_update_set import LastUpdateSet
+from util.code_dict import CodeDict
 
 __author__ = 'juan pablo isaza'
 
@@ -56,12 +57,12 @@ class Conditions(list):
     def get_ordered_dict(self, args, kwargs):
         """
         Big issue solved here. Adds args, to have positional args always in the same order as the user inputs.
-        Therefore the user can have precedence for logical operators, by having inputs in the right order.
+        Therefore the user can have short circuiting for logical operators, by having inputs in the right order.
         :param args: positional args. Used when specific order required.
         :param kwargs: a common dict
         :return: the right dict for the job a LastUpdatedOrderedDict.
         """
-        ordered_dict = LastUpdatedOrderedDict()
+        ordered_dict = LastUpdateDict()
 
         # Adds args
         start_idx = self.get_max_positional_arg()
@@ -152,7 +153,7 @@ class Conditions(list):
             :param new_element: any element to add in last position.
             :return: tuple set
             """
-            new_tuples = OrderedSet()
+            new_tuples = LastUpdateSet()
             for tuple_element in tuples_set:
                 new_tuples.add(tuple_element + (new_element,))
 
@@ -163,10 +164,10 @@ class Conditions(list):
         if KEYWORDS[OUTPUT] in row:
             output = row[KEYWORDS[OUTPUT]]
             if isinstance(output, bool) and not output:
-                return OrderedSet()
+                return LastUpdateSet()
 
         # starts with 1 tuple
-        tuples = OrderedSet([()])
+        tuples = LastUpdateSet([()])
         for variable in self.get_input_keys(inputs, output):
 
             if variable in row:
@@ -247,7 +248,7 @@ class Conditions(list):
         if output in truth_tables:
             truth_table = truth_tables[output]  # uses existing table.
         else:
-            truth_table = OrderedSet()  # adds new truth table
+            truth_table = LastUpdateSet()  # adds new truth table
 
         condition_rows = self.get_tuples_from_indices(row, inputs, output)
         truth_table = truth_table | condition_rows
@@ -265,7 +266,7 @@ class Conditions(list):
         """
 
         # dict where outputs are the keys, values are the rows.
-        truth_tables = TablesDict()
+        truth_tables = CodeDict()
 
         for row in self:
             if self.row_has_non_keyword_keys(row):
@@ -286,9 +287,9 @@ def add_to_dict_table(table, key, value):
     # will ignore key=False
     if key:
         if key in table:
-            table[key] = table[key] | OrderedSet([value])
+            table[key] = table[key] | LastUpdateSet([value])
         else:
-            table[key] = OrderedSet([value])
+            table[key] = LastUpdateSet([value])
 
     return table
 
@@ -317,7 +318,7 @@ def get_truth_tables(conditions, inputs):
     """
     if isinstance(conditions, Conditions):
         return conditions.get_truth_tables(inputs)
-    elif isinstance(conditions, set) or isinstance(conditions, OrderedSet):  # raw set case.
+    elif isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):  # raw set case.
         return from_raw_set_to_dict_table(conditions)
     else:
         warnings.warn('Found conditions that is not a set nor a Conditions object', UserWarning)
@@ -331,11 +332,11 @@ def valid_conditions(conditions):
     :param conditions: truth table or a conditions object.
     :return: boolean.
     """
-    if not isinstance(conditions, set) and not isinstance(conditions, Conditions) and not isinstance(conditions, OrderedSet):
+    if not isinstance(conditions, set) and not isinstance(conditions, Conditions) and not isinstance(conditions, LastUpdateSet):
         warnings.warn('Truth table is not a set or a Conditions object', UserWarning)
         return False
 
-    if isinstance(conditions, set) or isinstance(conditions, OrderedSet):
+    if isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):
         for row in conditions:
             if not isinstance(row, tuple):
                 warnings.warn('A row in truth table is not a tuple', UserWarning)

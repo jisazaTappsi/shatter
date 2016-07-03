@@ -6,7 +6,7 @@ import warnings
 import os
 import re
 
-import constants as cts
+import boolean_solver.constants as cts
 
 __author__ = 'juan pablo isaza'
 

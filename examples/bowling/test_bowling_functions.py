@@ -27,23 +27,6 @@ class MyTest(unittest.TestCase):
 
     def test_get_next_2_throws(self):
 
-        # TODO: fix, should factorize code, like this:
-        # optimal solution:
-        """
-        @s.solve()
-        def get_next_2_throws(i, game):
-
-            if i == 9:
-                return game[i][1] + game[i][2]
-
-            if i == 8 and is_strike(game[i+1]) or not is_strike(game[i+1]):
-                return game[i+1][0] + game[i+1][1]
-
-            if is_strike(game[i+1]):
-                return game[i+1][0] + game[i+2][0]
-
-            return False
-        """
         cond = solver.Conditions(last_bonus_throw=solver.Code('i == 9'), output=solver.Code('game[i][1] + game[i][2]'))
 
         cond.add(solver.Code('i == 8'),

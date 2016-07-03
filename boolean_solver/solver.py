@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 """This is the main file. Calls QM algorithm and code generation functions."""
+import qm
 from boolean_solver.solution import Solution
 from boolean_solver.tester import test_implementation
-import helpers as h
-from processed_conditions import *
+from boolean_solver.util import helpers as h
 from code_generator import *
-import qm
+from processed_conditions import *
 
 #  TODO: from boolean_solver import solver as production_solver
 

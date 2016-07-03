@@ -13,7 +13,6 @@ class ConditionsTest(unittest.TestCase):
     def test_get_truth_table(self):
         """
         Input data in different ways.
-        :return: passes or not
         """
 
         # case 1: single condition added on constructor
