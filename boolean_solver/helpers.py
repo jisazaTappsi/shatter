@@ -11,12 +11,12 @@ import constants as cts
 __author__ = 'juan pablo isaza'
 
 
-def read_file(filename):
+def read_file(absolute_path):
     """
-    :param filename: relative path.
+    :param absolute_path: string path.
     :return: list with lines of the file.
     """
-    return [line.rstrip('\n') for line in open(filename)]
+    return [line.rstrip('\n') for line in open(absolute_path)]
 
 
 def delete_file(filename):
