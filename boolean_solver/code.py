@@ -16,3 +16,6 @@ class Code:
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.code_as_str == other.code_as_str
+
+    def __str__(self):
+        return str(self.code_as_str)

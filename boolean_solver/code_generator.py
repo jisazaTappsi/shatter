@@ -132,21 +132,6 @@ def get_signature(definition):
     return signature_obj.group()
 
 
-def print_input(instance):
-    """
-    Modify input in special cases
-    :param instance: anything to be printed as output code.
-    :return: string with code representing the input
-    """
-    if isinstance(instance, str):
-        return instance
-
-    if isinstance(instance, Code):
-        return str(instance.code_as_str)
-
-    return str(instance)
-
-
 def translate_to_python_expression(all_inputs, qm_output):
     """
     Converts the algorithm output to friendlier python code.
@@ -169,10 +154,10 @@ def translate_to_python_expression(all_inputs, qm_output):
                 factor += ' and '
 
             if character == '1':
-                factor += print_input(all_inputs[j])
+                factor += str(all_inputs[j])
 
             if character == '0':
-                factor += 'not ' + print_input(all_inputs[j])
+                factor += 'not ' + str(all_inputs[j])
 
         final_expression += factor
 
