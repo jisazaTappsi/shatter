@@ -11,9 +11,11 @@ from boolean_solver import solver as s
 def is_spare(frame):
     return frame[0] < 10 and frame[0] + frame[1] == 10
 
+
 @s.solve()
 def is_strike(frame):
     return frame[0] == 10
+
 
 @s.solve()
 def get_next_throw(i, game):

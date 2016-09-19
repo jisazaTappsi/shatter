@@ -8,8 +8,19 @@ __author__ = 'juan pablo isaza'
 
 
 class Code:
+    """
+    Holds all code that the user enters for evaluation. Is a holder for meta-code.
+    """
 
     def __init__(self, rho=None, lho=None, super_method=None, code_str=None):
+        """
+        Code can either be specified as string with code_str or with the 3 parameters rho, super_method and lho.
+        :param rho: right hand operand.
+        :param lho: left hand operand.
+        :param super_method: When rho == lho then super_method = __eq__.
+        :param code_str: alternatively code can be entered as a string.
+        """
+
         self.rho = rho
         self.lho = lho
 
@@ -18,7 +29,7 @@ class Code:
         else:
             self.operator = None
 
-        self.the_locals = {}
+        self.the_locals = None
         self.code_str = code_str
 
     # explicit hash definition when overriding __eq__, otherwise hash = None.
@@ -59,3 +70,6 @@ class Code:
             return self.code_str
         else:
             raise NotImplemented
+
+    def add_locals(self, the_locals):
+        self.the_locals = the_locals

@@ -27,7 +27,7 @@ class SolverTest(unittest.TestCase):
         qm_ordered_set = s.execute_qm_algorithm(qm_input)
         self.assertSetEqual(set(list(qm_ordered_set)), expected_qm_output)
 
-        exp = translate_to_python_expression(var_names, qm_ordered_set)
+        exp = translate_to_python_expression(var_names, qm_ordered_set, locals())
         self.assertEqual(exp, expected_exp)
 
     def test_qm_algorithm_and_translate(self):

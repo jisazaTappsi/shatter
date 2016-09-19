@@ -42,7 +42,7 @@ class GeneratorTest(unittest.TestCase):
         expected_code = ["def " + signature + ":", "    return " + expression_expected]
 
         inputs = get_function_inputs(fun)
-        expression = s.get_function_expression(table, inputs)
+        expression = s.get_function_expression(table, inputs, locals())
         definition = 'def ' + signature
         code = s.add_code_to_implementation(current_implementation=s.get_initial_implementation(definition),
                                             bool_expression=expression,

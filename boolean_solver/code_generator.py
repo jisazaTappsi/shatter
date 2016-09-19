@@ -132,11 +132,12 @@ def get_signature(definition):
     return signature_obj.group()
 
 
-def translate_to_python_expression(all_inputs, qm_output):
+def translate_to_python_expression(all_inputs, qm_output, local_vars):
     """
     Converts the algorithm output to friendlier python code.
     :param all_inputs: tuple with the names of the boolean inputs.
     :param qm_output: set containing strings. see "execute_qm_algorithm" for details.
+    :param local_vars: locals()
     :return: python boolean expression
     """
     final_expression = ''
@@ -152,6 +153,9 @@ def translate_to_python_expression(all_inputs, qm_output):
 
             if character != '-' and helpers.string_has_bits_for_and(str_bits, j):
                 factor += ' and '
+
+            if isinstance(all_inputs[j], Code):
+                all_inputs[j].add_locals(local_vars)
 
             if character == '1':
                 factor += str(all_inputs[j])

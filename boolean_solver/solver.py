@@ -67,18 +67,19 @@ def execute_qm_algorithm(ones):
     return qm_obj.simplify_los(ones)
 
 
-def get_function_expression(table, inputs):
+def get_function_expression(table, inputs, local_vars):
     """
     Get boolean expression. Can return empty string.
     solution provided by mc algorithm.
     :param inputs: Function explicit inputs or implicit added rules.
     :param table: truth table.
+    :param local_vars: locals()
     :return: string with boolean expression.
     """
     ones = from_table_to_ones(table)
     if len(ones) > 0:
         qm_output = execute_qm_algorithm(ones)
-        return translate_to_python_expression(inputs, qm_output)
+        return translate_to_python_expression(inputs, qm_output, local_vars)
     else:
         return ''
 
@@ -173,12 +174,13 @@ def get_input_values(conditions, function_inputs, output):
         return list(function_inputs)
 
 
-def return_solution(unittest, f, conditions):
+def return_solution(unittest, f, conditions, local_vars):
     """
     Solves the riddle, Writes it and tests it.
     :param unittest: the unittest object that is passed to test stuff
     :param f: any function object.
     :param conditions: condition or object or partial truth table (explicit, implicit or mix).
+    :param local_vars: locals()
     :return: True for successful operation, False if not.
     """
     f_path = h.get_function_path(f)
@@ -198,7 +200,7 @@ def return_solution(unittest, f, conditions):
         for the_output, table in processed_conditions.tables.iteritems():
 
             all_inputs = get_input_values(conditions, function_inputs, the_output)
-            expression = get_function_expression(table, all_inputs)
+            expression = get_function_expression(table, all_inputs, local_vars)
 
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,
@@ -220,12 +222,13 @@ def return_solution(unittest, f, conditions):
     return get_empty_solution(f, conditions)
 
 
-def execute(unittest, function, conditions):
+def execute(unittest, function, conditions, local_vars=None):
     """
     Solves the riddle, Writes it and tests it.
     :param unittest: the current test being run eg: 'self'.
     :param function: the function to be coded.
     :param conditions: condition or object or partial truth table (explicit, implicit or mix).
+    :param local_vars: locals()
     :return: Solution object, empty object if operation unsuccessful.
     """
     # input validation
@@ -240,4 +243,5 @@ def execute(unittest, function, conditions):
 
     return return_solution(unittest=unittest,
                            f=function,
-                           conditions=conditions)
+                           conditions=conditions,
+                           local_vars=local_vars)
