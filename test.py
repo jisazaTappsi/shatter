@@ -40,7 +40,7 @@ class MyTest(unittest.TestCase):
         """
         Will do recursion, extremely cool!!!
         """
-        args = {'a': solver.Code('not a')}
+        args = {'a': solver.Code(code_str='not a')}
         out = solver.Output(start.recursive, args)
 
         cond = solver.Conditions(a=False, output=0, default=out)
@@ -50,5 +50,5 @@ class MyTest(unittest.TestCase):
         """
         Testing internal pieces of code
         """
-        cond = solver.Conditions(any_non_input_name=solver.Code('isinstance(a, str)'), output=2)
+        cond = solver.Conditions(any_non_input_name=solver.Code(code_str='isinstance(a, str)'), output=2)
         solver.execute(self, start.internal_code, cond)

@@ -48,7 +48,7 @@ def print_object(instance):
         return instance.__name__  # when the function is passed as object; not invoked.
 
     if isinstance(instance, Code):
-        return str(instance.code_as_str)
+        return str(instance.code_str)
 
     if isinstance(instance, c.Output):
         return print_invoked_function(instance)

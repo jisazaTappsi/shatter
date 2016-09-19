@@ -216,7 +216,7 @@ class GeneratorTest(unittest.TestCase):
         Invoke function with arguments.
         """
         function = f.another_call2
-        args = {'a': s.Code('a'), 'b': s.Code('b')}
+        args = {'a': s.Code(code_str='a'), 'b': s.Code(code_str='b')}
         out_f = f.another_call
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
@@ -257,7 +257,7 @@ class GeneratorTest(unittest.TestCase):
         Will do recursion, extremely cool!!!
         """
         function = f.recursive
-        args = {'a': s.Code('not a')}
+        args = {'a': s.Code(code_str='not a')}
         out = s.Output(f.recursive, args)
         code = ['def ' + function.__name__ + '(a):',
                 '',
@@ -275,7 +275,7 @@ class GeneratorTest(unittest.TestCase):
         call nested functions.
         """
         function = f.nested_call
-        out_obj = s.Output(f.f, {'a': s.Output(f.g, {'a': s.Code('a')})})
+        out_obj = s.Output(f.f, {'a': s.Output(f.g, {'a': s.Code(code_str='a')})})
         code = ['def ' + function.__name__ + '(a):',
                 '',
                 '    if not a:',
@@ -299,7 +299,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = s.Conditions(any_non_input_name=s.Code('isinstance(a, str)'), output=2)
+        cond = s.Conditions(any_non_input_name=s.Code(code_str='isinstance(a, str)'), output=2)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
 
@@ -322,9 +322,9 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = s.Conditions(s.Code(code1_str),
-                            s.Code(code2_str),
-                            s.Code(code3_str),
+        cond = s.Conditions(s.Code(code_str=code1_str),
+                            s.Code(code_str=code2_str),
+                            s.Code(code_str=code3_str),
                             output=right_str)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
@@ -346,11 +346,11 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = s.Conditions(rule1=s.Code(code1_str),
-                            rule2=s.Code(code2_str),
+        cond = s.Conditions(rule1=s.Code(code_str=code1_str),
+                            rule2=s.Code(code_str=code2_str),
                             output=right_str)
 
-        cond.add(rule3=s.Code(code3_str), output=right_str)
+        cond.add(rule3=s.Code(code_str=code3_str), output=right_str)
 
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
@@ -372,11 +372,11 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = s.Conditions(s.Code(code1_str),
-                            s.Code(code2_str),
+        cond = s.Conditions(s.Code(code_str=code1_str),
+                            s.Code(code_str=code2_str),
                             output=right_str)
 
-        cond.add(s.Code(code3_str), output=right_str)
+        cond.add(s.Code(code_str=code3_str), output=right_str)
 
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
@@ -397,8 +397,8 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = s.Conditions(s.Code(code1_str), output=s.Code(output_code))
-        cond.add(s.Code(code2_str), output=s.Code(output_code))
+        cond = s.Conditions(s.Code(code_str=code1_str), output=s.Code(code_str=output_code))
+        cond.add(s.Code(code_str=code2_str), output=s.Code(code_str=output_code))
 
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
