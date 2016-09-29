@@ -4,12 +4,19 @@
 
 import unittest
 
-from tests.generated_code.tester_functions import *
+from tests.generated_code import tester_functions as f
+from tests.testing_helpers import common_testing_code
+from boolean_solver.conditions import Conditions
+from boolean_solver.solver import execute
 
 __author__ = 'juan pablo isaza'
 
 
 class TesterTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        common_testing_code.reset_functions_file(f.__file__, hard_reset=True)
 
     def test_collision(self):
         """
@@ -18,13 +25,8 @@ class TesterTest(unittest.TestCase):
         cond = Conditions(a=True, output=1)  # first condition
         cond.add(a=False, output=1)  # contradictory condition.
 
-        try:
-            execute(self, collision, cond)
-        except AssertionError:
-            return
-
-        # if goes here then fail!
-        self.assertTrue(False)
+        with self.assertRaises(AssertionError):
+            execute(self, f.collision, cond)
 
     def test_non_collision(self):
         """
@@ -35,7 +37,7 @@ class TesterTest(unittest.TestCase):
         cond.add(a=True, c=False, d=True, output=2)  # leave b out
         cond.add(b=True, c=False, d=False, output=3)  # leave a out
 
-        execute(self, non_collision, cond)
+        execute(self, f.non_collision, cond)
 
 
 if __name__ == '__main__':

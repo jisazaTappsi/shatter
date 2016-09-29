@@ -12,7 +12,7 @@ from processed_conditions import *
 
 __author__ = 'juan pablo isaza'
 
-# TODO: Raise a comprehensive exception when missing arguments in the function: Cuase it has awful behavior when (eg):
+# TODO: Raise a comprehensive exception when missing arguments in the function: Cause it has awful behavior when (eg):
 # @solve()
 # def my_function(existing_arg)
 #   pass
@@ -42,14 +42,14 @@ def solve():
         :param f: function
         :return: returns wrapped_f
         """
-        # TODO: include optional **kwargs???
-        def wrapped_f(*args):
+        def wrapped_f(*args, **kwargs):
             """
             same as wrap(f), but with *args
             :param args: of function
+            :param kwargs: of function
             :return: eval of f with args.
             """
-            return f(*args)
+            return f(*args, **kwargs)
 
         # Meta data transfer enables introspection of decorated functions.
         wrapped_f.__name__ = f.__name__
@@ -81,7 +81,6 @@ def get_function_expression(table, inputs):
     solution provided by mc algorithm.
     :param inputs: Function explicit inputs or implicit added rules.
     :param table: truth table.
-    :param local_vars: locals()
     :return: string with boolean expression.
     """
     ones = from_table_to_ones(table)

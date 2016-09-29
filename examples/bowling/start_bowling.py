@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 """
 http://code.joejag.com/coding-dojo/bowling-scores/
@@ -33,4 +34,13 @@ def get_frame_score(frame, game, i):
 
 
 def get_score(game):
-    pass
+    """
+    eg: game = ((10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,10,10))
+    """
+
+    score = 0
+
+    for i, frame in enumerate(game):
+        score += get_frame_score(frame, game, i)
+
+    return score

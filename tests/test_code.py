@@ -7,11 +7,17 @@ import unittest
 from boolean_solver.code import Code, MagicVar, MagicVarNotFound
 from tests.generated_code import code_functions as f
 from boolean_solver import solver as s
+from tests.testing_helpers import common_testing_code
+
 
 __author__ = 'juan pablo isaza'
 
 
 class CodeTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        common_testing_code.reset_functions_file(f.__file__, hard_reset=True)
 
     def test_comparison_operators(self):
 

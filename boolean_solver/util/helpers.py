@@ -21,7 +21,7 @@ def read_file(absolute_path):
 
 def delete_file(filename):
     """
-    :filename: relative path to file.
+    :param filename: relative path to file.
     """
     if os.path.exists(filename):
         os.remove(filename)
@@ -118,6 +118,7 @@ def get_function_line_number(f, file_code):
     """
     Returns first line number for decorated and un-decorated methods. -1 if not found.
     :param f: function.
+    :param file_code: the code as a list where each element is a line.
     :return: the line of the file(starting in zero), 0 if not found!
     """
     for index, line in enumerate(file_code):

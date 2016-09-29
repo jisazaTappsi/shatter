@@ -9,11 +9,16 @@ from boolean_solver.code_generator import translate_to_python_expression
 from boolean_solver.util.last_update_set import LastUpdateSet
 from tests.generated_code import solver_functions as f
 from tests.testing_helpers import constants as cts
+from tests.testing_helpers import common_testing_code
 
 __author__ = 'juan pablo isaza'
 
 
 class SolverTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        common_testing_code.reset_functions_file(f.__file__, hard_reset=True)
 
     def qm_algorithm_and_translate(self, var_names, qm_input, expected_qm_output, expected_exp):
         """

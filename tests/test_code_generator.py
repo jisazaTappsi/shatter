@@ -16,7 +16,7 @@ class GeneratorTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        common_testing_code.reset_functions_file(common_testing_code.get_source_path(f.__file__))
+        common_testing_code.reset_functions_file(f.__file__, hard_reset=True)
 
     def test_code_generation_with_if(self):
         """
