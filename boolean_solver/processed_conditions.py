@@ -5,6 +5,7 @@
 from boolean_solver.conditions import *
 from boolean_solver.constants import *
 from boolean_solver.frozen_dict import FrozenDict
+from boolean_solver.code import Code
 
 __author__ = 'juan pablo isaza'
 
@@ -32,6 +33,21 @@ def get_default(conditions):
         return False
 
 
-def get_processed_conditions(conditions, inputs):
+def add_locals_to_all_code_objects(tables, the_locals):
+
+    for the_output, table in tables.items():
+        if isinstance(the_output, Code):
+            the_output.add_locals(the_locals)
+
+        for row in table:
+            for item in row:
+                if isinstance(item, Code):
+                    item.add_locals(the_locals)
+
+
+def get_processed_conditions(conditions, inputs, local_vars):
     tables = get_truth_tables(conditions, inputs)
+
+    add_locals_to_all_code_objects(tables, local_vars)
+
     return ProcessedConditions(tables, get_default(conditions))

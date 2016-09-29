@@ -38,8 +38,27 @@ class Code:
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.code_str == other.code_str
 
+    # TODO: odd way to solve composition, missing locals() complexity.
+    """
+    def __gt__(self, other):
+        return Code(self, other, self.__gt__)
+
+    def __mod__(self, other):
+        return Code(self, other, self.__mod__)
+
+    def __rmod__(self, other):
+        return Code(self, other, self.__rmod__)
+
+    def __mul__(self, other):
+        return Code(self, other, self.__mul__)
+
+    def __rmul__(self, other):
+        return Code(self, other, self.__rmul__)
+    """
+
     def get_use_case(self):
         """0 for operands, 1 for code as string and 2 for NotImplemented"""
+        # TODO: refactor this shit!
         if self.rho is not None and self.operator is not None and self.lho is not None and self.code_str is None:
             return 0
         elif self.rho is None and self.operator is None and self.lho is None and self.code_str is not None:
@@ -48,14 +67,14 @@ class Code:
             return 2
 
     def get_operands_str(self, operand):
-        """had to try-except in order to not import MagicVar, because ir would imply a circular reference, as Code is
-        imported in MagicVar class.
+        """
+        prints according to type.
         :param operand: Can be MagicVar or any other stuff, that is operated on.
         :returns string of that operand, ie enhanced str(operand)"""
 
-        try:
+        if operand is not None and isinstance(operand, MagicVar):
             return operand.get_variable_name(self.the_locals)
-        except AttributeError:
+        else:
             return str(operand)
 
     def __str__(self):
@@ -73,3 +92,128 @@ class Code:
 
     def add_locals(self, the_locals):
         self.the_locals = the_locals
+
+
+# Down here is the class MagicVar and related.
+
+current_id = 1
+
+
+class MagicVarNotFound(Exception):
+    pass
+
+    @staticmethod
+    def add_locals():
+        return "Could not find local variable. Add optional argument local_vars=locals() to solver() function."
+
+    @staticmethod
+    def declare_local():
+        return "Could not find local variable. Make sure that MagicVars are defined locally."
+
+
+class MagicVar:
+
+    def __init__(self):
+
+        # gets the global id and adds 1 to generate a unique identifier for all objects running anywhere.
+        global current_id
+        self.id = current_id
+        current_id += 1
+
+    def __eq__(self, other):
+        return Code(self, other, self.__eq__)
+
+    def __lt__(self, other):
+        return Code(self, other, self.__lt__)
+
+    def __gt__(self, other):
+        return Code(self, other, self.__gt__)
+
+    def __le__(self, other):
+        return Code(self, other, self.__le__)
+
+    def __ge__(self, other):
+        return Code(self, other, self.__ge__)
+
+    def __ne__(self, other):
+        return Code(self, other, self.__ne__)
+
+    def __add__(self, other):
+        return Code(self, other, self.__add__)
+
+    def __radd__(self, other):
+        return Code(self, other, self.__radd__)
+
+    def __mul__(self, other):
+        return Code(self, other, self.__mul__)
+
+    def __rmul__(self, other):
+        return Code(self, other, self.__rmul__)
+
+    def __sub__(self, other):
+        return Code(self, other, self.__sub__)
+
+    def __rsub__(self, other):
+        return Code(self, other, self.__rsub__)
+
+    def __div__(self, other):
+        return Code(self, other, self.__div__)
+
+    def __rdiv__(self, other):
+        return Code(self, other, self.__rdiv__)
+
+    def __mod__(self, other):
+        return Code(self, other, self.__mod__)
+
+    def __rmod__(self, other):
+        return Code(self, other, self.__rmod__)
+
+    def __pow__(self, power, modulo=None):
+        return Code(self, power, self.__pow__)
+
+    def __rpow__(self, power, modulo=None):
+        return Code(self, power, self.__rpow__)
+
+    def __floordiv__(self, other):
+        return Code(self, other, self.__floordiv__)
+
+    def __rfloordiv__(self, other):
+        return Code(self, other, self.__rfloordiv__)
+
+    def __get_id__(self):
+        return self.id
+
+    @staticmethod
+    def get_id(var):
+        try:
+            return var.__get_id__()
+        except AttributeError:
+            return -1  # negative value guarantees its not going to match to any other MagicVar, as all their ids are +
+
+    def get_variable_name(self, the_locals):
+        """
+        :param the_locals: a dictionary result of calling locals().
+        :returns the name of the variable or raises exception if not found.
+        """
+        if the_locals is not None:
+
+            names = [k for k, v in list(the_locals.items()) if self.get_id(v) == self.get_id(self)]
+
+            if len(names) > 0:
+                return names[0]
+            else:
+                raise MagicVarNotFound(MagicVarNotFound.declare_local())
+        else:
+            raise MagicVarNotFound(MagicVarNotFound.add_locals())
+
+    # TODO: add indexing capabilities
+    """
+    def __delitem__(self, key):
+        self.__delattr__(key)
+
+    def __getitem__(self, key):
+        return self.__getattribute__(key)
+
+    def __setitem__(self, key, value):
+        self.__setattr__(key, value)
+    """

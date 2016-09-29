@@ -4,7 +4,7 @@
 
 import unittest
 
-from tests.generated_code.tester import *
+from tests.generated_code.tester_functions import *
 
 __author__ = 'juan pablo isaza'
 
@@ -36,3 +36,7 @@ class TesterTest(unittest.TestCase):
         cond.add(b=True, c=False, d=False, output=3)  # leave a out
 
         execute(self, non_collision, cond)
+
+
+if __name__ == '__main__':
+    unittest.main()

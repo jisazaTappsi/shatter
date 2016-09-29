@@ -51,3 +51,6 @@ class ConditionsTest(unittest.TestCase):
                                                   POSITIONAL_ARGS_RULE + str(1): 4})
         self.assertEqual(r, 2)
 
+
+if __name__ == '__main__':
+    unittest.main()

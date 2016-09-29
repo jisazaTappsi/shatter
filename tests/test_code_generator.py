@@ -6,7 +6,7 @@ import unittest
 from boolean_solver import code_generator as c
 from boolean_solver import solver as s
 from boolean_solver.util.helpers import get_function_inputs
-from tests.generated_code import code_generator as f
+from tests.generated_code import code_generator_functions as f
 from tests.testing_helpers import constants as cts, common_testing_code
 
 __author__ = 'juan pablo isaza'
@@ -42,7 +42,7 @@ class GeneratorTest(unittest.TestCase):
         expected_code = ["def " + signature + ":", "    return " + expression_expected]
 
         inputs = get_function_inputs(fun)
-        expression = s.get_function_expression(table, inputs, locals())
+        expression = s.get_function_expression(table, inputs)
         definition = 'def ' + signature
         code = s.add_code_to_implementation(current_implementation=s.get_initial_implementation(definition),
                                             bool_expression=expression,
@@ -402,3 +402,67 @@ class GeneratorTest(unittest.TestCase):
 
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
+
+    # TODO: pass test. How to remove redundancy?
+
+    #def test_factor_ordered_pieces_with_redundancy(self):
+    #    """Tests that string output is factored, when inputs are given in more than one addition."""
+#
+    #    function = f.factor_ordered_pieces_with_redundancy
+    #    right_str = 'factoring!!!'
+    #    code0_str = 'isinstance(array[0], int)'
+    #    code1_str = 'isinstance(array[1], int)'
+#
+    #    code = ['def {}(array):'.format(function.__name__),
+    #            '',
+    #            '    if {}:'.format(code1_str),
+    #            "        return \"{}\"".format(right_str),
+    #            '',
+    #            '    return False']
+#
+    #    cond = s.Conditions(s.Code(code_str=code0_str),
+    #                        s.Code(code_str=code1_str),
+    #                        output=right_str)
+#
+    #    cond.add(s.Code(code_str=code1_str), output=right_str)
+#
+    #    solution = s.execute(self, function, cond)
+    #    self.assertEqual(solution.implementation, code)
+
+    # TODO: auxiliary test: remove?
+    def test_basic(self):
+
+        function = f.basic
+        code = ['def {}(a, b):'.format(function.__name__),
+                '    return b']
+
+        cond = s.Conditions(a=True,
+                            b=True,
+                            output=True)
+        cond.add(b=True, output=True)
+
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    # test basic stuff:
+    def test_basic_if(self):
+
+        function = f.basic_if
+        code = ['def {}(a, b):'.format(function.__name__),
+                '',
+                '    if b:',
+                "        return \"le\"",
+                '',
+                '    return False']
+
+        cond = s.Conditions(a=True,
+                            b=True,
+                            output='le')
+        cond.add(b=True, output='le')
+
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+
+if __name__ == '__main__':
+    unittest.main()

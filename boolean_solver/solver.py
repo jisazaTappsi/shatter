@@ -12,6 +12,14 @@ from processed_conditions import *
 
 __author__ = 'juan pablo isaza'
 
+# TODO: Raise a comprehensive exception when missing arguments in the function: Cuase it has awful behavior when (eg):
+# @solve()
+# def my_function(existing_arg)
+#   pass
+#
+# Conditions(non_exiting_arg=True, output=True)
+
+
 # TODO: add a decorator when function optimization is to be ignored. @ignore_solver()
 # Maybe the programmer modified the original version and wants it to be manually specified.
 # TODO: do the comment section of functions.
@@ -67,7 +75,7 @@ def execute_qm_algorithm(ones):
     return qm_obj.simplify_los(ones)
 
 
-def get_function_expression(table, inputs, local_vars):
+def get_function_expression(table, inputs):
     """
     Get boolean expression. Can return empty string.
     solution provided by mc algorithm.
@@ -79,7 +87,7 @@ def get_function_expression(table, inputs, local_vars):
     ones = from_table_to_ones(table)
     if len(ones) > 0:
         qm_output = execute_qm_algorithm(ones)
-        return translate_to_python_expression(inputs, qm_output, local_vars)
+        return translate_to_python_expression(inputs, qm_output)
     else:
         return ''
 
@@ -195,12 +203,12 @@ def return_solution(unittest, f, conditions, local_vars):
 
         # init variables
         implementation = get_initial_implementation(definition)
-        processed_conditions = get_processed_conditions(conditions, function_inputs)
+        processed_conditions = get_processed_conditions(conditions, function_inputs, local_vars)
 
         for the_output, table in processed_conditions.tables.iteritems():
 
             all_inputs = get_input_values(conditions, function_inputs, the_output)
-            expression = get_function_expression(table, all_inputs, local_vars)
+            expression = get_function_expression(table, all_inputs)
 
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,

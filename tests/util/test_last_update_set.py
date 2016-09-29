@@ -27,3 +27,7 @@ class LastUpdateSetTest(unittest.TestCase):
             new_list.append(e)
 
         self.assertEqual(new_list, old_list)
+
+
+if __name__ == '__main__':
+    unittest.main()

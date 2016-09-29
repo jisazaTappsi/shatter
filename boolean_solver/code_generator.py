@@ -48,7 +48,7 @@ def print_object(instance):
         return instance.__name__  # when the function is passed as object; not invoked.
 
     if isinstance(instance, Code):
-        return str(instance.code_str)
+        return str(instance)
 
     if isinstance(instance, c.Output):
         return print_invoked_function(instance)
@@ -132,7 +132,7 @@ def get_signature(definition):
     return signature_obj.group()
 
 
-def translate_to_python_expression(all_inputs, qm_output, local_vars):
+def translate_to_python_expression(all_inputs, qm_output):
     """
     Converts the algorithm output to friendlier python code.
     :param all_inputs: tuple with the names of the boolean inputs.
@@ -153,9 +153,6 @@ def translate_to_python_expression(all_inputs, qm_output, local_vars):
 
             if character != '-' and helpers.string_has_bits_for_and(str_bits, j):
                 factor += ' and '
-
-            if isinstance(all_inputs[j], Code):
-                all_inputs[j].add_locals(local_vars)
 
             if character == '1':
                 factor += str(all_inputs[j])

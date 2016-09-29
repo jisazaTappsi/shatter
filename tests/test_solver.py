@@ -7,7 +7,7 @@ import unittest
 from boolean_solver import solver as s, conditions as c
 from boolean_solver.code_generator import translate_to_python_expression
 from boolean_solver.util.last_update_set import LastUpdateSet
-from tests.generated_code import solver as f
+from tests.generated_code import solver_functions as f
 from tests.testing_helpers import constants as cts
 
 __author__ = 'juan pablo isaza'
@@ -27,7 +27,7 @@ class SolverTest(unittest.TestCase):
         qm_ordered_set = s.execute_qm_algorithm(qm_input)
         self.assertSetEqual(set(list(qm_ordered_set)), expected_qm_output)
 
-        exp = translate_to_python_expression(var_names, qm_ordered_set, locals())
+        exp = translate_to_python_expression(var_names, qm_ordered_set)
         self.assertEqual(exp, expected_exp)
 
     def test_qm_algorithm_and_translate(self):
@@ -143,3 +143,7 @@ class SolverTest(unittest.TestCase):
                             a_callable=f.mix_xor_function,
                             signature=f.mix_xor_function.__name__ + '(a, b)',
                             expression=cts.exp_xor)
+
+
+if __name__ == '__main__':
+    unittest.main()

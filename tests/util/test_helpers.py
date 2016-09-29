@@ -48,3 +48,7 @@ class UtilTest(unittest.TestCase):
                                                '            a = False',
                                                '',
                                                '            return a or b'])
+
+
+if __name__ == '__main__':
+    unittest.main()

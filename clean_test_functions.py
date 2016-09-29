@@ -9,6 +9,8 @@ from tests.testing_helpers import common_testing_code
 
 __author__ = 'juan pablo isaza'
 
+SPECIFIC_FILES = ['start.py', 'examples/bowling/start_bowling.py', 'boolean_solver/start_sample.py']
+
 
 def find(pattern, path):
     """
@@ -32,9 +34,9 @@ def clean_functions():
     """
     path = os.path.dirname(os.path.abspath(__file__))
     path = '/'.join(path.split('/')) + '/tests/'
-    res = find('*_functions.py', path)
+    testing_files = find('*_functions.py', path)
 
-    for a_file in res:
+    for a_file in testing_files + SPECIFIC_FILES:
         common_testing_code.reset_functions_file(a_file)
 
 clean_functions()

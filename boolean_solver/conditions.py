@@ -9,6 +9,7 @@ from boolean_solver.output import Output
 from boolean_solver.util import helpers
 from boolean_solver.util.last_update_dict import LastUpdateDict
 from boolean_solver.util.last_update_set import LastUpdateSet
+from boolean_solver.code import Code
 from util.code_dict import CodeDict
 
 __author__ = 'juan pablo isaza'
@@ -22,7 +23,7 @@ class Conditions(list):
     @staticmethod
     def gets_start_positional_idx(dictionary):
         """
-        Gets the biggest index for a dictionary and adds 1.
+        Gets the biggest index for a dictionary and add 1.
         :param dictionary: any dict
         :return: int
         """
@@ -68,6 +69,12 @@ class Conditions(list):
         start_idx = self.get_max_positional_arg()
         for idx, e in enumerate(args):
             ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
+
+            # TODO: THIS HAS A BUG FOR CODE CASES: Solution below is not good yet.
+            #if isinstance(e, Code):
+            #    ordered_dict[str(e)] = e
+            #else:
+            #    ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
 
         # Adds kwargs
         for k in kwargs.keys():

@@ -1,7 +1,7 @@
 import unittest
 
 from boolean_solver import solver
-from boolean_solver.magic_var import MagicVar
+from boolean_solver.code import MagicVar
 from examples.bowling import start_bowling
 
 

@@ -8,28 +8,34 @@ __author__ = 'juan pablo isaza'
 
 class CustomOperator:
 
-    COMPARISON_OPERATORS = {'__eq__': '==',
-                            '__ne__': '!=',
-                            '__lt__': '<',
-                            '__gt__': '>',
-                            '__le__': '<=',
-                            '__ge__': '>='}
-
-    ARITHMETIC_OPERATORS = {'addition': '+',
-                            'subtraction': '-',
-                            'multiplication': '*',
-                            'division': '/',
-                            'modulus': '%',
-                            'exponent': '**',
-                            'floor_division': '//'}
-
-    LOGICAL_OPERATORS = {'intersection': 'and',
-                         'union': 'or',
-                         'negation': 'not'}
+    OPERATORS = {'__eq__': '==',  # COMPARISON
+                '__ne__': '!=',
+                '__lt__': '<',
+                '__gt__': '>',
+                '__le__': '<=',
+                '__ge__': '>=',
+                '__add__': '+',  # ARITHMETIC
+                '__radd__': '+',
+                '__sub__': '-',
+                '__rsub__': '-',
+                '__mul__': '*',
+                '__rmul__': '*',
+                '__div__': '/',
+                '__rdiv__': '/',
+                '__mod__': '%',
+                '__rmod__': '%',
+                '__pow__': '**',
+                '__rpow__': '**',
+                '__floordiv__': '//',
+                '__rfloordiv__': '//',
+                 # TODO: NOT READY TO IMPLEMENT THESE. NOT SURE ABOUT CONSEQUENCES!
+                'intersection': 'and',  # LOGICAL
+                'union': 'or',
+                'negation': 'not'}
 
     def __init__(self, method):
         self.method = method
         if method is not None:
-            self.symbol = self.COMPARISON_OPERATORS[self.method.__name__]
+            self.symbol = self.OPERATORS[self.method.__name__]
         else:
             self.symbol = None

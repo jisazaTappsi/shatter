@@ -67,3 +67,6 @@ target/
 ## File-based project format:
 *.ipr
 *.iws
+
+# pyenv
+.python-version

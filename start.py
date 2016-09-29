@@ -2,9 +2,9 @@
 
 """Short example"""
 
-__author__ = 'juan pablo isaza'
-
 from boolean_solver import solver as s
+
+__author__ = 'juan pablo isaza'
 
 
 @s.solve()

@@ -29,3 +29,6 @@ class ConstantsTest(unittest.TestCase):
         pat = re.search(cts.DEFINITION_PATTERN, '   def    fun(   a  ,  b   )   :# anything')
         self.assertIsNotNone(pat)
 
+
+if __name__ == '__main__':
+    unittest.main()
