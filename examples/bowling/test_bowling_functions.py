@@ -5,7 +5,7 @@ from boolean_solver.code import MagicVar
 from examples.bowling import start_bowling
 
 
-class MyTest(unittest.TestCase):
+class BowlingTest(unittest.TestCase):
 
     def test_is_strike(self):
 

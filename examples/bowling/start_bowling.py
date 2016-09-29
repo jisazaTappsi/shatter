@@ -4,30 +4,30 @@ http://code.joejag.com/coding-dojo/bowling-scores/
 """
 
 
-from boolean_solver import solver as s
+from boolean_solver.solver import solve
 
 
-@s.solve()
+@solve()
 def is_spare(frame):
     pass
 
 
-@s.solve()
+@solve()
 def is_strike(frame):
     pass
 
 
-@s.solve()
+@solve()
 def get_next_throw(i, game):
     pass
 
 
-@s.solve()
+@solve()
 def get_next_2_throws(i, game):
     pass
 
 
-@s.solve()
+@solve()
 def get_frame_score(frame, game, i):
     pass
 
