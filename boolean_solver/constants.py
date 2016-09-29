@@ -8,14 +8,16 @@ __author__ = 'juan pablo isaza'
 
 INTERNAL_FUNC_CODE = 'internal_func_code'
 
-COMMENT_PATTERN = re.compile(r"\s*(#.*)?")
+COMMENT_PATTERN = re.compile(r"\s*(#.*)?$")
 INDENT = re.compile(r"^\s*")
-
-# TODO: add indent comment and function regex factoring
-DEFINITION_PATTERN = re.compile(r"^\s*def\s*(\w+)\(\s*\w*\s*(,\s*\w+\s*)*\)\s*:")
 FUNCTION_PATTERN = re.compile(r"(\w+)\(\s*\w*\s*(,\s*\w+\s*)*\)")
-SOLVE_PATTERN = re.compile(r"{indent}^\s*@(\w+\.)?solve\(\){comment}".format(indent=INDENT.pattern,
-                                                                             comment=COMMENT_PATTERN.pattern))
+
+DEFINITION_PATTERN = re.compile(r"{indent}def\s*{function}\s*:{comment}".format(indent=INDENT.pattern,
+                                                                                function=FUNCTION_PATTERN.pattern,
+                                                                                comment=COMMENT_PATTERN.pattern))
+
+SOLVE_PATTERN = re.compile(r"{indent}@(\w+\.)?solve\(\){comment}".format(indent=INDENT.pattern,
+                                                                         comment=COMMENT_PATTERN.pattern))
 
 
 # reserved keywords
