@@ -16,7 +16,7 @@ def line_has_solve(line):
     :param line
     :return: boolean
     """
-    return re.search(cts.SOLVE_PATTERN, line) is not None
+    return re.search(cts.SOLVE_DECORATOR_PATTERN, line) is not None
 
 
 def reset_functions_file(path, hard_reset=False):

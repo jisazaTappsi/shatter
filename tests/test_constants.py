@@ -25,8 +25,16 @@ class ConstantsTest(unittest.TestCase):
         pat = re.search(cts.DEFINITION_PATTERN, '   def fun(a) :')
         self.assertIsNotNone(pat)
 
-        # very hard one
+        # hard one
         pat = re.search(cts.DEFINITION_PATTERN, '   def    fun(   a  ,  b   )   :# anything')
+        self.assertIsNotNone(pat)
+
+        # even harder
+        pat = re.search(cts.DEFINITION_PATTERN, '   def    fun   (   a  ,  b   )   :  # anything # other stuff')
+        self.assertIsNotNone(pat)
+
+        # hard solve decorator
+        pat = re.search(cts.SOLVE_DECORATOR_PATTERN, '    @ s . solve ()   # anything')
         self.assertIsNotNone(pat)
 
 
