@@ -9,7 +9,6 @@ from boolean_solver.output import Output
 from boolean_solver.util import helpers
 from boolean_solver.util.last_update_dict import LastUpdateDict
 from boolean_solver.util.last_update_set import LastUpdateSet
-from boolean_solver.code import Code
 from util.code_dict import CodeDict
 
 __author__ = 'juan pablo isaza'
@@ -55,6 +54,18 @@ class Conditions(list):
 
         return max_arg
 
+    def search_repeating_variable(self, value):
+        """Tries to find if variable was already declared. If so outputs the original key else outputs None. Will
+        exclude reserved words, as they are not variable declarations.
+        :param value: a variable value. For example a Code object.
+        :return : key of possible repeating variable  or None
+        """
+        for d in self:
+            for key in set(d.keys()) - set(KEYWORDS.values()):
+                if d[key] == value:
+                    return key
+        return None
+
     def get_ordered_dict(self, args, kwargs):
         """
         Big issue solved here. Adds args, to have positional args always in the same order as the user inputs.
@@ -68,13 +79,12 @@ class Conditions(list):
         # Adds args
         start_idx = self.get_max_positional_arg()
         for idx, e in enumerate(args):
-            ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
 
-            # TODO: THIS HAS A BUG FOR CODE CASES: Solution below is not good yet.
-            #if isinstance(e, Code):
-            #    ordered_dict[str(e)] = e
-            #else:
-            #    ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
+            repeating_var = self.search_repeating_variable(e)
+            if repeating_var is None:  # first time: declares new value.
+                ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
+            else:  # has been previously declared.
+                ordered_dict[repeating_var] = e
 
         # Adds kwargs
         for k in kwargs.keys():
@@ -125,65 +135,77 @@ class Conditions(list):
 
     def get_input_keys(self, f_inputs, output):
         """
-        Scans the whole conditions object looking for input keys. Will add inputs such as code pieces, that are not
+        Scans the whole conditions object looking for input keys. Will add inputs (such as code pieces), that are not
         explicitly declared as function inputs.
+        Uses LastOrderSets because order is very important. The order is:
+        first the f_inputs (ordered from right to left), then args added on the condition object from right to left and
+        top to bottom.
+        Example:
+        >>>out = -1
+
+        >>>def f(a, b):
+        >>>    return a + b
+
+        >>>cond = Conditions(c=1, d=2, output=out)
+        >>>cond.add(x=3, y=4, output='other_stuff')
+        >>>cond.add(e=3, f=4, output=out)
+
+        >>>cond.get_input_keys(helpers.get_function_inputs(f), out)
+        >>>LastUpdateSet(['a', 'b', 'c', 'd', 'e', 'f'])
+
         :param f_inputs: function inputs.
         :param output: the output of the row.
         :return: All possible inputs that are not keywords.
         """
+        # TODO: missing optional args(kwargs) of the input function.
+        f_inputs = LastUpdateSet(f_inputs)
+        new_inputs = LastUpdateSet()
 
-        f_inputs = list(f_inputs)
-
-        new_inputs = []
         for row in self:
             if KEYWORDS[OUTPUT] in row and row[KEYWORDS[OUTPUT]] == output:
-                new_inputs += helpers.remove_list_from_list(row.keys(), f_inputs)
+                new_inputs |= LastUpdateSet(row.keys()) - f_inputs  # adds inputs who are not already args.
 
-        all_elements = f_inputs + new_inputs
-        remove_elements = KEYWORDS.values()
+        all_elements = f_inputs | new_inputs
 
-        return helpers.remove_list_from_list(all_elements, remove_elements)
+        return all_elements - KEYWORDS.values()
 
-    def get_tuples_from_indices(self, row, inputs, output):
+    @staticmethod
+    def add_element_to_tuples(tuples_set, new_element):
+        """
+        Adds additional element to a tuple set.
+        :param tuples_set: a set containing tuples.
+        :param new_element: any element to add in last position.
+        :return: tuple set
+        """
+        new_tuples = LastUpdateSet()
+        for tuple_element in tuples_set:
+            new_tuples.add(tuple_element + (new_element,))
+
+        return new_tuples
+
+    def get_tuples_from_args(self, row, function_args, output):
         """
         Get a set containing tuples (with implicit or explicit rows).
         :param row: dict with index as key and value as input value.
-        :param inputs: the output of the row.
-        :param output:
+        :param function_args: function
+        :param output: the output of the row.
         :return: set containing tuples.
         """
 
-        def add_element_to_tuples(tuples_set, new_element):
-            """
-            Adds additional element to a tuple set.
-            :param tuples_set: a set containing tuples.
-            :param new_element: any element to add in last position.
-            :return: tuple set
-            """
-            new_tuples = LastUpdateSet()
-            for tuple_element in tuples_set:
-                new_tuples.add(tuple_element + (new_element,))
-
-            return new_tuples
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-        if KEYWORDS[OUTPUT] in row:
-            output = row[KEYWORDS[OUTPUT]]
-            if isinstance(output, bool) and not output:
-                return LastUpdateSet()
+        if helpers.var_is_false(output):
+            return LastUpdateSet()
 
         # starts with 1 tuple
         tuples = LastUpdateSet([()])
-        for variable in self.get_input_keys(inputs, output):
+        for variable in self.get_input_keys(function_args, output):
 
             if variable in row:
-                tuples = add_element_to_tuples(tuples, row[variable])
+                tuples = self.add_element_to_tuples(tuples, row[variable])
             else:
 
                 # All possible outcomes for undetermined boolean variable: duplicates number of tuples.
-                true_tuples = add_element_to_tuples(tuples, True)
-                false_tuples = add_element_to_tuples(tuples, False)
+                true_tuples = self.add_element_to_tuples(tuples, True)
+                false_tuples = self.add_element_to_tuples(tuples, False)
                 tuples = true_tuples | false_tuples
 
         # add explicit output to tuples, if necessary.
@@ -207,7 +229,7 @@ class Conditions(list):
         """
         out_key = KEYWORDS[OUTPUT]
         args_key = KEYWORDS[OUTPUT_ARGS]
-        if out_key in row and args_key in row:
+        if out_key in row and args_key in row:  # This case is encountered only when the output is a function.
             return Output(function=row[out_key], arguments=row[args_key])
         elif out_key in row:
             return row[out_key]
@@ -226,7 +248,7 @@ class Conditions(list):
         return len(row_keys.difference(keyword_keys)) > 0
 
     @staticmethod
-    def change_keys_from_bool_to_int(d, new_key):
+    def change_key_from_bool_to_int(d, new_key):
         """
         Changes the keys from booleans (True or False) to int(0 or 1)
         if a int(0 or 1) is present.
@@ -242,34 +264,34 @@ class Conditions(list):
 
         return d
 
-    def add_truth_table(self, truth_tables, row, inputs):
+    def add_truth_table(self, truth_tables, row, function_args):
         """
         Adds a new truth table to the dict of truth_tables.
         :param truth_tables: orderDict, where the key is the output and the inputs are a orderSet of values.
         :param row: 1 row of self.
-        :param inputs: function inputs.
+        :param function_args: tuple
         :return: modified truth_tables.
         """
         output = self.get_output(row)
-        # gets a already worked on table.
-        if output in truth_tables:
-            truth_table = truth_tables[output]  # uses existing table.
-        else:
-            truth_table = LastUpdateSet()  # adds new truth table
 
-        condition_rows = self.get_tuples_from_indices(row, inputs, output)
-        truth_table = truth_table | condition_rows
+        if output in truth_tables:  # uses existing table.
+            truth_table = truth_tables[output]
+        else:  # adds new truth table
+            truth_table = LastUpdateSet()
+
+        condition_rows = self.get_tuples_from_args(row, function_args, output)
+        truth_table = truth_table | condition_rows  # concat sets.
 
         truth_tables[output] = truth_table  # add to tables dict.
 
-        return self.change_keys_from_bool_to_int(truth_tables, output)
+        return self.change_key_from_bool_to_int(truth_tables, output)
 
-    def get_truth_tables(self, inputs):
+    def get_truth_tables(self, function_args):
         """
         Factor Truth tables by output.
         This is the 'private' version.
-        :param inputs: variables.
-        :return: dict(), where key=output and value=implicit truth table.
+        :param function_args: variables.
+        :return: CodeDict(), where key=output and value=implicit truth table.
         """
 
         # dict where outputs are the keys, values are the rows.
@@ -277,7 +299,7 @@ class Conditions(list):
 
         for row in self:
             if self.row_has_non_keyword_keys(row):
-                truth_tables = self.add_truth_table(truth_tables, row, inputs)
+                truth_tables = self.add_truth_table(truth_tables, row, function_args)
 
         return truth_tables
 
@@ -293,9 +315,9 @@ def add_to_dict_table(table, key, value):
     """
     # will ignore key=False
     if key:
-        if key in table:
+        if key in table:  # add value to set in already existing key value pair.
             table[key] = table[key] | LastUpdateSet([value])
-        else:
+        else:  # create new key value pair.
             table[key] = LastUpdateSet([value])
 
     return table
@@ -309,50 +331,71 @@ def from_raw_set_to_dict_table(conditions):
     """
     table = dict()
     for row in conditions:
-        if Conditions.is_explicit(row):
+        if Conditions.is_explicit(row):  # explicit case
             table = add_to_dict_table(table, row[1], row[0])
-        else:
+        else:  # implicit case
             table = add_to_dict_table(table, True, row)
 
     return table
 
+TYPE_ERROR = 'type_error'
+ROW_ERROR = 'row_error'
+EXPLICIT_ROW_ERROR = 'explicit_row_error'
 
-def get_truth_tables(conditions, inputs):
+
+class ConditionsTypeError(TypeError):
+    def __init__(self, error_object, error_type):
+        if TYPE_ERROR == error_type:
+            message = 'Conditions variable is not a set nor a Conditions object, but rather type {}'\
+                .format(type(error_object))
+        elif ROW_ERROR:
+            message = '{} row in truth table is not a tuple'.format(error_object)
+        elif EXPLICIT_ROW_ERROR:
+            message = '{} row with explicit output in truth table has wrong format.'.format(error_object)
+        else:
+            message = 'unknown TypeError'
+
+        super(ConditionsTypeError, self).__init__(message)
+
+
+def get_truth_tables(conditions, function_args):
     """
     This is the 'public' version of the class method with the same name.
     :param conditions: either a truth table or a conditions object.
     :return: truth table (ie set with tuples).
     """
     if isinstance(conditions, Conditions):
-        return conditions.get_truth_tables(inputs)
+        return conditions.get_truth_tables(function_args)
     elif isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):  # raw set case.
         return from_raw_set_to_dict_table(conditions)
     else:
-        warnings.warn('Found conditions that is not a set nor a Conditions object', UserWarning)
-    return conditions
+        raise ConditionsTypeError(conditions, TYPE_ERROR)
 
 
 def valid_conditions(conditions):
     """
-    Valid conditions must be sets, inherit from set or be a Conditions object.
-    If conditions is a set: all rows have to be tuples or inherit from tuple.
+    Valid conditions must be sets, LastUpdateSet, inherit from set or be a Conditions object.
+    - set case:  When the input is a raw table. If conditions is a set then all rows have to be tuples or inherit
+    from tuple.
+    - LastUpdateSet case: same as set.
+    - Conditions case: When the input is a Conditions object.
     :param conditions: truth table or a conditions object.
     :return: boolean.
     """
-    if not isinstance(conditions, set) and not isinstance(conditions, Conditions) and not isinstance(conditions, LastUpdateSet):
-        warnings.warn('Truth table is not a set or a Conditions object', UserWarning)
-        return False
+    if not isinstance(conditions, set)\
+            and not isinstance(conditions, Conditions)\
+            and not isinstance(conditions, LastUpdateSet):
+        raise ConditionsTypeError(conditions, TYPE_ERROR)
 
+    # only for set and LastUpdateSet.
     if isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):
         for row in conditions:
             if not isinstance(row, tuple):
-                warnings.warn('A row in truth table is not a tuple', UserWarning)
-                return False
+                raise ConditionsTypeError(row, ROW_ERROR)
 
             # when the output is explicit, check for 2 elements of outer tuple.
             if isinstance(row[0], tuple):
                 if len(row) != 2:
-                    warnings.warn('A row with explicit output in truth table has wrong format.', UserWarning)
-                    return False
+                    raise ConditionsTypeError(row, EXPLICIT_ROW_ERROR)
 
     return True

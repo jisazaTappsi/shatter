@@ -18,6 +18,12 @@ class GeneratorTest(unittest.TestCase):
     def setUpClass(cls):
         common_testing_code.reset_functions_file(f.__file__, hard_reset=True)
 
+    def test_get_signature_exception(self):
+        """a non valid definition is given, should raise a FunctionNotFound exception."""
+
+        with self.assertRaises(c.FunctionNotFound):
+            c.get_signature_from_definition('invalid_function_definition')
+
     def test_code_generation_with_if(self):
         """
         Test with outputs different from boolean.
@@ -200,10 +206,10 @@ class GeneratorTest(unittest.TestCase):
         """
         function = f.another_call
         out = f.no_args
-        code = ['def ' + function.__name__ + '(a, b):',
+        code = ['def {}(a, b):'.format(function.__name__),
                 '',
                 '    if not a and b:',
-                '        return ' + out.__name__ + '()',
+                '        return {}()'.format(out.__name__),
                 '',
                 '    return False']
 
@@ -218,10 +224,10 @@ class GeneratorTest(unittest.TestCase):
         function = f.another_call2
         args = {'a': s.Code(code_str='a'), 'b': s.Code(code_str='b')}
         out_f = f.another_call
-        code = ['def ' + function.__name__ + '(a, b):',
+        code = ['def {}(a, b):'.format(function.__name__),
                 '',
                 '    if not a and b:',
-                '        return ' + out_f.__name__ + '(a, b)',
+                '        return {}(a, b)'.format(out_f.__name__),
                 '',
                 '    return False']
 
@@ -403,31 +409,29 @@ class GeneratorTest(unittest.TestCase):
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
 
-    # TODO: pass test. How to remove redundancy?
+    def test_factor_ordered_pieces_with_redundancy(self):
+        """Tests that string output is factored, when inputs are given in more than one addition."""
 
-    #def test_factor_ordered_pieces_with_redundancy(self):
-    #    """Tests that string output is factored, when inputs are given in more than one addition."""
-#
-    #    function = f.factor_ordered_pieces_with_redundancy
-    #    right_str = 'factoring!!!'
-    #    code0_str = 'isinstance(array[0], int)'
-    #    code1_str = 'isinstance(array[1], int)'
-#
-    #    code = ['def {}(array):'.format(function.__name__),
-    #            '',
-    #            '    if {}:'.format(code1_str),
-    #            "        return \"{}\"".format(right_str),
-    #            '',
-    #            '    return False']
-#
-    #    cond = s.Conditions(s.Code(code_str=code0_str),
-    #                        s.Code(code_str=code1_str),
-    #                        output=right_str)
-#
-    #    cond.add(s.Code(code_str=code1_str), output=right_str)
-#
-    #    solution = s.execute(self, function, cond)
-    #    self.assertEqual(solution.implementation, code)
+        function = f.factor_ordered_pieces_with_redundancy
+        right_str = 'factoring!!!'
+        code0_str = 'isinstance(array[0], int)'
+        code1_str = 'isinstance(array[1], int)'
+
+        code = ['def {}(array):'.format(function.__name__),
+                '',
+                '    if {}:'.format(code1_str),
+                "        return \"{}\"".format(right_str),
+                '',
+                '    return False']
+
+        cond = s.Conditions(s.Code(code_str=code0_str),
+                            s.Code(code_str=code1_str),
+                            output=right_str)
+
+        cond.add(s.Code(code_str=code1_str), output=right_str)
+
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
 
     # TODO: auxiliary test: remove?
     def test_basic(self):

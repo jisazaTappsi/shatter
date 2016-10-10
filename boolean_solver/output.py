@@ -14,22 +14,19 @@ class Output:
     Contains any output properties.
     """
     @staticmethod
-    def valid_arguments(function, arguments):
+    def has_all_function_arguments(function, arguments):
         """
-        Returns boolean indicating if all arguments are supplied.
+        Returns boolean indicating if all function arguments are in arguments input.
         :param function: object.
         :param arguments: dict with arguments.
         :return: Boolean.
         """
         # TODO: deal with optional arguments.
-        for var in helpers.get_function_inputs(function):
-            if var not in arguments:
-                return False
-
-        return True
+        function_args_tuple = helpers.get_function_inputs(function)
+        return all(k in arguments for k in function_args_tuple)
 
     def __init__(self, function, arguments):
-        if self.valid_arguments(function, arguments):
+        if self.has_all_function_arguments(function, arguments):
             self.function = function
             self.arguments = arguments
         else:

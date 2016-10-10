@@ -35,8 +35,29 @@ class Code:
     # explicit hash definition when overriding __eq__, otherwise hash = None.
     __hash__ = object.__hash__
 
+    def equal_redefined(self, other):
+        """code prints its operands and tries a match on them. They need to match their address location.
+        :param other: any object to compare can be Code or another stuff
+        :return: boolean indicating strict equality"""
+
+        if isinstance(other, Code):
+            non_commutative = str(self.rho) == str(other.rho) and str(self.lho) == str(other.lho)
+            commutative = str(self.rho) == str(other.lho) and str(self.lho) == str(other.rho)
+            return (non_commutative or commutative) and self.operator == other.operator
+        else:
+            return False
+
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.code_str == other.code_str
+        """Uses cases strategy to differentiate between raw text init and magicVar. Same as in __str__ method."""
+
+        case = self.get_use_case()
+        if case == 0:
+            return self.equal_redefined(other)
+        elif case == 1:
+            # for this case, equality is defined only if other is of type Code and their code_str is equal.
+            return isinstance(other, Code) and self.code_str == other.code_str
+        else:
+            raise NotImplemented
 
     # TODO: odd way to solve composition, missing locals() complexity.
     """
@@ -59,9 +80,9 @@ class Code:
     def get_use_case(self):
         """0 for operands, 1 for code as string and 2 for NotImplemented"""
         # TODO: refactor this shit!
-        if self.rho is not None and self.operator is not None and self.lho is not None and self.code_str is None:
+        if self.rho is not None and self.operator is not None and self.lho is not None:
             return 0
-        elif self.rho is None and self.operator is None and self.lho is None and self.code_str is not None:
+        elif self.rho is None and self.operator is None and self.lho is None:
             return 1
         else:
             return 2
@@ -94,21 +115,27 @@ class Code:
         self.the_locals = the_locals
 
 
-# Down here is the class MagicVar and related.
+# ---------------------------------- Down here is the class MagicVar and related. --------------------------------------
 
 current_id = 1
+ADD_LOCALS = 'add_locals'
+DECLARE_LOCAL = 'declare_local'
 
 
 class MagicVarNotFound(Exception):
-    pass
+    """This class is an exception when the magic var variable is not found in locals()."""
 
-    @staticmethod
-    def add_locals():
-        return "Could not find local variable. Add optional argument local_vars=locals() to solver() function."
-
-    @staticmethod
-    def declare_local():
-        return "Could not find local variable. Make sure that MagicVars are defined locally."
+    def __init__(self, exception_type):
+        if exception_type == ADD_LOCALS:
+            super(MagicVarNotFound, self)\
+                .__init__("Could not find local variable. Add optional argument 'local_vars=locals()' to"
+                          " solver.execute()")
+        elif exception_type == DECLARE_LOCAL:
+            super(MagicVarNotFound, self)\
+                .__init__("Could not find local variable. Make sure that MagicVars are defined locally.")
+        else:
+            super(MagicVarNotFound, self)\
+                .__init__("Unknown specific reason")
 
 
 class MagicVar:
@@ -202,9 +229,9 @@ class MagicVar:
             if len(names) > 0:
                 return names[0]
             else:
-                raise MagicVarNotFound(MagicVarNotFound.declare_local())
+                raise MagicVarNotFound(DECLARE_LOCAL)
         else:
-            raise MagicVarNotFound(MagicVarNotFound.add_locals())
+            raise MagicVarNotFound(ADD_LOCALS)
 
     # TODO: add indexing capabilities
     """

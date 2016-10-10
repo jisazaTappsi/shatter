@@ -39,3 +39,6 @@ class CustomOperator:
             self.symbol = self.OPERATORS[self.method.__name__]
         else:
             self.symbol = None
+
+    def __eq__(self, other):
+        return self.symbol == other.symbol

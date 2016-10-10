@@ -146,7 +146,8 @@ class CodeTest(unittest.TestCase):
     def test_variable_not_found(self):
         """
         If User forgets to call:
-        >>> code_object.add_locals(locals())
+        >>> code_obj = Code()
+        >>> code_obj.add_locals(locals())
         it should display:
         >>> MagicVarNotFound("friendly message")
         Exception with friendly message.
@@ -192,7 +193,7 @@ class CodeTest(unittest.TestCase):
 
         code = ['def ' + function.__name__ + '(i, j):',
                 '',
-                '    if ' + code1_str + ' and ' + code2_str + ' or ' + code3_str + ':',
+                '    if {0} and {1} or {2}:'.format(code1_str, code2_str, code3_str),
                 '        return ' + right_str,
                 '',
                 '    return False']

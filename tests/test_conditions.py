@@ -51,6 +51,26 @@ class ConditionsTest(unittest.TestCase):
                                                   POSITIONAL_ARGS_RULE + str(1): 4})
         self.assertEqual(r, 2)
 
+    def test_get_truth_tables(self):
+        """anomaly case: when conditions is not a set or a Conditions object. It should raise exception."""
+        with self.assertRaises(ConditionsTypeError):
+            get_truth_tables(conditions=1, function_args=None)
+
+    def test_correct_variables_order(self):
+        """Order should be: function args first (from right to left), then args from condition obj from left to right
+        and top to bottom"""
+
+        out = -1
+
+        def f(a, b):
+            return a + b
+
+        cond = Conditions(c=1, d=2, output=out)
+        cond.add(x=3, y=4, output='other_stuff')
+        cond.add(e=3, f=4, output=out)
+
+        self.assertEqual(cond.get_input_keys(helpers.get_function_inputs(f), out),
+                         LastUpdateSet(['a', 'b', 'c', 'd', 'e', 'f']))
 
 if __name__ == '__main__':
     unittest.main()

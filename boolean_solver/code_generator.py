@@ -94,20 +94,22 @@ def get_initial_implementation(definition):
     :param definition: function definition.
     :return: code
     """
-    signature = get_signature(definition)
+    signature = get_signature_from_definition(definition)
     indent = helpers.get_indent_from_definition(definition)
 
-    return [indent + "def " + signature + ":"]
+    return ["{indent}def {sig}:".format(indent=indent, sig=signature)]
 
 
 def add_code_to_implementation(current_implementation, bool_expression, definition, the_output):
     """
     Given definition and expression gets the function implementation.
+    :param current_implementation: current code.
     :param bool_expression: a boolean expression that can be evaluated.
     :param definition:   def function(input1, input2, ...).
+    :param the_output: the value to be returned.
     :return: string list with implementation.
     """
-    signature = get_signature(definition)
+    signature = get_signature_from_definition(definition)
     indent = helpers.get_indent_from_definition(definition)
     if bool_expression and len(bool_expression) > 0:
 
@@ -118,16 +120,24 @@ def add_code_to_implementation(current_implementation, bool_expression, definiti
         return current_implementation
 
 
-def get_signature(definition):
+class FunctionNotFound(Exception):
+    def __init__(self):
+        super(FunctionNotFound, self).__init__("Couldn't find signature of function")
+
+
+def get_signature_from_definition(definition):
     """
-    Gets the signature of a function given the definition ie: from:'    def sum(a, b):  #bla bla bla' to 'sum(a,b)'
+    Gets the signature of a function given the definition for example,
+    from:
+    >>>    def f(a, b):  #bla bla bla
+    gets:
+    >>>f(a, b)
     :param definition:
     :return: string signature.
     """
     signature_obj = re.search(FUNCTION_PATTERN, definition)
     if signature_obj is None:
-        warnings.warn("Couldn't find signature of function")
-        return None
+        raise FunctionNotFound()
 
     return signature_obj.group()
 
@@ -137,7 +147,6 @@ def translate_to_python_expression(all_inputs, qm_output):
     Converts the algorithm output to friendlier python code.
     :param all_inputs: tuple with the names of the boolean inputs.
     :param qm_output: set containing strings. see "execute_qm_algorithm" for details.
-    :param local_vars: locals()
     :return: python boolean expression
     """
     final_expression = ''

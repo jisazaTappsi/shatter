@@ -95,7 +95,7 @@ def from_table_to_ones(table):
     """
     Gets the ones as a list of strings from a truth table like set, containing tuples.
     :param table: truth table
-    :return: set containing bits.
+    :return: list containing bits.
     """
     ones = []
     for row in table:
@@ -105,7 +105,7 @@ def from_table_to_ones(table):
             if row[1]:  # only do it for true outputs.# TODO change for non booleans.
                 ones.append(''.join(list(map(h.from_bool_to_bit, list(row[0])))))
 
-        else:  # case 2: The output is a implicit True. inputs are in the row.
+        else:  # case 2: The output is an implicit True, inputs are in the row.
             ones.append(''.join(list(map(h.from_bool_to_bit, list(row)))))
 
     return ones
@@ -133,8 +133,7 @@ def get_empty_solution(function, conditions):
     :param conditions: Conditions object.
     :return : solution object.
     """
-    return Solution(implementation=[],
-                    function=function,
+    return Solution(function=function,
                     conditions=conditions,
                     processed_conditions=ProcessedConditions())
 
@@ -194,19 +193,19 @@ def return_solution(unittest, f, conditions, local_vars):
     file_code = h.read_file(f_path)
     f_line = h.get_function_line_number(f, file_code)
 
-    # enters only if the function source code was found.
-    if f_line > 0 and get_signature(file_code[f_line]):
+    # enters only if the function source code was found and has a signature.
+    if f_line > 0 and get_signature_from_definition(file_code[f_line]):
 
         definition = file_code[f_line]
-        function_inputs = h.get_function_inputs(f)
+        function_args = h.get_function_inputs(f)
 
         # init variables
         implementation = get_initial_implementation(definition)
-        processed_conditions = get_processed_conditions(conditions, function_inputs, local_vars)
+        processed_conditions = get_processed_conditions(conditions, function_args, local_vars)
 
         for the_output, table in processed_conditions.tables.iteritems():
 
-            all_inputs = get_input_values(conditions, function_inputs, the_output)
+            all_inputs = get_input_values(conditions, function_args, the_output)
             expression = get_function_expression(table, all_inputs)
 
             if len(expression) > 0:
@@ -238,9 +237,8 @@ def execute(unittest, function, conditions, local_vars=None):
     :param local_vars: locals()
     :return: Solution object, empty object if operation unsuccessful.
     """
-    # input validation
-    if not h.valid_function(function) or not valid_conditions(conditions):
-        return get_empty_solution(function, conditions)
+    # if invalid raises exception.
+    h.valid_function(function) and valid_conditions(conditions)
 
     function = h.reload_function(function)
     f_path = h.get_function_path(function)

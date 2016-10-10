@@ -100,16 +100,15 @@ def get_function_path(f):
 
 def valid_function(f):
     """
-    Validates function. Returns warning if it is not a function or it doesn't has a decorator.
+    Validates function. Returns warning if it is not a function or it doesn't have a decorator.
     :param f: function
-    :return: boolean
+    :return: passes, raises warning or raises TypeError
     """
     if not hasattr(f, '__call__'):
-        warnings.warn('A valid function was not provided.')
-        return False
+        raise TypeError('{} is not a valid function.'.format(f))
 
     if not hasattr(f, cts.INTERNAL_FUNC_CODE):
-        warnings.warn('Function ' + f.func_name + ' has no decorator, reading can be harder!!!', UserWarning)
+        warnings.warn('Function {} has no decorator, reading can be harder!!!'.format(f.func_name), UserWarning)
 
     return True
 
@@ -123,7 +122,8 @@ def get_function_line_number(f, file_code):
     """
     for index, line in enumerate(file_code):
 
-        definition = re.search(re.compile(r"^\s*def\s*" + f.__name__ + r"\(\s*\w*\s*(,\s*\w+\s*)*\)\s*:"), line)
+        pattern = re.compile(cts.PARTICULAR_DEFINITION.pattern.format(name=f.__name__))
+        definition = re.search(pattern, line)
         if definition:
             return index
 
@@ -267,7 +267,7 @@ def reload_function(f):
     """
     module = inspect.getmodule(f)
     reload(module)
-    # TODO: find any method anywhere within the module.
+    # TODO: find nested methods or inside classes: difficult!!!
     return getattr(module, f.__name__)
 
 

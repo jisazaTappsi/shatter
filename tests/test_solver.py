@@ -88,7 +88,8 @@ class SolverTest(unittest.TestCase):
         Checks that the function passed is valid.
         """
         non_callable = ''
-        self.assertEqual(len(s.execute(self, non_callable, cts.and_table).ast.body), 0)
+        with self.assertRaises(TypeError):
+            s.execute(self, non_callable, cts.and_table)
 
     def test_wrong_table(self):
         """
@@ -96,15 +97,18 @@ class SolverTest(unittest.TestCase):
         """
         # case 1: table not set
         wrong_table = ''
-        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
+        with self.assertRaises(c.ConditionsTypeError):
+            s.execute(self, f.any_method, wrong_table)
 
         # case 2: at least 1 row not a tuple
         wrong_table = {(), True}
-        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
+        with self.assertRaises(c.ConditionsTypeError):
+            s.execute(self, f.any_method, wrong_table)
 
         # case 3: more than one explicit output.
         wrong_table = {((True, True), True, True)}
-        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
+        with self.assertRaises(c.ConditionsTypeError):
+            s.execute(self, f.any_method, wrong_table)
 
     def test_implicit_table_output(self):
         """

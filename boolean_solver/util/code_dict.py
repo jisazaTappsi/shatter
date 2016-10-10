@@ -10,7 +10,8 @@ __author__ = 'Juan Pablo Isaza'
 
 
 class CodeDict(MutableMapping):
-    """Compare Code pieces by their content only"""
+    """If type Code Compares pieces by their content(code_str)
+    else behaves like an standard ordered dict."""
 
     def __init__(self, *args, **kwargs):
         self.store = OrderedDict()
@@ -21,7 +22,7 @@ class CodeDict(MutableMapping):
         if isinstance(key, Code):
 
             for k, v in self.store.iteritems():
-                if isinstance(k, Code) and key == k:
+                if isinstance(k, Code) and key == k:  # the == is override on Code class, see code.py for details.
                     return self.store[k]
             raise KeyError
         else:
