@@ -2,6 +2,7 @@ import unittest
 
 from boolean_solver.solver import Conditions, Code, execute
 from examples.game_of_life.game_of_life import is_alive, valid_indexes, get_neighbors, me, solve
+from boolean_solver.code import MagicVar
 
 
 class GameOfLifeTest(unittest.TestCase):
@@ -25,13 +26,18 @@ class GameOfLifeTest(unittest.TestCase):
 
     def test_valid_indexes(self):
 
-        # TODO: ERROR when output is not present. FIX
-        cond = Conditions(more_than1=Code(code_str='idx1 >= 0'),
-                          less_than1=Code(code_str='idx1 < max_idx1'),
-                          more_than2=Code(code_str='idx2 >= 0'),
-                          less_than2=Code(code_str='idx2 < max_idx2'), output=True)
+        idx1 = MagicVar()
+        idx2 = MagicVar()
+        max_idx1 = MagicVar()
+        max_idx2 = MagicVar()
 
-        execute(self, valid_indexes, cond)
+        # TODO: ERROR when output is not present. FIX
+        cond = Conditions(more_than1=idx1 >= 0,
+                          less_than1=idx1 < max_idx1,
+                          more_than2=idx2 >= 0,
+                          less_than2=idx2 < max_idx2, output=True)
+
+        execute(self, valid_indexes, cond, locals())
 
     def test_me(self):
 
@@ -39,9 +45,14 @@ class GameOfLifeTest(unittest.TestCase):
         #cond = Conditions(different1=Code('idx1 != x'),
         #                  different2=Code('idx2 != y'), output=False)
 
-        cond = Conditions(different1=Code(code_str='idx == x'),
-                          different2=Code(code_str='idy == y'), output=True)
-        execute(self, me, cond)
+        idx = MagicVar()
+        idy = MagicVar()
+        x = MagicVar()
+        y = MagicVar()
+
+        cond = Conditions(different1=idx == x,
+                          different2=idy == y, output=True)
+        execute(self, me, cond, locals())
 
     def test_get_neighbors(self):
 
