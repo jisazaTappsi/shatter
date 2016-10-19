@@ -109,7 +109,7 @@ class Code:
         elif case == 1:
             return self.code_str
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
     def add_locals(self, the_locals):
         self.the_locals = the_locals
