@@ -21,7 +21,7 @@ class CodeDict(MutableMapping):
 
         if isinstance(key, Code):
 
-            for k, v in self.store.iteritems():
+            for k, v in self.store.items():
                 if isinstance(k, Code) and key == k:  # the == is override on Code class, see code.py for details.
                     return self.store[k]
             raise KeyError
@@ -31,7 +31,7 @@ class CodeDict(MutableMapping):
     def __setitem__(self, key, value):
 
         if isinstance(key, Code):
-            for k, v in self.store.iteritems():
+            for k, v in self.store.items():
                 if isinstance(k, Code) and key == k:
                     self.store[k] = value
                     return

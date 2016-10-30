@@ -36,7 +36,7 @@ def get_used_inputs(tables):
     :param tables: the variable in processed_conditions.
     :return: a set with all used tuples.
     """
-    return set([item for k, set_v in tables.iteritems() for item in set_v])
+    return set([item for k, set_v in tables.items() for item in set_v])
 
 
 def get_inputs_with_default_output(inputs, tables):
@@ -73,7 +73,7 @@ def run_single_test(test_class, a_tuple, solution, expected_value):
     function_call_code = get_eval_code(print_inputs_of_tuple(a_tuple), solution.function)
 
     try:
-        exec "\n".join(solution.implementation)
+        exec("\n".join(solution.implementation))
         given_out = eval(function_call_code)
 
     except:
@@ -90,7 +90,7 @@ def has_code_args(tables):
     :param tables: dict with keys as outputs and sets of tuples as dict values.
     :return: bool
     """
-    for k, v_set in tables.iteritems():
+    for k, v_set in tables.items():
         for a_tuple in v_set:
             for e in a_tuple:
                 if isinstance(e, Code):
@@ -114,7 +114,7 @@ def test_implementation(test_class, solution):
     if has_code_args(tables):
         warnings.warn("Cannot test function, it has added code", UserWarning)
     else:
-        for expected_value, tuple_set in tables.iteritems():
+        for expected_value, tuple_set in tables.items():
             for a_tuple in tuple_set:
                 run_single_test(test_class=test_class,
                                 a_tuple=a_tuple,

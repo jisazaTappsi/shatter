@@ -1,1 +1,2 @@
 include README_on_pip.md LICENSE.txt
+include requirements.txt

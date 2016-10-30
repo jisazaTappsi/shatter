@@ -183,11 +183,11 @@ class MagicVar:
     def __rsub__(self, other):
         return Code(self, other, self.__rsub__)
 
-    def __div__(self, other):
-        return Code(self, other, self.__div__)
+    def __truediv__(self, other):
+        return Code(self, other, self.__truediv__)
 
-    def __rdiv__(self, other):
-        return Code(self, other, self.__rdiv__)
+    def __rtruediv__(self, other):
+        return Code(self, other, self.__rtruediv__)
 
     def __mod__(self, other):
         return Code(self, other, self.__mod__)
