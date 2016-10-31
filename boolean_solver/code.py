@@ -57,7 +57,7 @@ class Code:
             # for this case, equality is defined only if other is of type Code and their code_str is equal.
             return isinstance(other, Code) and self.code_str == other.code_str
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
     # TODO: odd way to solve composition, missing locals() complexity.
     """
@@ -183,11 +183,11 @@ class MagicVar:
     def __rsub__(self, other):
         return Code(self, other, self.__rsub__)
 
-    def __div__(self, other):
-        return Code(self, other, self.__div__)
+    def __truediv__(self, other):
+        return Code(self, other, self.__truediv__)
 
-    def __rdiv__(self, other):
-        return Code(self, other, self.__rdiv__)
+    def __rtruediv__(self, other):
+        return Code(self, other, self.__rtruediv__)
 
     def __mod__(self, other):
         return Code(self, other, self.__mod__)

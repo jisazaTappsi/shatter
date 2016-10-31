@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
 """This is the main file. Calls QM algorithm and code generation functions."""
-import qm
+from boolean_solver import qm
 from boolean_solver.solution import Solution
 from boolean_solver.tester import test_implementation
 from boolean_solver.util import helpers as h
-from code_generator import *
-from processed_conditions import *
+from boolean_solver.code_generator import *
+from boolean_solver.processed_conditions import *
 
 #  TODO: from boolean_solver import solver as production_solver
 
@@ -54,7 +54,7 @@ def solve():
         # Meta data transfer enables introspection of decorated functions.
         wrapped_f.__name__ = f.__name__
         wrapped_f.__module__ = f.__module__
-        wrapped_f.internal_func_code = f.func_code
+        wrapped_f.internal_code = f.__code__
 
         return wrapped_f
     return wrap
@@ -203,7 +203,7 @@ def return_solution(unittest, f, conditions, local_vars):
         implementation = get_initial_implementation(definition)
         processed_conditions = get_processed_conditions(conditions, function_args, local_vars)
 
-        for the_output, table in processed_conditions.tables.iteritems():
+        for the_output, table in processed_conditions.tables.items():
 
             all_inputs = get_input_values(conditions, function_args, the_output)
             expression = get_function_expression(table, all_inputs)
@@ -222,7 +222,7 @@ def return_solution(unittest, f, conditions, local_vars):
         test_implementation(unittest, solution)
 
         alter_file(f_line, file_code, implementation, f_path)
-        print "Solved and tested " + f.__name__
+        print("Solved and tested " + f.__name__)
         return solution
 
     return get_empty_solution(f, conditions)

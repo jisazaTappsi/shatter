@@ -2,7 +2,7 @@
 
 """Example of a use case."""
 
-from solver import *
+from boolean_solver.solver import *
 
 __author__ = 'juan pablo isaza'
 
@@ -39,6 +39,6 @@ if __name__ == "__main__":
     xor_result = xor_function(True, False)  # should be: 'True ^ False = True', after running test1.
 
     if and_function_3_variables(and_result, or_function, xor_result):  # should be True, after running test1.
-        print txt_success
+        print(txt_success)
     else:
-        print txt_fail
+        print(txt_fail)

@@ -79,11 +79,6 @@ def fun8(a, b):
 
 
 @s.solve()
-def fun9(a, b):
-    pass
-
-
-@s.solve()
 def output_function_obj(a, b):
     pass
 
@@ -109,6 +104,11 @@ def another_call2(a, b):
 
 @s.solve()
 def recursive(a):
+    pass
+
+
+@s.solve()
+def recursive_iteration(array):
     pass
 
 

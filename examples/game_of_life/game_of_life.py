@@ -8,7 +8,7 @@ def is_alive(alive, neighbors):
 
 @solve()
 def valid_indexes(idx1, idx2, max_idx1, max_idx2):
-    return idx2 < max_idx2 and idx1 < max_idx1 and idx1 >= 0 and idx2 >= 0
+    return idx1 >= 0 and idx1 < max_idx1 and idx2 >= 0 and idx2 < max_idx2
 
 
 @solve()

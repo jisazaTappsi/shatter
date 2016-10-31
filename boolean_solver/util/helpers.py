@@ -5,6 +5,7 @@ import inspect
 import warnings
 import os
 import re
+import importlib
 
 import boolean_solver.constants as cts
 
@@ -88,13 +89,13 @@ def from_bool_to_bit(boolean):
 
 def get_function_path(f):
     """
-    Passes the internal func_code to a attribute called internal_func_code on the wrapper.
+    Passes the internal func_code to a attribute called internal_code on the wrapper.
     Then we call the wrapper attribute which throws metadata of the internal function, and gets the path.
     :param f: function
     :return: path
     """
     # does the wrapper is defining the new attribute, to expose internal func_code? or use std func_code if no decorator
-    code = f.internal_func_code if hasattr(f, cts.INTERNAL_FUNC_CODE) else f.func_code
+    code = f.internal_code if hasattr(f, cts.INTERNAL_CODE) else f.__code__
     return code.co_filename
 
 
@@ -107,8 +108,8 @@ def valid_function(f):
     if not hasattr(f, '__call__'):
         raise TypeError('{} is not a valid function.'.format(f))
 
-    if not hasattr(f, cts.INTERNAL_FUNC_CODE):
-        warnings.warn('Function {} has no decorator, reading can be harder!!!'.format(f.func_name), UserWarning)
+    if not hasattr(f, cts.INTERNAL_CODE):
+        warnings.warn('Function {} has no decorator, reading can be harder!!!'.format(f.__name__), UserWarning)
 
     return True
 
@@ -136,10 +137,10 @@ def get_function_inputs(f):
     :param f: a callable function
     :return: input names on a tuple.
     """
-    if hasattr(f, cts.INTERNAL_FUNC_CODE):
-        return f.internal_func_code.co_varnames
+    if hasattr(f, cts.INTERNAL_CODE):
+        return f.internal_code.co_varnames
     else:
-        return f.func_code.co_varnames
+        return f.__code__.co_varnames
 
 
 def get_function_code(start, file_code):
@@ -266,7 +267,7 @@ def reload_function(f):
     :return: updated function
     """
     module = inspect.getmodule(f)
-    reload(module)
+    importlib.reload(module)
     # TODO: find nested methods or inside classes: difficult!!!
     return getattr(module, f.__name__)
 

@@ -6,7 +6,7 @@ import re
 
 __author__ = 'juan pablo isaza'
 
-INTERNAL_FUNC_CODE = 'internal_func_code'
+INTERNAL_CODE = 'internal_code'
 
 COMMENT_PATTERN = re.compile(r"\s*(#.*)?$")
 INDENT = re.compile(r"^\s*")

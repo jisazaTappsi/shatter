@@ -22,9 +22,7 @@ class LastUpdateSetTest(unittest.TestCase):
         for e in old_list:
             s.add(e)
 
-        new_list = []
-        for e in s:
-            new_list.append(e)
+        new_list = [e for e in s]
 
         self.assertEqual(new_list, old_list)
 

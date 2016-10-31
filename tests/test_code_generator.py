@@ -154,12 +154,11 @@ class GeneratorTest(unittest.TestCase):
         """
         uniform_pairs = [(2, 3, f.fun2),
                          (2.12345, 3.12345, f.fun3),
-                         (2L, 3L, f.fun4),
-                         ('3', '2', f.fun5),
-                         (3j, 2j, f.fun6),
-                         ((3, 3), (2, 2), f.fun7),
-                         (2, '3', f.fun8),
-                         (3.12345, (3, 3), f.fun9)]
+                         ('3', '2', f.fun4),
+                         (3j, 2j, f.fun5),
+                         ((3, 3), (2, 2), f.fun6),
+                         (2, '3', f.fun7),
+                         (3.12345, (3, 3), f.fun8)]
                          # TODO: include lists dictionaries and sets.
                          #([1, 2, 3], {4, 5, 6}, f.fun10)]
 
@@ -171,7 +170,7 @@ class GeneratorTest(unittest.TestCase):
         When output is a function.
         """
         function = f.output_function_obj
-        out1 = f.fun9
+        out1 = f.fun8
         code = ['def ' + function.__name__ + '(a, b):',
                 '',
                 '    if not a and b:',
@@ -263,16 +262,37 @@ class GeneratorTest(unittest.TestCase):
         Will do recursion, extremely cool!!!
         """
         function = f.recursive
-        args = {'a': s.Code(code_str='not a')}
-        out = s.Output(f.recursive, args)
-        code = ['def ' + function.__name__ + '(a):',
+        not_a = 'not a'
+        args = {'a': s.Code(code_str=not_a)}
+        out = s.Output(function, args)
+        code = ['def {}(a):'.format(function.__name__),
                 '',
-                '    if not a:',
+                '    if {}:'.format(not_a),
                 '        return 0',
                 '',
-                '    return ' + function.__name__ + '(not a)']
+                '    return {0}({1})'.format(function.__name__, not_a)]
 
         cond = s.Conditions(a=False, output=0, default=out)
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_recursive_iteration(self):
+        """
+        Will do recursive iteration, extremely cool!!!
+        """
+        function = f.recursive_iteration
+        array_len_0 = 'len(array) == 0'
+        array_1 = 'array[1:]'
+        args = {'array': s.Code(code_str=array_1)}
+        out = s.Output(function, args)
+        code = ['def {}(array):'.format(function.__name__),
+                '',
+                '    if {}:'.format(array_len_0),
+                '        return 0',
+                '',
+                '    return {0}({1})'.format(function.__name__, array_1)]
+
+        cond = s.Conditions(s.Code(code_str=array_len_0), output=0, default=out)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
 

@@ -3,8 +3,8 @@
 """Example of a use case."""
 
 import unittest
-import solver
-import start_sample
+from boolean_solver import solver
+from boolean_solver import start_sample
 
 __author__ = 'juan pablo isaza'
 
@@ -43,4 +43,4 @@ class MyTest(unittest.TestCase):
         cond = solver.Conditions(a=True, b=True, c=True)
         solver.execute(self, start_sample.and_function_3_variables, cond)
 
-print "We have solved the riddle, go run start_sample.py, again!!!"
+print("We have solved the riddle, go run start_sample.py, again!!!")

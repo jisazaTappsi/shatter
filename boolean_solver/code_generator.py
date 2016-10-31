@@ -7,7 +7,7 @@ import warnings
 from boolean_solver import conditions as c
 from boolean_solver.code import Code
 from boolean_solver.util import helpers
-from constants import *
+from boolean_solver.constants import *
 
 __author__ = 'juan pablo isaza'
 

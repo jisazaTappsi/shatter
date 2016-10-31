@@ -9,7 +9,7 @@ from boolean_solver.output import Output
 from boolean_solver.util import helpers
 from boolean_solver.util.last_update_dict import LastUpdateDict
 from boolean_solver.util.last_update_set import LastUpdateSet
-from util.code_dict import CodeDict
+from boolean_solver.util.code_dict import CodeDict
 
 __author__ = 'juan pablo isaza'
 
