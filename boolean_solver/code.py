@@ -57,7 +57,7 @@ class Code:
             # for this case, equality is defined only if other is of type Code and their code_str is equal.
             return isinstance(other, Code) and self.code_str == other.code_str
         else:
-            raise NotImplemented
+            raise NotImplementedError
 
     # TODO: odd way to solve composition, missing locals() complexity.
     """

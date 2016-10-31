@@ -262,16 +262,37 @@ class GeneratorTest(unittest.TestCase):
         Will do recursion, extremely cool!!!
         """
         function = f.recursive
-        args = {'a': s.Code(code_str='not a')}
-        out = s.Output(f.recursive, args)
-        code = ['def ' + function.__name__ + '(a):',
+        not_a = 'not a'
+        args = {'a': s.Code(code_str=not_a)}
+        out = s.Output(function, args)
+        code = ['def {}(a):'.format(function.__name__),
                 '',
-                '    if not a:',
+                '    if {}:'.format(not_a),
                 '        return 0',
                 '',
-                '    return ' + function.__name__ + '(not a)']
+                '    return {0}({1})'.format(function.__name__, not_a)]
 
         cond = s.Conditions(a=False, output=0, default=out)
+        solution = s.execute(self, function, cond)
+        self.assertEqual(solution.implementation, code)
+
+    def test_recursive_iteration(self):
+        """
+        Will do recursive iteration, extremely cool!!!
+        """
+        function = f.recursive_iteration
+        array_len_0 = 'len(array) == 0'
+        array_1 = 'array[1:]'
+        args = {'array': s.Code(code_str=array_1)}
+        out = s.Output(function, args)
+        code = ['def {}(array):'.format(function.__name__),
+                '',
+                '    if {}:'.format(array_len_0),
+                '        return 0',
+                '',
+                '    return {0}({1})'.format(function.__name__, array_1)]
+
+        cond = s.Conditions(s.Code(code_str=array_len_0), output=0, default=out)
         solution = s.execute(self, function, cond)
         self.assertEqual(solution.implementation, code)
 

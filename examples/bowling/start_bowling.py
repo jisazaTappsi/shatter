@@ -38,8 +38,8 @@ def get_score(game):
     eg: game = ((10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,10,10))
     """
 
+    # TODO: add recursive iteration and use solver for this.
     score = 0
-
     for i, frame in enumerate(game):
         score += get_frame_score(frame, game, i)
 

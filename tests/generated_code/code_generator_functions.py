@@ -108,6 +108,11 @@ def recursive(a):
 
 
 @s.solve()
+def recursive_iteration(array):
+    pass
+
+
+@s.solve()
 def with_string_args():
     pass
 
