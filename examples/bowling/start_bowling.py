@@ -33,14 +33,15 @@ def get_frame_score(frame, game, i):
     pass
 
 
+@solve()
+def recursive_get_score(game, i):
+    pass
+
+
 def get_score(game):
     """
     eg: game = ((10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,0),(10,10,10))
     """
 
     # TODO: add recursive iteration and use solver for this.
-    score = 0
-    for i, frame in enumerate(game):
-        score += get_frame_score(frame, game, i)
-
-    return score
+    return recursive_get_score(game, 0)
