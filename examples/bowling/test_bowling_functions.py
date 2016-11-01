@@ -60,6 +60,13 @@ class BowlingTest(unittest.TestCase):
                  output=solver.Code(code_str='frame[0] + get_next_2_throws(i, game)'))
         solver.execute(self, start_bowling.get_frame_score, cond)
 
+    def test_recursive_get_score(self):
+
+        cond = solver.Conditions(solver.Code(code_str='i == len(game)'),
+                                 output=0,
+                                 default=solver.Code(code_str='recursive_get_score(game, i + 1) + get_frame_score(game[i], game, i)'))
+        solver.execute(self, start_bowling.recursive_get_score, cond)
+
     def test_gutter_balls(self):
         game = ((0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0))
         self.assertEqual(start_bowling.get_score(game), 0)
