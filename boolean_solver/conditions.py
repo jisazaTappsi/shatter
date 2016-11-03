@@ -58,7 +58,7 @@ class Conditions(list):
         """Tries to find if variable was already declared. If so outputs the original key else outputs None. Will
         exclude reserved words, as they are not variable declarations.
         :param value: a variable value. For example a Code object.
-        :return : key of possible repeating variable  or None
+        :return : key of possible repeating variable or None
         """
         for d in self:
             for key in set(d.keys()) - set(KEYWORDS.values()):

@@ -23,11 +23,11 @@ install_requirements = parse_requirements(REQ, session=False)
 requirements = [str(ir.req) for ir in install_requirements]
 
 setup(
-	name='Boolean Solver',
+	name='mastermind',
 	version='0.5.2',
 	author='Juan Pablo Isaza',
 	author_email='biosolardecolombia@gmail.com',
-	description='Fast development with generated boolean expressions.',
+	description='Faster and better development with generated code.',
 	long_description=pypandoc.convert('README.md', 'rst'),
 	license=open("LICENSE.txt").read(),
 	keywords='Quine McCluskey, Boolean, code, automatic code generation, expression, Boolean expression',
