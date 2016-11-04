@@ -42,8 +42,7 @@ class Code:
 
         if isinstance(other, Code):
             non_commutative = str(self.rho) == str(other.rho) and str(self.lho) == str(other.lho)
-            commutative = str(self.rho) == str(other.lho) and str(self.lho) == str(other.rho)
-            return (non_commutative or commutative) and self.operator == other.operator
+            return non_commutative and self.operator == other.operator
         else:
             return False
 

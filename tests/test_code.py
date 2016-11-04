@@ -68,6 +68,7 @@ class CodeTest(unittest.TestCase):
         self.assertTrue(isinstance(2 // i, Code))
         self.assertTrue(isinstance(i // j, Code))
 
+
     # TODO: NOT READY TO IMPLEMENT THESE. NOT SURE ABOUT CONSEQUENCES!
     """
     def test_logical_operators(self):
