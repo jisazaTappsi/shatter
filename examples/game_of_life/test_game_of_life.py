@@ -1,6 +1,6 @@
 import unittest
 
-from boolean_solver.solver import Conditions, Code, execute
+from boolean_solver.solver import Conditions, Code
 from examples.game_of_life.game_of_life import is_alive, valid_indexes, get_neighbors, me, solve
 from boolean_solver.code import MagicVar
 
@@ -22,7 +22,7 @@ class GameOfLifeTest(unittest.TestCase):
         cond.add(alive=True, rule4=Code(code_str='sum(neighbors) == 3'), output=True)
         cond.add(alive=False, rule5=Code(code_str='sum(neighbors) == 3'), output=True)
 
-        execute(self, is_alive, cond)
+        cond.solve(self, is_alive)
 
     def test_valid_indexes(self):
 
@@ -37,7 +37,7 @@ class GameOfLifeTest(unittest.TestCase):
                           more_than2=idx2 >= 0,
                           less_than2=idx2 < max_idx2, output=True)
 
-        execute(self, valid_indexes, cond, locals())
+        cond.solve(self, valid_indexes, locals())
 
     def test_me(self):
 
@@ -52,7 +52,7 @@ class GameOfLifeTest(unittest.TestCase):
 
         cond = Conditions(different1=idx == x,
                           different2=idy == y, output=True)
-        execute(self, me, cond, locals())
+        cond.solve(self, me, locals())
 
     def test_get_neighbors(self):
 

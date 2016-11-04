@@ -26,7 +26,7 @@ class TesterTest(unittest.TestCase):
         cond.add(a=False, output=1)  # contradictory condition.
 
         with self.assertRaises(AssertionError):
-            execute(self, f.collision, cond)
+            cond.solve(self, f.collision)
 
     def test_non_collision(self):
         """
@@ -37,7 +37,7 @@ class TesterTest(unittest.TestCase):
         cond.add(a=True, c=False, d=True, output=2)  # leave b out
         cond.add(b=True, c=False, d=False, output=3)  # leave a out
 
-        execute(self, f.non_collision, cond)
+        cond.solve(self, f.non_collision)
 
 
 if __name__ == '__main__':

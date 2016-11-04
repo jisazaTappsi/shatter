@@ -10,6 +10,8 @@ from boolean_solver.util import helpers
 from boolean_solver.util.last_update_dict import LastUpdateDict
 from boolean_solver.util.last_update_set import LastUpdateSet
 from boolean_solver.util.code_dict import CodeDict
+from boolean_solver import solver
+from boolean_solver.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 
@@ -114,6 +116,31 @@ class Conditions(list):
             self.append(self.get_ordered_dict(args, kwargs))
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
+
+    def solve(self, unittest, function, local_vars=None):
+        """
+        Solves puzzle given the restrains added. This is a method wrapper of solver.execute().
+        :param unittest: the current test being run eg: 'self'.
+        :param function: the function to be coded.
+        :param local_vars: locals()
+        :return: Solution object.
+        """
+
+        # if invalid raises exception.
+        h.valid_function(function) and valid_conditions(self)
+
+        function = h.reload_function(function)
+        f_path = h.get_function_path(function)
+
+        if not h.os.path.exists(f_path):
+            return solver.get_empty_solution(function, self)
+
+        return solver.return_solution(unittest=unittest,
+                                      f=function,
+                                      conditions=self,
+                                      local_vars=local_vars)
+
+        #return solver.execute(unittest, function, self, local_vars)
 
     def get_input_values(self, f_inputs, output):
         """

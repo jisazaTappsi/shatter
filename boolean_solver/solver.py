@@ -235,7 +235,7 @@ def execute(unittest, function, conditions, local_vars=None):
     :param function: the function to be coded.
     :param conditions: condition or object or partial truth table (explicit, implicit or mix).
     :param local_vars: locals()
-    :return: Solution object, empty object if operation unsuccessful.
+    :return: Solution object.
     """
     # if invalid raises exception.
     h.valid_function(function) and valid_conditions(conditions)
