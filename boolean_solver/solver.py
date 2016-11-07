@@ -4,7 +4,6 @@
 from boolean_solver import qm
 from boolean_solver.solution import Solution
 from boolean_solver.tester import test_implementation
-from boolean_solver.util import helpers as h
 from boolean_solver.code_generator import *
 from boolean_solver.processed_conditions import *
 
@@ -226,27 +225,3 @@ def return_solution(unittest, f, conditions, local_vars):
         return solution
 
     return get_empty_solution(f, conditions)
-
-
-def execute(unittest, function, conditions, local_vars=None):
-    """
-    Solves the riddle, Writes it and tests it.
-    :param unittest: the current test being run eg: 'self'.
-    :param function: the function to be coded.
-    :param conditions: condition or object or partial truth table (explicit, implicit or mix).
-    :param local_vars: locals()
-    :return: Solution object, empty object if operation unsuccessful.
-    """
-    # if invalid raises exception.
-    h.valid_function(function) and valid_conditions(conditions)
-
-    function = h.reload_function(function)
-    f_path = h.get_function_path(function)
-
-    if not h.os.path.exists(f_path):
-        return get_empty_solution(function, conditions)
-
-    return return_solution(unittest=unittest,
-                           f=function,
-                           conditions=conditions,
-                           local_vars=local_vars)

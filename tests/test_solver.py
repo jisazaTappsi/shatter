@@ -63,7 +63,7 @@ class SolverTest(unittest.TestCase):
         """
         Factoring test.
         """
-        solution = s.execute(self, a_callable, conditions)
+        solution = c.solve(self, a_callable, conditions)
         expected_code = ["def " + signature + ":", "    return " + expression]
         self.assertListEqual(solution.implementation, expected_code)
 
@@ -83,14 +83,6 @@ class SolverTest(unittest.TestCase):
         """
         self.factor_execute(cts.and_table, f.and_missing_decorator, 'and_missing_decorator(a, b)', cts.exp_and)
 
-    def test_non_callable(self):
-        """
-        Checks that the function passed is valid.
-        """
-        non_callable = ''
-        with self.assertRaises(TypeError):
-            s.execute(self, non_callable, cts.and_table)
-
     def test_wrong_table(self):
         """
         Checks that the table is a set and that the rows are all tuples
@@ -98,17 +90,17 @@ class SolverTest(unittest.TestCase):
         # case 1: table not set
         wrong_table = ''
         with self.assertRaises(c.ConditionsTypeError):
-            s.execute(self, f.any_method, wrong_table)
+            c.solve(self, f.any_method, wrong_table)
 
         # case 2: at least 1 row not a tuple
         wrong_table = {(), True}
         with self.assertRaises(c.ConditionsTypeError):
-            s.execute(self, f.any_method, wrong_table)
+            c.solve(self, f.any_method, wrong_table)
 
         # case 3: more than one explicit output.
         wrong_table = {((True, True), True, True)}
         with self.assertRaises(c.ConditionsTypeError):
-            s.execute(self, f.any_method, wrong_table)
+            c.solve(self, f.any_method, wrong_table)
 
     def test_implicit_table_output(self):
         """

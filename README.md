@@ -8,7 +8,7 @@ A picture is worth a thousand words and a vid is worth a thousand pictures, so w
 
 This is a [python 3.6+ project](https://pypi.python.org/pypi/Boolean-Solver) to speed up boolean expression coding. Sometimes we need to crack a problem by combining boolean operators such as: `and`, `or` & `not`. We as humans are prone to err, specially when expressions get big. But there is an algorithm (Quine-McCluskey) to get this expressions with zero error. Just specify your specs in a test and set a dummy function on your code. When you run your tests a solver will take your specs and code them into a simple boolean expression, enjoy :).
 
-This same boolean logic is being expanded to a broader range of problems check other coding capabilities below.
+This same boolean logic is being expanded to a broader range of problems; check other coding capabilities below.
 
 Package Setup
 -------------
@@ -44,7 +44,7 @@ Add a unittest(`test.py`) with specs:
 
             # The output is explicitly set to true
             cond = solver.Conditions(a=True, b=True, output=True)
-            solver.execute(self, start.and_function, cond)
+            cond.solve(self, start.and_function)
 
 Then run `$ python -m unittest test`. In `start.py` the result should be:
 
@@ -70,7 +70,7 @@ Add `test_ifs(self)` to `MyTest(unittest.TestCase)` class in `test.py`:
         """
         cond = solver.Conditions(a=False, b=True, output=1)  # non-boolean output
         cond.add(a=True, b=False, output=0)  # non-boolean output
-        solver.execute(self, start.if_function, cond)
+        cond.solve(self, start.if_function)
 
 Then run `$ python -m unittest test`, the result should be:
 
@@ -103,7 +103,7 @@ Add `test_recursive_function(self)` to `MyTest(unittest.TestCase)` class in `tes
         out = solver.Output(start.recursive, args)
 
         cond = solver.Conditions(a=False, output=0, default=out)
-        solver.execute(self, start.recursive, cond)
+        cond.solve(self, start.recursive)
 
 The result this time will be a recursive function :)
 
@@ -132,7 +132,7 @@ Add `test_internal_code(self)` to `MyTest(unittest.TestCase)` class in `test.py`
         Testing internal pieces of code
         """
         cond = solver.Conditions(any_non_input_name=solver.Code('isinstance(a, str)'), output=2)
-        solver.execute(self, start.internal_code, cond)
+        cond.solve(self, start.internal_code)
 
 The result should be:
 
@@ -189,7 +189,7 @@ How does Boolean Solver works?
 ------------------------------
 Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@boolean_solver()`.
 
-Arguments of `solver.execute(test, function, conditions)`
+Arguments of `cond.solve(test, function, local_vars=None)`
 -------------------------------------------------------------------
 1. The test case itself, to be able to perform tests, eg: `self`
 

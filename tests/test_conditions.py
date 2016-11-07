@@ -4,6 +4,7 @@
 
 import unittest
 from boolean_solver.conditions import *
+from tests.testing_helpers import constants as cts
 
 __author__ = 'juan pablo isaza'
 
@@ -71,6 +72,19 @@ class ConditionsTest(unittest.TestCase):
 
         self.assertEqual(cond.get_input_keys(helpers.get_function_inputs(f), out),
                          LastUpdateSet(['a', 'b', 'c', 'd', 'e', 'f']))
+
+    # --------- test validation --------- #
+
+    def test_non_callable(self):
+        """
+        Checks that the function passed is valid.
+        """
+        non_callable = ''
+        with self.assertRaises(TypeError):
+            solve(self, non_callable, cts.and_table)
+
+    # --------- test validation --------- #
+
 
 if __name__ == '__main__':
     unittest.main()

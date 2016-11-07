@@ -20,7 +20,7 @@ class MyTest(unittest.TestCase):
 
         # The output is explicitly set to true
         cond = solver.Conditions(a=True, b=True, output=True)
-        solver.execute(self, start_sample.and_function, cond)
+        cond.solve(self, start_sample.and_function)
 
     def test_OR_function(self):
 
@@ -29,18 +29,18 @@ class MyTest(unittest.TestCase):
         cond.add(a=True, b=False)
         cond.add(a=True, b=True)
 
-        solver.execute(self, start_sample.or_function, cond)
+        cond.solve(self, start_sample.or_function)
 
     def test_XOR_function(self):
 
         cond = solver.Conditions(a=False, b=True)
         cond.add(a=True, b=False)
 
-        solver.execute(self, start_sample.xor_function, cond)
+        cond.solve(self, start_sample.xor_function)
 
     def test_AND_3_VARIABLES_function(self):
 
         cond = solver.Conditions(a=True, b=True, c=True)
-        solver.execute(self, start_sample.and_function_3_variables, cond)
+        cond.solve(self, start_sample.and_function_3_variables)
 
 print("We have solved the riddle, go run start_sample.py, again!!!")

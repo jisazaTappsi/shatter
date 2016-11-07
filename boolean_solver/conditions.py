@@ -10,6 +10,8 @@ from boolean_solver.util import helpers
 from boolean_solver.util.last_update_dict import LastUpdateDict
 from boolean_solver.util.last_update_set import LastUpdateSet
 from boolean_solver.util.code_dict import CodeDict
+from boolean_solver import solver
+from boolean_solver.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 
@@ -114,6 +116,36 @@ class Conditions(list):
             self.append(self.get_ordered_dict(args, kwargs))
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
+
+    @staticmethod
+    def validate(function, conditions):
+        """
+        Validates the entries, for solver()
+        :param function: callable
+        :param conditions: conditions object or table.
+        """
+        # if invalid raises exception.
+        h.valid_function(function) and valid_conditions(conditions)
+
+        function = h.reload_function(function)
+        f_path = h.get_function_path(function)
+
+        if not h.os.path.exists(f_path):
+            raise NotImplementedError("Function path {} not found.".format(f_path))
+
+    def solve(self, unittest, function, local_vars=None):
+        """
+        Solves puzzle given the restrains added. This is a method wrapper of solver.execute().
+        :param unittest: the current test being run eg: 'self'.
+        :param function: the function to be coded.
+        :param local_vars: locals()
+        :return: Solution object.
+        """
+        self.validate(function, self)
+        return solver.return_solution(unittest=unittest,
+                                      f=function,
+                                      conditions=self,
+                                      local_vars=local_vars)
 
     def get_input_values(self, f_inputs, output):
         """
@@ -324,6 +356,22 @@ def add_to_dict_table(table, key, value):
     return table
 
 
+def solve(unittest, function, conditions, local_vars=None):
+    """
+    This is the static version of conditions.solve()
+    :param unittest: the current test being run eg: 'self'.
+    :param function: the function to be coded.
+    :param conditions: Conditions object or table.
+    :param local_vars: locals()
+    :return: Solution object.
+    """
+    Conditions.validate(function, conditions)
+    return solver.return_solution(unittest=unittest,
+                                  f=function,
+                                  conditions=conditions,
+                                  local_vars=local_vars)
+
+
 def from_raw_set_to_dict_table(conditions):
     """
     Convert raw case to general format.
@@ -363,6 +411,7 @@ def get_truth_tables(conditions, function_args):
     """
     This is the 'public' version of the class method with the same name.
     :param conditions: either a truth table or a conditions object.
+    :param function_args: the arguments of the function.
     :return: truth table (ie set with tuples).
     """
     if isinstance(conditions, Conditions):

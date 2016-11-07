@@ -179,7 +179,7 @@ class CodeTest(unittest.TestCase):
         i = MagicVar()
         cond = s.Conditions(i == 9, output=i*2)
         cond.add(i == 7, output=i*2)
-        solution = s.execute(self, function, cond, local_vars=locals())
+        solution = cond.solve(self, function, local_vars=locals())
 
         self.assertEqual(solution.implementation, code)
 
@@ -205,7 +205,7 @@ class CodeTest(unittest.TestCase):
                             i < 1,
                             output=i * j)
         cond.add(i > j, output=i * j)
-        solution = s.execute(self, function, cond, local_vars=locals())
+        solution = cond.solve(self, function, local_vars=locals())
 
         self.assertEqual(solution.implementation, code)
 

@@ -4,7 +4,7 @@
 
 import warnings
 
-from boolean_solver import conditions as c
+from boolean_solver.output import Output
 from boolean_solver.code import Code
 from boolean_solver.util import helpers
 from boolean_solver.constants import *
@@ -15,10 +15,10 @@ __author__ = 'juan pablo isaza'
 def print_invoked_function(output):
     """
     Prints a function that is invoked with arguments: eg: fun(a, b)
-    :param output: a c.Output object
+    :param output: an Output object
     :return: string
     """
-    if isinstance(output, c.Output):
+    if isinstance(output, Output):
         args_dict = output.arguments
         args_str = ''
         for var in helpers.get_function_inputs(output.function):
@@ -50,7 +50,7 @@ def print_object(instance):
     if isinstance(instance, Code):
         return str(instance)
 
-    if isinstance(instance, c.Output):
+    if isinstance(instance, Output):
         return print_invoked_function(instance)
 
     return str(instance)

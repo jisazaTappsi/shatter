@@ -10,14 +10,14 @@ class BowlingTest(unittest.TestCase):
     def test_is_strike(self):
 
         cond = solver.Conditions(rule=solver.Code(code_str='frame[0] == 10'), output=True)
-        solver.execute(self, start_bowling.is_strike, cond)
+        cond.solve(self, start_bowling.is_strike)
 
     def test_is_spare(self):
 
         cond = solver.Conditions(rule1=solver.Code(code_str='frame[0] < 10'),
                                  rule2=solver.Code(code_str='frame[0] + frame[1] == 10'),
                                  output=True)
-        solver.execute(self, start_bowling.is_spare, cond)
+        cond.solve(self, start_bowling.is_spare)
 
     def test_get_next_throw(self):
 
@@ -26,7 +26,7 @@ class BowlingTest(unittest.TestCase):
         cond = solver.Conditions(before_last=(i < 9),
                                  output=solver.Code(code_str='game[i+1][0]'))
         cond.add(last_bonus_thow=(i == 9), output=solver.Code(code_str='game[i][2]'))
-        solver.execute(self, start_bowling.get_next_throw, cond, local_vars=locals())
+        cond.solve(self, start_bowling.get_next_throw, local_vars=locals())
 
     def test_get_next_2_throws(self):
 
@@ -45,7 +45,7 @@ class BowlingTest(unittest.TestCase):
         cond.add(next_is_strike=solver.Code(code_str='is_strike(game[i+1])'),
                  output=solver.Code(code_str='game[i+1][0] + game[i+2][0]'))
 
-        solver.execute(self, start_bowling.get_next_2_throws, cond, local_vars=locals())
+        cond.solve(self, start_bowling.get_next_2_throws, local_vars=locals())
 
     def test_get_frame_score(self):
 
@@ -58,14 +58,14 @@ class BowlingTest(unittest.TestCase):
 
         cond.add(is_strike=solver.Code(code_str='is_strike(frame)'),
                  output=solver.Code(code_str='frame[0] + get_next_2_throws(i, game)'))
-        solver.execute(self, start_bowling.get_frame_score, cond)
+        cond.solve(self, start_bowling.get_frame_score)
 
     def test_recursive_get_score(self):
 
         cond = solver.Conditions(solver.Code(code_str='i == len(game)'),
                                  output=0,
                                  default=solver.Code(code_str='recursive_get_score(game, i + 1) + get_frame_score(game[i], game, i)'))
-        solver.execute(self, start_bowling.recursive_get_score, cond)
+        cond.solve(self, start_bowling.recursive_get_score)
 
     def test_gutter_balls(self):
         game = ((0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0))
