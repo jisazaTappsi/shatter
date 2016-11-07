@@ -7,7 +7,6 @@ import unittest
 from tests.generated_code import tester_functions as f
 from tests.testing_helpers import common_testing_code
 from boolean_solver.conditions import Conditions
-from boolean_solver.solver import execute
 
 __author__ = 'juan pablo isaza'
 
