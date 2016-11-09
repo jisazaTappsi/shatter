@@ -3,6 +3,7 @@
 """A class that defines a code, with a string."""
 
 from boolean_solver.custom_operator import CustomOperator
+from boolean_solver.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 
@@ -35,7 +36,7 @@ class Code:
     # explicit hash definition when overriding __eq__, otherwise hash = None.
     __hash__ = object.__hash__
 
-    def equal_redefined(self, other):
+    def case_0_equals(self, other):
         """code prints its operands and tries a match on them. They need to match their address location.
         :param other: any object to compare can be Code or another stuff
         :return: boolean indicating strict equality"""
@@ -46,17 +47,33 @@ class Code:
         else:
             return False
 
-    def __eq__(self, other):
-        """Uses cases strategy to differentiate between raw text init and magicVar. Same as in __str__ method."""
-
+    def _equals(self, other):
+        """
+        Uses cases strategy to differentiate between raw text init and magicVar. Same as in __str__ method.
+        :param other: any other stuff
+        :return: boolean
+        """
         case = self.get_use_case()
         if case == 0:
-            return self.equal_redefined(other)
+            return self.case_0_equals(other)
         elif case == 1:
             # for this case, equality is defined only if other is of type Code and their code_str is equal.
             return isinstance(other, Code) and self.code_str == other.code_str
         else:
             raise NotImplementedError
+
+    def __eq__(self, other):
+        """
+        If called from a private context(ie  inside this project), will behave according to _equals(self, other),
+        otherwise it will return a Code object.
+        :param: other
+        :return: boolean for private calls, Code object for public calls.
+        """
+        private_call = h.is_private_call()
+        if private_call:  # case: private call.
+            return self._equals(other)
+        else:  # case: public call.
+            return Code(self, other, self.__eq__)
 
     # TODO: odd way to solve composition, missing locals() complexity.
     """
