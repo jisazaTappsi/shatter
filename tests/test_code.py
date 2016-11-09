@@ -6,7 +6,7 @@ import unittest
 
 from boolean_solver.code import Code, MagicVar, MagicVarNotFound
 from tests.generated_code import code_functions as f
-from boolean_solver import solver as s
+from boolean_solver.conditions import Conditions
 from tests.testing_helpers import common_testing_code
 
 
@@ -88,23 +88,19 @@ class CodeTest(unittest.TestCase):
 
     # TODO: missing the real part of composition!.
     def test_composition(self):
+        """
+        Complex expression is assembled, should print out the same value.
+        """
 
         i = MagicVar()
         j = MagicVar()
+        k = MagicVar()
+        l = MagicVar()
 
-        c1 = i == j
-        c1.add_locals(locals())
-        self.assertEqual(str(c1), 'i == j')
-
-        #c4 = i % j
-        #c4.add_locals(locals())
-
-        #c3 = c4 * 2
-        #c3.add_locals(locals())
-
-        #c2 = c3 > j
-        #c2.add_locals(locals())
-        #self.assertEqual(str(c2), 'i * 2 > j')
+        s = 'j + i ** i // 5 / l < j - k'
+        c = eval(s)
+        c.add_locals(locals())
+        self.assertEqual(str(c), s)
 
     def test_magic_with_int(self):
         """
@@ -177,7 +173,7 @@ class CodeTest(unittest.TestCase):
                 '    return False']
 
         i = MagicVar()
-        cond = s.Conditions(i == 9, output=i*2)
+        cond = Conditions(i == 9, output=i*2)
         cond.add(i == 7, output=i*2)
         solution = cond.solve(self, function, local_vars=locals())
 
@@ -201,9 +197,9 @@ class CodeTest(unittest.TestCase):
 
         i = MagicVar()
         j = MagicVar()
-        cond = s.Conditions(i != 0,
-                            i < 1,
-                            output=i * j)
+        cond = Conditions(i != 0,
+                          i < 1,
+                          output=i * j)
         cond.add(i > j, output=i * j)
         solution = cond.solve(self, function, local_vars=locals())
 

@@ -29,9 +29,10 @@ class CustomOperator:
                 '__floordiv__': '//',
                 '__rfloordiv__': '//',
                  # TODO: NOT READY TO IMPLEMENT THESE. NOT SURE ABOUT CONSEQUENCES!
-                'intersection': 'and',  # LOGICAL
-                'union': 'or',
-                'negation': 'not'}
+                #'intersection': 'and',  # LOGICAL
+                #'union': 'or',
+                #'negation': 'not'
+    }
 
     def __init__(self, method):
         self.method = method

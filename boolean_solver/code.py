@@ -75,10 +75,44 @@ class Code:
         else:  # case: public call.
             return Code(self, other, self.__eq__)
 
-    # TODO: odd way to solve composition, missing locals() complexity.
-    """
+    def __lt__(self, other):
+        return Code(self, other, self.__lt__)
+
     def __gt__(self, other):
         return Code(self, other, self.__gt__)
+
+    def __le__(self, other):
+        return Code(self, other, self.__le__)
+
+    def __ge__(self, other):
+        return Code(self, other, self.__ge__)
+
+    def __ne__(self, other):
+        return Code(self, other, self.__ne__)
+
+    def __add__(self, other):
+        return Code(self, other, self.__add__)
+
+    def __radd__(self, other):
+        return Code(self, other, self.__radd__)
+
+    def __mul__(self, other):
+        return Code(self, other, self.__mul__)
+
+    def __rmul__(self, other):
+        return Code(self, other, self.__rmul__)
+
+    def __sub__(self, other):
+        return Code(self, other, self.__sub__)
+
+    def __rsub__(self, other):
+        return Code(self, other, self.__rsub__)
+
+    def __truediv__(self, other):
+        return Code(self, other, self.__truediv__)
+
+    def __rtruediv__(self, other):
+        return Code(self, other, self.__rtruediv__)
 
     def __mod__(self, other):
         return Code(self, other, self.__mod__)
@@ -86,12 +120,17 @@ class Code:
     def __rmod__(self, other):
         return Code(self, other, self.__rmod__)
 
-    def __mul__(self, other):
-        return Code(self, other, self.__mul__)
+    def __pow__(self, power, modulo=None):
+        return Code(self, power, self.__pow__)
 
-    def __rmul__(self, other):
-        return Code(self, other, self.__rmul__)
-    """
+    def __rpow__(self, power, modulo=None):
+        return Code(self, power, self.__rpow__)
+
+    def __floordiv__(self, other):
+        return Code(self, other, self.__floordiv__)
+
+    def __rfloordiv__(self, other):
+        return Code(self, other, self.__rfloordiv__)
 
     def get_use_case(self):
         """0 for operands, 1 for code as string and 2 for NotImplemented"""
@@ -127,8 +166,24 @@ class Code:
         else:
             raise NotImplementedError
 
+    @staticmethod
+    def add_locals_to_branch(branch, the_locals):
+        """
+        Calls add_locals recursively to the branch.
+        """
+        if branch and isinstance(branch, Code):
+            branch.add_locals(the_locals)
+
     def add_locals(self, the_locals):
+        """
+        Adds the locals dictionary, with information of the name of the variables declared outside.
+        :param the_locals: the locals() call.
+        :return: returns self for concise implementations.
+        """
         self.the_locals = the_locals
+        self.add_locals_to_branch(self.rho, the_locals)
+        self.add_locals_to_branch(self.lho, the_locals)
+        return self
 
 
 # ---------------------------------- Down here is the class MagicVar and related. --------------------------------------
