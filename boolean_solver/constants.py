@@ -6,6 +6,7 @@ import re
 
 __author__ = 'juan pablo isaza'
 
+PACKAGE_NAME = 'boolean_solver'
 INTERNAL_CODE = 'internal_code'
 
 COMMENT_PATTERN = re.compile(r"\s*(#.*)?$")

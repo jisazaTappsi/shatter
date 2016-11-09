@@ -7,6 +7,7 @@ from setuptools import setup
 import setuptools
 import pypandoc
 from pip.req import parse_requirements
+
 __author__ = 'juan pablo isaza'
 
 # To publish do:

@@ -288,8 +288,8 @@ def is_private_call():
     function is being called privately from inside the package, otherwise it is called from outside the package.
     :return: boolean
     """
-    package_name = '/boolean_solver/'
-    p = re.match(r'^.*' + package_name, inspect.stack()[0].filename).group()
+    p_name = '/{}/'.format(cts.PACKAGE_NAME)
+    p = re.match(r'^.*' + p_name, inspect.stack()[0].filename).group()
 
     # the number 2 in 'inspect.stack()[2:]' is because we are not looking inside is_private_call() function nor one
     # level above it, where its suppose to tell us if that function is being called privately or publicly.
