@@ -132,19 +132,17 @@ class Conditions(list):
         if not h.os.path.exists(f_path):
             raise NotImplementedError("Function path {} not found.".format(f_path))
 
-    def solve(self, unittest, function, local_vars=None):
+    def solve(self, unittest, function):
         """
         Solves puzzle given the restrains added. This is a method wrapper of solver.execute().
         :param unittest: the current test being run eg: 'self'.
         :param function: the function to be coded.
-        :param local_vars: locals()
         :return: Solution object.
         """
         self.validate(function, self)
         return solver.return_solution(unittest=unittest,
                                       f=function,
-                                      conditions=self,
-                                      local_vars=local_vars)
+                                      conditions=self)
 
     def get_input_values(self, f_inputs, output):
         """
@@ -355,20 +353,18 @@ def add_to_dict_table(table, key, value):
     return table
 
 
-def solve(unittest, function, conditions, local_vars=None):
+def solve(unittest, function, conditions):
     """
     This is the static version of conditions.solve()
     :param unittest: the current test being run eg: 'self'.
     :param function: the function to be coded.
     :param conditions: Conditions object or table.
-    :param local_vars: locals()
     :return: Solution object.
     """
     Conditions.validate(function, conditions)
     return solver.return_solution(unittest=unittest,
                                   f=function,
-                                  conditions=conditions,
-                                  local_vars=local_vars)
+                                  conditions=conditions)
 
 
 def from_raw_set_to_dict_table(conditions):

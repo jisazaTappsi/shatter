@@ -5,7 +5,8 @@
 import unittest
 
 from boolean_solver.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number,\
-    is_private_call
+    is_private_call, retrieve_name
+from boolean_solver.code import Code
 
 __author__ = 'juan pablo isaza'
 
@@ -55,6 +56,18 @@ class UtilTest(unittest.TestCase):
         Tests that private_call detects that the context of this call is public.
         """
         self.assertFalse(is_private_call())
+
+    def test_variable_name_retrieval(self):
+        """
+        Should get the outer most name of the variable. although the call is nested.
+        """
+        def f(k):
+            def g(l):
+                return retrieve_name(l)
+            return g(k)
+
+        j = Code()
+        self.assertEqual(f(j), 'j')
 
 
 if __name__ == '__main__':

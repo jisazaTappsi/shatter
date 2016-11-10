@@ -13,8 +13,6 @@ SINGLE_VARIABLE = 2
 NOT_IMPLEMENTED = 3
 
 current_id = 1
-ADD_LOCALS = 'add_locals'
-DECLARE_LOCAL = 'declare_local'
 
 
 class Code:
@@ -44,7 +42,6 @@ class Code:
         else:
             self.operator = None
 
-        self.the_locals = None
         self.code_str = code_str
 
     # explicit hash definition when overriding __eq__, otherwise hash = None.
@@ -172,22 +169,6 @@ class Code:
         except AttributeError:
             return -1  # negative value guarantees its not going to match to any other Code instance, as ids are +
 
-    def get_variable_name(self, the_locals):
-        """
-        :param the_locals: a dictionary result of calling locals().
-        :returns the name of the variable or raises exception if not found.
-        """
-        if the_locals is not None:
-
-            names = [k for k, v in list(the_locals.items()) if self.get_id(v) == self.get_id(self)]
-
-            if len(names) > 0:
-                return names[0]
-            else:
-                raise VarNotFound(DECLARE_LOCAL)
-        else:
-            raise VarNotFound(ADD_LOCALS)
-
     def __str__(self):
         """different behaviours according to get_use_case()"""
         case = self.get_use_case()
@@ -199,53 +180,11 @@ class Code:
         elif case == CODE_STRING:
             return self.code_str
         elif case == SINGLE_VARIABLE:
-            if self.the_locals is not None:  # prints the variable value.
-                return self.get_variable_name(self.the_locals)
-            else:
-                # uses super method to print the raw object and compare,
-                # eg: <boolean_solver.code.Code object at 0x101694c>
-                return super(Code, self).__str__()
+            return h.retrieve_name(self)
         elif case == NOT_IMPLEMENTED:
             raise NotImplementedError
         else:
             raise SystemError("unknown value for case")
-
-    @staticmethod
-    def add_locals_to_branch(branch, the_locals):
-        """
-        Calls add_locals recursively to the branch.
-        :param branch: either rho or lho.
-        :param the_locals: just the locals().
-        """
-        if branch and isinstance(branch, Code):
-            branch.add_locals(the_locals)
-
-    def add_locals(self, the_locals):
-        """
-        Adds the locals dictionary, with information of the name of the variables declared outside.
-        :param the_locals: the locals() call.
-        :return: returns self for concise implementations.
-        """
-        self.the_locals = the_locals
-        self.add_locals_to_branch(self.rho, the_locals)
-        self.add_locals_to_branch(self.lho, the_locals)
-        return self
-
-
-class VarNotFound(Exception):
-    """This class is an exception when the code variable is not found in locals()."""
-
-    def __init__(self, exception_type):
-        if exception_type == ADD_LOCALS:
-            super(VarNotFound, self)\
-                .__init__("Could not find local variable. Add optional argument 'local_vars=locals()' to"
-                          " solver.execute()")
-        elif exception_type == DECLARE_LOCAL:
-            super(VarNotFound, self)\
-                .__init__("Could not find local variable. Make sure that Code instances are defined locally.")
-        else:
-            super(VarNotFound, self)\
-                .__init__("Unknown specific reason")
 
     # TODO: add indexing capabilities
     """

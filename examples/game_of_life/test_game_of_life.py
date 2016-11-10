@@ -36,7 +36,7 @@ class GameOfLifeTest(unittest.TestCase):
                           more_than2=idx2 >= 0,
                           less_than2=idx2 < max_idx2, output=True)
 
-        cond.solve(self, valid_indexes, locals())
+        cond.solve(self, valid_indexes)
 
     def test_me(self):
 
@@ -51,7 +51,7 @@ class GameOfLifeTest(unittest.TestCase):
 
         cond = Conditions(different1=idx == x,
                           different2=idy == y, output=True)
-        cond.solve(self, me, locals())
+        cond.solve(self, me)
 
     def test_get_neighbors(self):
 

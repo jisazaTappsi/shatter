@@ -294,3 +294,26 @@ def is_private_call():
     # the number 2 in 'inspect.stack()[2:]' is because we are not looking inside is_private_call() function nor one
     # level above it, where its suppose to tell us if that function is being called privately or publicly.
     return any(re.match(p, frame.filename) is not None for frame in inspect.stack()[2:])
+
+
+def name_in_frame(var, frame):
+    """
+    Looks at the locals of the frame and searches in it for var.
+    :param var: variable to get name from.
+    :param frame: a inspect frame
+    :return: list with strings.
+    """
+    callers_local_vars = frame.f_locals.items()
+    return [var_name for var_name, var_val in callers_local_vars if var_val is var]
+
+
+def retrieve_name(var):
+    """
+    Gets the name of var. Does it from the out most frame inner-wards.
+    :param var: variable to get name from.
+    :return: string
+    """
+    for fi in reversed(inspect.stack()):
+        names = name_in_frame(var, fi.frame)
+        if len(names) > 0:
+            return names[0]

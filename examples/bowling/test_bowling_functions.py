@@ -26,7 +26,7 @@ class BowlingTest(unittest.TestCase):
         cond = solver.Conditions(before_last=(i < 9),
                                  output=solver.Code(code_str='game[i+1][0]'))
         cond.add(last_bonus_thow=(i == 9), output=solver.Code(code_str='game[i][2]'))
-        cond.solve(self, start_bowling.get_next_throw, local_vars=locals())
+        cond.solve(self, start_bowling.get_next_throw)
 
     def test_get_next_2_throws(self):
 
@@ -45,7 +45,7 @@ class BowlingTest(unittest.TestCase):
         cond.add(next_is_strike=solver.Code(code_str='is_strike(game[i+1])'),
                  output=solver.Code(code_str='game[i+1][0] + game[i+2][0]'))
 
-        cond.solve(self, start_bowling.get_next_2_throws, local_vars=locals())
+        cond.solve(self, start_bowling.get_next_2_throws)
 
     def test_get_frame_score(self):
 

@@ -179,13 +179,12 @@ def get_input_values(conditions, function_inputs, output):
         return list(function_inputs)
 
 
-def return_solution(unittest, f, conditions, local_vars):
+def return_solution(unittest, f, conditions):
     """
     Solves the riddle, Writes it and tests it.
     :param unittest: the unittest object that is passed to test stuff
     :param f: any function object.
     :param conditions: condition or object or partial truth table (explicit, implicit or mix).
-    :param local_vars: locals()
     :return: True for successful operation, False if not.
     """
     f_path = h.get_function_path(f)
@@ -200,7 +199,7 @@ def return_solution(unittest, f, conditions, local_vars):
 
         # init variables
         implementation = get_initial_implementation(definition)
-        processed_conditions = get_processed_conditions(conditions, function_args, local_vars)
+        processed_conditions = get_processed_conditions(conditions, function_args)
 
         for the_output, table in processed_conditions.tables.items():
 

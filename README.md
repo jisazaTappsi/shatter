@@ -189,7 +189,7 @@ How does Boolean Solver works?
 ------------------------------
 Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@boolean_solver()`.
 
-Arguments of `cond.solve(test, function, local_vars=None)`
+Arguments of `cond.solve(test, function)`
 -------------------------------------------------------------------
 1. The test case itself, to be able to perform tests, eg: `self`
 

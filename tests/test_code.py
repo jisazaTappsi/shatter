@@ -98,7 +98,6 @@ class CodeTest(unittest.TestCase):
         l = Code()
 
         c = j + i ** i // 5 / l < j - k
-        c.add_locals(locals())
         self.assertEqual(str(c), 'j + i ** i // 5 / l < j - k')
 
     def test_code_with_int(self):
@@ -114,7 +113,6 @@ class CodeTest(unittest.TestCase):
 
         v = Code()
         code_object = v == 2
-        code_object.add_locals(locals())
 
         self.assertTrue(isinstance(code_object, Code))
         self.assertEqual(str(code_object), 'v == 2')
@@ -134,7 +132,6 @@ class CodeTest(unittest.TestCase):
         v = Code()
         w = Code()
         code_object = v == w
-        code_object.add_locals(locals())
 
         self.assertTrue(isinstance(code_object, Code))
         self.assertEqual(str(code_object), 'v == w')
@@ -156,7 +153,7 @@ class CodeTest(unittest.TestCase):
         i = Code()
         cond = Conditions(i == 9, output=i*2)
         cond.add(i == 7, output=i*2)
-        solution = cond.solve(self, function, local_vars=locals())
+        solution = cond.solve(self, function)
 
         self.assertEqual(solution.implementation, code)
 
@@ -182,9 +179,17 @@ class CodeTest(unittest.TestCase):
                           i < 1,
                           output=i * j)
         cond.add(i > j, output=i * j)
-        solution = cond.solve(self, function, local_vars=locals())
+        solution = cond.solve(self, function)
 
         self.assertEqual(solution.implementation, code)
+
+    def test_get_name_of_variable(self):
+        """
+        Gets the name of a variable instance of Code class.
+        """
+        name = Code()
+        self.assertEqual(str(name), 'name')
+
 
 if __name__ == '__main__':
     unittest.main()

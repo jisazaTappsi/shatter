@@ -43,21 +43,11 @@ def get_default_output(conditions):
         return False
 
 
-def add_locals_to_all_code_objects(tables, the_locals):
-
-    for the_output, table in tables.items():
-        if isinstance(the_output, Code):
-            the_output.add_locals(the_locals)
-
-        for row in table:
-            for item in row:
-                if isinstance(item, Code):
-                    item.add_locals(the_locals)
-
-
-def get_processed_conditions(conditions, function_args, local_vars):
+def get_processed_conditions(conditions, function_args):
+    """
+    :param conditions:
+    :param function_args: args
+    :return: processConditions instance
+    """
     tables = get_truth_tables(conditions, function_args)
-
-    add_locals_to_all_code_objects(tables, local_vars)
-
     return ProcessedConditions(tables, get_default_output(conditions))

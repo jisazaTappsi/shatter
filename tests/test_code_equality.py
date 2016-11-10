@@ -24,8 +24,8 @@ class CodeTest(unittest.TestCase):
 		i = Code()
 		j = Code()
 
-		m = (i == j).add_locals(locals())
-		k = (i < j).add_locals(locals())
+		m = (i == j)
+		k = (i < j)
 		self.assertFalse(str(m) == str(k))
 		self.assertFalse(str(k) == str(m))
 
@@ -35,8 +35,8 @@ class CodeTest(unittest.TestCase):
 		j = Code()
 
 		for s in CustomOperator.OPERATORS.values():
-			m = (eval('i {} j'.format(s))).add_locals(locals())
-			k = (eval('i {} j'.format(s))).add_locals(locals())
+			m = (eval('i {} j'.format(s)))
+			k = (eval('i {} j'.format(s)))
 			self.assertTrue(str(m) == str(k))
 
 	def test_no_commutation(self):
@@ -45,8 +45,8 @@ class CodeTest(unittest.TestCase):
 		j = Code()
 
 		for s in CustomOperator.OPERATORS.values():
-			m = (eval('i {} j'.format(s))).add_locals(locals())
-			k = (eval('j {} i'.format(s))).add_locals(locals())
+			m = (eval('i {} j'.format(s)))
+			k = (eval('j {} i'.format(s)))
 			self.assertFalse(str(m) == str(k))
 
 
