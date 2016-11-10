@@ -4,16 +4,12 @@
 
 import unittest
 
-from boolean_solver.code import MagicVar
+from boolean_solver.code import Code
 from tests.generated_code import code_functions as f
 from tests.testing_helpers import common_testing_code
-
+from boolean_solver.custom_operator import CustomOperator
 
 __author__ = 'juan pablo isaza'
-
-
-i = MagicVar()
-j = MagicVar()
 
 
 class CodeTest(unittest.TestCase):
@@ -24,47 +20,35 @@ class CodeTest(unittest.TestCase):
 
 	def test_inequality_different_operator(self):
 		"""Always false if there is an operator mismatch"""
-		self.assertFalse((i == j) == (i < j))
-		self.assertFalse((i < j) == (i == j))
 
-	def test_equality_comparison_operators(self):
+		i = Code()
+		j = Code()
 
-		self.assertTrue((i == j) == (i == j))
-		self.assertTrue((i != j) == (i != j))
-		self.assertTrue((i < j) == (i < j))
-		self.assertTrue((i > j) == (i > j))
-		self.assertTrue((i <= j) == (i <= j))
-		self.assertTrue((i >= j) == (i >= j))
+		m = (i == j).add_locals(locals())
+		k = (i < j).add_locals(locals())
+		self.assertFalse(str(m) == str(k))
+		self.assertFalse(str(k) == str(m))
 
-	def test_equality_arithmetic_operators(self):
+	def test_equality(self):
 
-		self.assertTrue((i + j) == (i + j))
-		self.assertTrue((i + j) == (i + j))
-		self.assertTrue((i - j) == (i - j))
-		self.assertTrue((i * j) == (i * j))
-		self.assertTrue((i / j) == (i / j))
-		self.assertTrue((i % j) == (i % j))
-		self.assertTrue((i ** j) == (i ** j))
-		self.assertTrue((i // j) == (i // j))
+		i = Code()
+		j = Code()
 
-	def test_no_commutation_comparison_operators(self):
+		for s in CustomOperator.OPERATORS.values():
+			m = (eval('i {} j'.format(s))).add_locals(locals())
+			k = (eval('i {} j'.format(s))).add_locals(locals())
+			self.assertTrue(str(m) == str(k))
 
-		self.assertFalse((i == j) == (j == i))
-		self.assertFalse((i != j) == (j != i))
-		self.assertFalse((i < j) == (j < i))
-		self.assertFalse((i > j) == (j > i))
-		self.assertFalse((i <= j) == (j <= i))
-		self.assertFalse((i >= j) == (j >= i))
+	def test_no_commutation(self):
 
-	def test_no_commutation_arithmetic_operators(self):
+		i = Code()
+		j = Code()
 
-		self.assertFalse((i + j) == (j + i))
-		self.assertFalse((i - j) == (j - i))
-		self.assertFalse((i * j) == (j * i))
-		self.assertFalse((i / j) == (j / i))
-		self.assertFalse((i % j) == (j % i))
-		self.assertFalse((i ** j) == (j ** i))
-		self.assertFalse((i // j) == (j // i))
+		for s in CustomOperator.OPERATORS.values():
+			m = (eval('i {} j'.format(s))).add_locals(locals())
+			k = (eval('j {} i'.format(s))).add_locals(locals())
+			self.assertFalse(str(m) == str(k))
+
 
 if __name__ == '__main__':
 	unittest.main()

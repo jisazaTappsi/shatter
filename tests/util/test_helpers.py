@@ -4,7 +4,8 @@
 
 import unittest
 
-from boolean_solver.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number
+from boolean_solver.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number,\
+    is_private_call
 
 __author__ = 'juan pablo isaza'
 
@@ -48,6 +49,12 @@ class UtilTest(unittest.TestCase):
                                                '            a = False',
                                                '',
                                                '            return a or b'])
+
+    def test_is_private_call(self):
+        """
+        Tests that private_call detects that the context of this call is public.
+        """
+        self.assertFalse(is_private_call())
 
 
 if __name__ == '__main__':

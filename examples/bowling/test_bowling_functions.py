@@ -1,7 +1,7 @@
 import unittest
 
 from boolean_solver import solver
-from boolean_solver.code import MagicVar
+from boolean_solver.code import Code
 from examples.bowling import start_bowling
 
 
@@ -21,7 +21,7 @@ class BowlingTest(unittest.TestCase):
 
     def test_get_next_throw(self):
 
-        i = MagicVar()
+        i = Code()
 
         cond = solver.Conditions(before_last=(i < 9),
                                  output=solver.Code(code_str='game[i+1][0]'))
@@ -30,7 +30,7 @@ class BowlingTest(unittest.TestCase):
 
     def test_get_next_2_throws(self):
 
-        i = MagicVar()
+        i = Code()
 
         cond = solver.Conditions(last_bonus_throw=(i == 9),
                                  output=solver.Code(code_str='game[i][1] + game[i][2]'))

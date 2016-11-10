@@ -64,7 +64,6 @@ class Conditions(list):
         """
         for d in self:
             for key in set(d.keys()) - set(KEYWORDS.values()):
-                # TODO: check for Code instance, and use redefine equals.
                 if d[key] == value:
                     return key
         return None

@@ -280,3 +280,17 @@ def remove_list_from_list(all_list, list_to_remove):
     """
 
     return [value for value in all_list if value not in list_to_remove]
+
+
+def is_private_call():
+    """
+    Searches in the stack for places where the package is. If there is something then the
+    function is being called privately from inside the package, otherwise it is called from outside the package.
+    :return: boolean
+    """
+    p_name = '/{}/'.format(cts.PACKAGE_NAME)
+    p = re.match(r'^.*' + p_name, inspect.stack()[0].filename).group()
+
+    # the number 2 in 'inspect.stack()[2:]' is because we are not looking inside is_private_call() function nor one
+    # level above it, where its suppose to tell us if that function is being called privately or publicly.
+    return any(re.match(p, frame.filename) is not None for frame in inspect.stack()[2:])
