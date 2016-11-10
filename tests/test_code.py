@@ -4,7 +4,7 @@
 
 import unittest
 
-from boolean_solver.code import Code, MagicVar, MagicVarNotFound
+from boolean_solver.code import Code
 from tests.generated_code import code_functions as f
 from boolean_solver.conditions import Conditions
 from tests.testing_helpers import common_testing_code
@@ -21,8 +21,8 @@ class CodeTest(unittest.TestCase):
 
     def test_comparison_operators(self):
 
-        i = MagicVar()
-        j = MagicVar()
+        i = Code()
+        j = Code()
         self.assertTrue(isinstance(i == 2, Code))
         self.assertTrue(isinstance(2 == i, Code))
         self.assertTrue(isinstance(i == j, Code))
@@ -44,8 +44,8 @@ class CodeTest(unittest.TestCase):
 
     def test_arithmetic_operators(self):
 
-        i = MagicVar()
-        j = MagicVar()
+        i = Code()
+        j = Code()
         self.assertTrue(isinstance(i + 2, Code))
         self.assertTrue(isinstance(2 + i, Code))
         self.assertTrue(isinstance(i + j, Code))
@@ -73,8 +73,8 @@ class CodeTest(unittest.TestCase):
     """
     def test_logical_operators(self):
 
-        i = MagicVar()
-        j = MagicVar()
+        i = Code()
+        j = Code()
         self.assertTrue(isinstance(i and 2, Code))
         self.assertTrue(isinstance(2 and i, Code))
         self.assertTrue(isinstance(i and j, Code))
@@ -92,20 +92,19 @@ class CodeTest(unittest.TestCase):
         Complex expression is assembled, should print out the same value.
         """
 
-        i = MagicVar()
-        j = MagicVar()
-        k = MagicVar()
-        l = MagicVar()
+        i = Code()
+        j = Code()
+        k = Code()
+        l = Code()
 
-        s = 'j + i ** i // 5 / l < j - k'
-        c = eval(s)
+        c = j + i ** i // 5 / l < j - k
         c.add_locals(locals())
-        self.assertEqual(str(c), s)
+        self.assertEqual(str(c), 'j + i ** i // 5 / l < j - k')
 
-    def test_magic_with_int(self):
+    def test_code_with_int(self):
         """
         When user declares
-        >>> v = MagicVar()
+        >>> v = Code()
         and
         >>> code_object = v == 2
         Then code_object should be of type Code, rather than boolean and
@@ -113,18 +112,18 @@ class CodeTest(unittest.TestCase):
         'v == 2'
         """
 
-        v = MagicVar()
+        v = Code()
         code_object = v == 2
         code_object.add_locals(locals())
 
         self.assertTrue(isinstance(code_object, Code))
         self.assertEqual(str(code_object), 'v == 2')
 
-    def test_magic_with_magic(self):
+    def test_code_with_code(self):
         """
         When user declares
-        >>> v = MagicVar()
-        >>> w = MagicVar()
+        >>> v = Code()
+        >>> w = Code()
         and
         >>> code_object = v == w
         Then code_object should be of type Code, rather than boolean and
@@ -132,35 +131,17 @@ class CodeTest(unittest.TestCase):
         'v == w'
         """
 
-        v = MagicVar()
-        w = MagicVar()
+        v = Code()
+        w = Code()
         code_object = v == w
         code_object.add_locals(locals())
 
         self.assertTrue(isinstance(code_object, Code))
         self.assertEqual(str(code_object), 'v == w')
 
-    def test_variable_not_found(self):
-        """
-        If User forgets to call:
-        >>> code_obj = Code()
-        >>> code_obj.add_locals(locals())
-        it should display:
-        >>> MagicVarNotFound("friendly message")
-        Exception with friendly message.
-        """
-
-        v = MagicVar()
-        w = MagicVar()
-        code_object = v == w
-
-        self.assertTrue(isinstance(code_object, Code))
-        with self.assertRaises(MagicVarNotFound):
-            str(code_object)
-
-    def test_factoring_with_magic_var(self):
-        """This is a hard test from test_code_generator.py, but additionally here it is added MagicVars :)"""
-        function = f.factor_code_with_magic
+    def test_factoring_with_code_var(self):
+        """This is a hard test from test_code_generator.py, but additionally here it is added Code instances :)"""
+        function = f.factor_code_with_code
         output_code = 'i * 2'
         code1_str = 'i == 9'
         code2_str = 'i == 7'
@@ -172,17 +153,17 @@ class CodeTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        i = MagicVar()
+        i = Code()
         cond = Conditions(i == 9, output=i*2)
         cond.add(i == 7, output=i*2)
         solution = cond.solve(self, function, local_vars=locals())
 
         self.assertEqual(solution.implementation, code)
 
-    def test_factor_ordered_with_magic(self):
-        """This is a hard test from test_code_generator.py, but additionally here it is added MagicVars :)"""
+    def test_factor_ordered_with_code(self):
+        """This is a hard test from test_code_generator.py, but additionally here it is added Code vars :)"""
 
-        function = f.factor_ordered_with_magic
+        function = f.factor_ordered_with_code
         right_str = 'i * j'
         code1_str = 'i != 0'
         code2_str = 'i < 1'
@@ -195,8 +176,8 @@ class CodeTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        i = MagicVar()
-        j = MagicVar()
+        i = Code()
+        j = Code()
         cond = Conditions(i != 0,
                           i < 1,
                           output=i * j)

@@ -4,7 +4,7 @@
 
 import unittest
 
-from boolean_solver.code import MagicVar
+from boolean_solver.code import Code
 from tests.generated_code import code_functions as f
 from tests.testing_helpers import common_testing_code
 from boolean_solver.custom_operator import CustomOperator
@@ -21,8 +21,8 @@ class CodeTest(unittest.TestCase):
 	def test_inequality_different_operator(self):
 		"""Always false if there is an operator mismatch"""
 
-		i = MagicVar()
-		j = MagicVar()
+		i = Code()
+		j = Code()
 
 		m = (i == j).add_locals(locals())
 		k = (i < j).add_locals(locals())
@@ -31,8 +31,8 @@ class CodeTest(unittest.TestCase):
 
 	def test_equality(self):
 
-		i = MagicVar()
-		j = MagicVar()
+		i = Code()
+		j = Code()
 
 		for s in CustomOperator.OPERATORS.values():
 			m = (eval('i {} j'.format(s))).add_locals(locals())
@@ -41,8 +41,8 @@ class CodeTest(unittest.TestCase):
 
 	def test_no_commutation(self):
 
-		i = MagicVar()
-		j = MagicVar()
+		i = Code()
+		j = Code()
 
 		for s in CustomOperator.OPERATORS.values():
 			m = (eval('i {} j'.format(s))).add_locals(locals())

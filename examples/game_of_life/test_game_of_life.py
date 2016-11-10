@@ -2,7 +2,6 @@ import unittest
 
 from boolean_solver.solver import Conditions, Code
 from examples.game_of_life.game_of_life import is_alive, valid_indexes, get_neighbors, me, solve
-from boolean_solver.code import MagicVar
 
 
 class GameOfLifeTest(unittest.TestCase):
@@ -26,10 +25,10 @@ class GameOfLifeTest(unittest.TestCase):
 
     def test_valid_indexes(self):
 
-        idx1 = MagicVar()
-        idx2 = MagicVar()
-        max_idx1 = MagicVar()
-        max_idx2 = MagicVar()
+        idx1 = Code()
+        idx2 = Code()
+        max_idx1 = Code()
+        max_idx2 = Code()
 
         # TODO: ERROR when output is not present. FIX
         cond = Conditions(more_than1=idx1 >= 0,
@@ -45,10 +44,10 @@ class GameOfLifeTest(unittest.TestCase):
         #cond = Conditions(different1=Code('idx1 != x'),
         #                  different2=Code('idx2 != y'), output=False)
 
-        idx = MagicVar()
-        idy = MagicVar()
-        x = MagicVar()
-        y = MagicVar()
+        idx = Code()
+        idy = Code()
+        x = Code()
+        y = Code()
 
         cond = Conditions(different1=idx == x,
                           different2=idy == y, output=True)
