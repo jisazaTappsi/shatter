@@ -7,7 +7,7 @@ from boolean_solver import solver as s
 __author__ = 'juan pablo isaza'
 
 
-# Mock functions
+# and, or and xor mock functions.
 @s.solve()
 def and_function(a, b):
     pass
@@ -88,6 +88,7 @@ def mix_output(a, b):
     pass
 
 
+# auxiliary function.
 def no_args():
     pass
 
@@ -109,11 +110,6 @@ def recursive(a):
 
 @s.solve()
 def recursive_iteration(array):
-    pass
-
-
-@s.solve()
-def with_string_args():
     pass
 
 

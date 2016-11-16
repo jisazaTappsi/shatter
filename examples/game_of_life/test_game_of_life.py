@@ -21,7 +21,7 @@ class GameOfLifeTest(unittest.TestCase):
         cond.add(alive=True, rule4=Code(code_str='sum(neighbors) == 3'), output=True)
         cond.add(alive=False, rule5=Code(code_str='sum(neighbors) == 3'), output=True)
 
-        cond.solve(self, is_alive)
+        cond.solve(is_alive, self)
 
     def test_valid_indexes(self):
 
@@ -36,7 +36,7 @@ class GameOfLifeTest(unittest.TestCase):
                           more_than2=idx2 >= 0,
                           less_than2=idx2 < max_idx2, output=True)
 
-        cond.solve(self, valid_indexes)
+        cond.solve(valid_indexes, self)
 
     def test_me(self):
 
@@ -51,7 +51,7 @@ class GameOfLifeTest(unittest.TestCase):
 
         cond = Conditions(different1=idx == x,
                           different2=idy == y, output=True)
-        cond.solve(self, me)
+        cond.solve(me, self)
 
     def test_get_neighbors(self):
 

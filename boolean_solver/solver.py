@@ -179,7 +179,7 @@ def get_input_values(conditions, function_inputs, output):
         return list(function_inputs)
 
 
-def return_solution(unittest, f, conditions):
+def return_solution(f, conditions, unittest):
     """
     Solves the riddle, Writes it and tests it.
     :param unittest: the unittest object that is passed to test stuff

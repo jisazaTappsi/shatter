@@ -126,23 +126,22 @@ class Conditions(list):
         # if invalid raises exception.
         h.valid_function(function) and valid_conditions(conditions)
 
-        function = h.reload_function(function)
         f_path = h.get_function_path(function)
 
         if not h.os.path.exists(f_path):
             raise NotImplementedError("Function path {} not found.".format(f_path))
 
-    def solve(self, unittest, function):
+    def solve(self, function, unittest=None):
         """
         Solves puzzle given the restrains added. This is a method wrapper of solver.execute().
-        :param unittest: the current test being run eg: 'self'.
         :param function: the function to be coded.
+        :param unittest: optional, the current test being run eg: 'self'.
         :return: Solution object.
         """
         self.validate(function, self)
-        return solver.return_solution(unittest=unittest,
-                                      f=function,
-                                      conditions=self)
+        return solver.return_solution(f=function,
+                                      conditions=self,
+                                      unittest=unittest)
 
     def get_input_values(self, f_inputs, output):
         """
@@ -353,18 +352,18 @@ def add_to_dict_table(table, key, value):
     return table
 
 
-def solve(unittest, function, conditions):
+def solve(function, conditions, unittest=None):
     """
     This is the static version of conditions.solve()
-    :param unittest: the current test being run eg: 'self'.
     :param function: the function to be coded.
     :param conditions: Conditions object or table.
+    :param unittest: optional, the current test being run eg: 'self'.
     :return: Solution object.
     """
     Conditions.validate(function, conditions)
-    return solver.return_solution(unittest=unittest,
-                                  f=function,
-                                  conditions=conditions)
+    return solver.return_solution(f=function,
+                                  conditions=conditions,
+                                  unittest=unittest)
 
 
 def from_raw_set_to_dict_table(conditions):
