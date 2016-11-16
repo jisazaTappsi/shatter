@@ -4,7 +4,7 @@
 
 import unittest
 
-from boolean_solver.util.inverse_tree_set import InverseTreeSet
+from mastermind.util.inverse_tree_set import InverseTreeSet
 
 __author__ = 'juan pablo isaza'
 

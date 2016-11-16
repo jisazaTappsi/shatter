@@ -2,7 +2,7 @@
 
 """Functions for test_code_generator.py"""
 
-from boolean_solver import solver as s
+from mastermind import solver as s
 
 __author__ = 'juan pablo isaza'
 

@@ -1,4 +1,4 @@
-from boolean_solver.solver import solve
+from mastermind.solver import solve
 
 
 @solve()

@@ -4,9 +4,9 @@
 
 import unittest
 
-from boolean_solver.code import Code
+from mastermind.code import Code
 from tests.generated_code import code_functions as f
-from boolean_solver.conditions import Conditions
+from mastermind.rules import Rules
 from tests.testing_helpers import common_testing_code
 
 
@@ -151,7 +151,7 @@ class CodeTest(unittest.TestCase):
                 '    return False']
 
         i = Code()
-        cond = Conditions(i == 9, output=i*2)
+        cond = Rules(i == 9, output=i * 2)
         cond.add(i == 7, output=i*2)
         solution = cond.solve(function, self)
 
@@ -175,9 +175,9 @@ class CodeTest(unittest.TestCase):
 
         i = Code()
         j = Code()
-        cond = Conditions(i != 0,
-                          i < 1,
-                          output=i * j)
+        cond = Rules(i != 0,
+                     i < 1,
+                     output=i * j)
         cond.add(i > j, output=i * j)
         solution = cond.solve(function, self)
 

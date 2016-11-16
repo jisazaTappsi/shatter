@@ -3,10 +3,10 @@
 """Test for code_generator.py"""
 import unittest
 
-from boolean_solver import code_generator as c
-from boolean_solver import solver as s
-from boolean_solver.conditions import Conditions
-from boolean_solver.util.helpers import get_function_inputs
+from mastermind import code_generator as c
+from mastermind import solver as s
+from mastermind.rules import Rules
+from mastermind.util.helpers import get_function_inputs
 from tests.generated_code import code_generator_functions as f
 from tests.testing_helpers import constants as cts, common_testing_code
 
@@ -29,7 +29,7 @@ class GeneratorTest(unittest.TestCase):
         """
         Test with outputs different from boolean.
         """
-        cond = Conditions(a=True, b=True, output=1)
+        cond = Rules(a=True, b=True, output=1)
         solution = cond.solve(f.non_boolean_and, self)
 
         code = ['def ' + f.non_boolean_and.__name__ + '(a, b):',
@@ -79,7 +79,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=True, b=False, output=1)  # non-boolean output
+        cond = Rules(a=True, b=False, output=1)  # non-boolean output
         cond.add(a=False, b=True, output=True)  # boolean condition
         solution = cond.solve(f.mix_true_values, self)
         self.assertEqual(solution.implementation, code)
@@ -95,17 +95,17 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=False, b=True, output=0)  # non-boolean output
+        cond = Rules(a=False, b=True, output=0)  # non-boolean output
         cond.add(a=True, b=False, output=False)  # boolean condition
         solution = cond.solve(f.mix_false_values, self)
         self.assertEqual(solution.implementation, code)
 
-        cond = Conditions(a=True, b=False, output=False)  # non-boolean output
+        cond = Rules(a=True, b=False, output=False)  # non-boolean output
         cond.add(a=False, b=True, output=0)  # boolean condition
         solution = cond.solve(f.mix_false_values, self)
         self.assertEqual(solution.implementation, code)
 
-    def test_conditions_input_order_is_respected(self):
+    def test_rules_input_order_is_respected(self):
         """
         First input has to be first on the final boolean expression.
         So programmers can use short circuiting to their advantage ;). Very useful when validating data.
@@ -114,7 +114,7 @@ class GeneratorTest(unittest.TestCase):
         code = ['def ordered_expression(a, b):',
                 '    return a or b']
 
-        cond = Conditions(a=True, output=True)  # boolean output
+        cond = Rules(a=True, output=True)  # boolean output
         cond.add(b=True, output=True)  # boolean condition
         solution = cond.solve(f.ordered_expression, self)
         self.assertEqual(solution.implementation, code)
@@ -122,7 +122,7 @@ class GeneratorTest(unittest.TestCase):
         code = ['def ordered_expression(a, b):',
                 '    return a or b']
 
-        cond = Conditions(b=True, output=True)  # boolean output
+        cond = Rules(b=True, output=True)  # boolean output
         cond.add(a=True, output=True)  # boolean condition
         solution = cond.solve(f.ordered_expression, self)
         self.assertEqual(solution.implementation, code)
@@ -144,7 +144,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=False, b=True, output=out1)  # non-boolean output
+        cond = Rules(a=False, b=True, output=out1)  # non-boolean output
         cond.add(a=True, b=False, output=out2)  # non-boolean condition
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
@@ -179,7 +179,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=False, b=True, output=out1)  # non-boolean output
+        cond = Rules(a=False, b=True, output=out1)  # non-boolean output
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -195,7 +195,7 @@ class GeneratorTest(unittest.TestCase):
                 '        return ' + c.print_object(out),
                 '    return a and b']
 
-        cond = Conditions(a=False, b=True, output=out)  # non-boolean output
+        cond = Rules(a=False, b=True, output=out)  # non-boolean output
         cond.add(a=True, b=True)  # boolean output
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
@@ -213,7 +213,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=False, b=True, output=out, output_args={})  # non-boolean output
+        cond = Rules(a=False, b=True, output=out, output_args={})  # non-boolean output
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -231,7 +231,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=False, b=True, output=out_f, output_args=args)  # non-boolean output
+        cond = Rules(a=False, b=True, output=out_f, output_args=args)  # non-boolean output
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -249,11 +249,11 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return ' + str(default)]
 
-        cond = Conditions(a=False, b=True, output=out, default=default)
+        cond = Rules(a=False, b=True, output=out, default=default)
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
-        cond = Conditions(a=False, b=True, output=out)
+        cond = Rules(a=False, b=True, output=out)
         cond.add(default=default)
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
@@ -273,7 +273,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return {0}({1})'.format(function.__name__, not_a)]
 
-        cond = Conditions(a=False, output=0, default=out)
+        cond = Rules(a=False, output=0, default=out)
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -293,7 +293,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return {0}({1})'.format(function.__name__, array_1)]
 
-        cond = Conditions(s.Code(code_str=array_len_0), output=0, default=out)
+        cond = Rules(s.Code(code_str=array_len_0), output=0, default=out)
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -310,7 +310,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=False, output=out_obj)
+        cond = Rules(a=False, output=out_obj)
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -326,7 +326,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(any_non_input_name=s.Code(code_str='isinstance(a, str)'), output=2)
+        cond = Rules(any_non_input_name=s.Code(code_str='isinstance(a, str)'), output=2)
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -349,10 +349,10 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(s.Code(code_str=code1_str),
-                          s.Code(code_str=code2_str),
-                          s.Code(code_str=code3_str),
-                          output=right_str)
+        cond = Rules(s.Code(code_str=code1_str),
+                     s.Code(code_str=code2_str),
+                     s.Code(code_str=code3_str),
+                     output=right_str)
         solution = cond.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -373,9 +373,9 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(rule1=s.Code(code_str=code1_str),
-                            rule2=s.Code(code_str=code2_str),
-                            output=right_str)
+        cond = Rules(rule1=s.Code(code_str=code1_str),
+                     rule2=s.Code(code_str=code2_str),
+                     output=right_str)
 
         cond.add(rule3=s.Code(code_str=code3_str), output=right_str)
 
@@ -399,9 +399,9 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(s.Code(code_str=code1_str),
-                            s.Code(code_str=code2_str),
-                            output=right_str)
+        cond = Rules(s.Code(code_str=code1_str),
+                     s.Code(code_str=code2_str),
+                     output=right_str)
 
         cond.add(s.Code(code_str=code3_str), output=right_str)
 
@@ -424,7 +424,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(s.Code(code_str=code1_str), output=s.Code(code_str=output_code))
+        cond = Rules(s.Code(code_str=code1_str), output=s.Code(code_str=output_code))
         cond.add(s.Code(code_str=code2_str), output=s.Code(code_str=output_code))
 
         solution = cond.solve(function, self)
@@ -445,9 +445,9 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(s.Code(code_str=code0_str),
-                            s.Code(code_str=code1_str),
-                            output=right_str)
+        cond = Rules(s.Code(code_str=code0_str),
+                     s.Code(code_str=code1_str),
+                     output=right_str)
 
         cond.add(s.Code(code_str=code1_str), output=right_str)
 
@@ -461,9 +461,9 @@ class GeneratorTest(unittest.TestCase):
         code = ['def {}(a, b):'.format(function.__name__),
                 '    return b']
 
-        cond = Conditions(a=True,
-                            b=True,
-                            output=True)
+        cond = Rules(a=True,
+                     b=True,
+                     output=True)
         cond.add(b=True, output=True)
 
         solution = cond.solve(function, self)
@@ -481,9 +481,9 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=True,
-                          b=True,
-                          output=ouput)
+        cond = Rules(a=True,
+                     b=True,
+                     output=ouput)
         cond.add(b=True, output=ouput)
 
         solution = cond.solve(function, self)

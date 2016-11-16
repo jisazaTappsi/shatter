@@ -1,6 +1,7 @@
 import unittest
 
-from boolean_solver.solver import Conditions, Code
+# TODO: check imports fucks!
+from mastermind.solver import Rules, Code
 from examples.game_of_life.game_of_life import is_alive, valid_indexes, get_neighbors, me, solve
 
 
@@ -15,7 +16,7 @@ class GameOfLifeTest(unittest.TestCase):
         4. Any dead cell with exactly three live neighbours becomes a live cell.
         """
 
-        cond = Conditions(rule1=Code(code_str='sum(neighbors) < 2'), output=False)
+        cond = Rules(rule1=Code(code_str='sum(neighbors) < 2'), output=False)
         cond.add(rule2=Code('sum(neighbors) > 3'), output=False)
         cond.add(alive=True, rule3=Code(code_str='sum(neighbors) == 2'), output=True)
         cond.add(alive=True, rule4=Code(code_str='sum(neighbors) == 3'), output=True)
@@ -31,26 +32,26 @@ class GameOfLifeTest(unittest.TestCase):
         max_idx2 = Code()
 
         # TODO: ERROR when output is not present. FIX
-        cond = Conditions(more_than1=idx1 >= 0,
-                          less_than1=idx1 < max_idx1,
-                          more_than2=idx2 >= 0,
-                          less_than2=idx2 < max_idx2, output=True)
+        cond = Rules(more_than1=idx1 >= 0,
+                     less_than1=idx1 < max_idx1,
+                     more_than2=idx2 >= 0,
+                     less_than2=idx2 < max_idx2, output=True)
 
         cond.solve(valid_indexes, self)
 
     def test_me(self):
 
         #TODO: make it right should return not (idx1 != x and idx1 != y)
-        #cond = Conditions(different1=Code('idx1 != x'),
-        #                  different2=Code('idx2 != y'), output=False)
+        #r = Rules(different1=Code('idx1 != x'),
+        #          different2=Code('idx2 != y'), output=False)
 
         idx = Code()
         idy = Code()
         x = Code()
         y = Code()
 
-        cond = Conditions(different1=idx == x,
-                          different2=idy == y, output=True)
+        cond = Rules(different1=idx == x,
+                     different2=idy == y, output=True)
         cond.solve(me, self)
 
     def test_get_neighbors(self):

@@ -2,14 +2,14 @@
 
 """Short example"""
 
-from boolean_solver import solver as s
-from boolean_solver.solver import Conditions, Code, Output
+from mastermind import solver as s
+from mastermind.solver import Rules, Code, Output
 
 __author__ = 'juan pablo isaza'
 
 
 """
-1. Set conditions of your function.
+1. Set rules of your function.
 2. Run cond.solve(callable) where callable is a function
  with the decorator=@solve().
  See examples below:
@@ -21,7 +21,7 @@ def and_function(a, b):
     pass
 
 # A simple and function.
-cond = Conditions(a=True, b=True, output=True)
+cond = Rules(a=True, b=True, output=True)
 cond.solve(and_function)
 
 
@@ -30,7 +30,7 @@ def if_function(a, b):
     pass
 
 # A function with an if statement.
-cond = Conditions(a=False, b=True, output=1)  # non-boolean output
+cond = Rules(a=False, b=True, output=1)  # non-boolean output
 cond.add(a=True, b=False, output=0)  # non-boolean output
 cond.solve(if_function)
 
@@ -42,7 +42,7 @@ def recursive(a):
 # Will do recursion, extremely cool!!!
 args = {'a': Code(code_str='not a')}
 out = Output(recursive, args)
-cond = Conditions(a=False, output=0, default=out)
+cond = Rules(a=False, output=0, default=out)
 cond.solve(recursive)
 
 
@@ -51,5 +51,5 @@ def internal_code(a):
     pass
 
 # Will have a arbitrary piece of code inside.
-cond = Conditions(any_non_input_name=Code(code_str='isinstance(a, str)'), output=2)
+cond = Rules(any_non_input_name=Code(code_str='isinstance(a, str)'), output=2)
 cond.solve(internal_code)

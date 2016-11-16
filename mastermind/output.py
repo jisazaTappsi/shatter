@@ -4,7 +4,7 @@
 
 import warnings
 
-from boolean_solver.util import helpers
+from mastermind.util import helpers
 
 __author__ = 'juan pablo isaza'
 

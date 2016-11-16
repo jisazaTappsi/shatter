@@ -5,8 +5,8 @@
 import copy
 import re
 
-from boolean_solver import constants as cts
-from boolean_solver.util import helpers as h
+from mastermind import constants as cts
+from mastermind.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 

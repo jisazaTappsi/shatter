@@ -2,7 +2,7 @@
 
 """Example of a use case."""
 
-from boolean_solver.solver import *
+from mastermind.solver import *
 
 __author__ = 'juan pablo isaza'
 

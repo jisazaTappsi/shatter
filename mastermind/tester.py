@@ -3,8 +3,8 @@
 """Implements the functions to test generated code."""
 import traceback
 
-from boolean_solver.code import Code
-from boolean_solver.util.helpers import *
+from mastermind.code import Code
+from mastermind.util.helpers import *
 
 __author__ = 'juan pablo isaza'
 
@@ -33,7 +33,7 @@ def get_all_possible_inputs(inputs):
 def get_used_inputs(tables):
     """
     List comprehensions are used to get all tuples.
-    :param tables: the variable in processed_conditions.
+    :param tables: the variable in processed_rules.
     :return: a set with all used tuples.
     """
     return set([item for k, set_v in tables.items() for item in set_v])
@@ -43,7 +43,7 @@ def get_inputs_with_default_output(inputs, tables):
     """
     Gets a set with all tuples going to default value.
     :param inputs: function ins.
-    :param tables: as in processed_conditions.
+    :param tables: as in processed_rules.
     :return: tuples that output default value.
     """
     all_tuples = get_all_possible_inputs(inputs)
@@ -122,9 +122,9 @@ def test_implementation(test_class, solution):
     validate(test_class)
 
     inputs = get_function_inputs(solution.function)
-    tables = solution.processed_conditions.tables
+    tables = solution.processed_rules.tables
     default_set = set(get_inputs_with_default_output(inputs, tables))
-    tables[solution.processed_conditions.default] = default_set
+    tables[solution.processed_rules.default] = default_set
 
     if has_code_args(tables):
         warnings.warn("Cannot test function, it has added code", UserWarning)

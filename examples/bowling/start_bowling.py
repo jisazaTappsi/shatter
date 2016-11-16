@@ -5,7 +5,7 @@ http://code.joejag.com/coding-dojo/bowling-scores/
 """
 
 
-from boolean_solver.solver import solve
+from mastermind.solver import solve
 
 
 @solve()

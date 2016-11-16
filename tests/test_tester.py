@@ -6,9 +6,9 @@ import unittest
 
 from tests.generated_code import tester_functions as f
 from tests.testing_helpers import common_testing_code
-from boolean_solver.conditions import Conditions
-from boolean_solver import tester
-from boolean_solver.solution import Solution
+from mastermind.rules import Rules
+from mastermind import tester
+from mastermind.solution import Solution
 
 __author__ = 'juan pablo isaza'
 
@@ -21,9 +21,9 @@ class TesterTest(unittest.TestCase):
 
     def test_collision(self):
         """
-        The internal test should fail, because the conditions have no internal consistency, they are bull...
+        The internal test should fail, because the rules have no internal consistency, they are bull...
         """
-        cond = Conditions(a=True, output=1)  # first condition
+        cond = Rules(a=True, output=1)  # first condition
         cond.add(a=False, output=1)  # contradictory condition.
 
         with self.assertRaises(AssertionError):
@@ -33,7 +33,7 @@ class TesterTest(unittest.TestCase):
         """
         Testing bigger stuff. Multiple ifs with multiple boolean variables
         """
-        cond = Conditions(a=True, b=True, c=True, output=0)  # leave d out
+        cond = Rules(a=True, b=True, c=True, output=0)  # leave d out
         cond.add(a=False, b=True, d=True, output=1)  # leave c out
         cond.add(a=True, c=False, d=True, output=2)  # leave b out
         cond.add(b=True, c=False, d=False, output=3)  # leave a out
@@ -67,9 +67,9 @@ class TesterTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Conditions(a=True,
-                          b=True,
-                          output=ouput)
+        cond = Rules(a=True,
+                     b=True,
+                     output=ouput)
         cond.add(b=True, output=ouput)
 
         solution = cond.solve(function)

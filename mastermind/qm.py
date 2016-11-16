@@ -42,8 +42,8 @@ from __future__ import print_function
 
 import math
 
-from boolean_solver.util.last_update_set import LastUpdateSet
-from boolean_solver.util.inverse_tree_set import InverseTreeSet
+from mastermind.util.last_update_set import LastUpdateSet
+from mastermind.util.inverse_tree_set import InverseTreeSet
 
 
 class QuineMcCluskey:

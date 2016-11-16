@@ -2,8 +2,8 @@
 
 """A class that defines a code, with a string."""
 
-from boolean_solver.custom_operator import CustomOperator
-from boolean_solver.util import helpers as h
+from mastermind.custom_operator import CustomOperator
+from mastermind.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 

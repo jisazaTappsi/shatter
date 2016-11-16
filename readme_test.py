@@ -2,7 +2,7 @@
 
 """setup the python package.py"""
 
-from boolean_solver.helpers import read_file
+from mastermind.helpers import read_file
 import os
 import re
 from subprocess import call

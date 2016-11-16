@@ -4,21 +4,21 @@
 
 import warnings
 
-from boolean_solver.constants import *
-from boolean_solver.output import Output
-from boolean_solver.util import helpers
-from boolean_solver.util.last_update_dict import LastUpdateDict
-from boolean_solver.util.last_update_set import LastUpdateSet
-from boolean_solver.util.code_dict import CodeDict
-from boolean_solver import solver
-from boolean_solver.util import helpers as h
+from mastermind.constants import *
+from mastermind.output import Output
+from mastermind.util import helpers
+from mastermind.util.last_update_dict import LastUpdateDict
+from mastermind.util.last_update_set import LastUpdateSet
+from mastermind.util.code_dict import CodeDict
+from mastermind import solver
+from mastermind.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 
 
-class Conditions(list):
+class Rules(list):
     """
-    It is a list that contains conditions, each being a dictionary with the inputs.
+    It is a list that contains rules, each being a dictionary with the inputs.
     """
 
     @staticmethod
@@ -117,14 +117,14 @@ class Conditions(list):
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 
     @staticmethod
-    def validate(function, conditions):
+    def validate(function, rules):
         """
         Validates the entries, for solver()
         :param function: callable
-        :param conditions: conditions object or table.
+        :param rules: rules object or table.
         """
         # if invalid raises exception.
-        h.valid_function(function) and valid_conditions(conditions)
+        h.valid_function(function) and valid_rules(rules)
 
         f_path = h.get_function_path(function)
 
@@ -140,12 +140,12 @@ class Conditions(list):
         """
         self.validate(function, self)
         return solver.return_solution(f=function,
-                                      conditions=self,
+                                      rules=self,
                                       unittest=unittest)
 
     def get_input_values(self, f_inputs, output):
         """
-        Scans the whole conditions object looking for input values, adds them with the function inputs.
+        Scans the whole rules object looking for input values, adds them with the function inputs.
         :param f_inputs: function inputs.
         :param output: the output of the row.
         :return: All possible inputs that are not keywords.
@@ -164,7 +164,7 @@ class Conditions(list):
 
     def get_input_keys(self, f_inputs, output):
         """
-        Scans the whole conditions object looking for input keys. Will add inputs (such as code pieces), that are not
+        Scans the whole rules object looking for input keys. Will add inputs (such as code pieces), that are not
         explicitly declared as function inputs.
         Uses LastOrderSets because order is very important. The order is:
         first the f_inputs (ordered from right to left), then args added on the condition object from right to left and
@@ -175,7 +175,7 @@ class Conditions(list):
         >>>def f(a, b):
         >>>    return a + b
 
-        >>>cond = Conditions(c=1, d=2, output=out)
+        >>>cond = Rules(c=1, d=2, output=out)
         >>>cond.add(x=3, y=4, output='other_stuff')
         >>>cond.add(e=3, f=4, output=out)
 
@@ -352,29 +352,29 @@ def add_to_dict_table(table, key, value):
     return table
 
 
-def solve(function, conditions, unittest=None):
+def solve(function, rules, unittest=None):
     """
-    This is the static version of conditions.solve()
+    This is the static version of rules.solve()
     :param function: the function to be coded.
-    :param conditions: Conditions object or table.
+    :param rules: Rules object or table.
     :param unittest: optional, the current test being run eg: 'self'.
     :return: Solution object.
     """
-    Conditions.validate(function, conditions)
+    Rules.validate(function, rules)
     return solver.return_solution(f=function,
-                                  conditions=conditions,
+                                  rules=rules,
                                   unittest=unittest)
 
 
-def from_raw_set_to_dict_table(conditions):
+def from_raw_set_to_dict_table(rules):
     """
     Convert raw case to general format.
-    :param conditions: obj
+    :param rules: obj
     :return: dict where key is output and value is implicit truth table.
     """
     table = dict()
-    for row in conditions:
-        if Conditions.is_explicit(row):  # explicit case
+    for row in rules:
+        if Rules.is_explicit(row):  # explicit case
             table = add_to_dict_table(table, row[1], row[0])
         else:  # implicit case
             table = add_to_dict_table(table, True, row)
@@ -386,10 +386,10 @@ ROW_ERROR = 'row_error'
 EXPLICIT_ROW_ERROR = 'explicit_row_error'
 
 
-class ConditionsTypeError(TypeError):
+class RulesTypeError(TypeError):
     def __init__(self, error_object, error_type):
         if TYPE_ERROR == error_type:
-            message = 'Conditions variable is not a set nor a Conditions object, but rather type {}'\
+            message = 'Rules variable is not a set nor a Rules object, but rather type {}'\
                 .format(type(error_object))
         elif ROW_ERROR:
             message = '{} row in truth table is not a tuple'.format(error_object)
@@ -398,48 +398,48 @@ class ConditionsTypeError(TypeError):
         else:
             message = 'unknown TypeError'
 
-        super(ConditionsTypeError, self).__init__(message)
+        super(RulesTypeError, self).__init__(message)
 
 
-def get_truth_tables(conditions, function_args):
+def get_truth_tables(rules, function_args):
     """
     This is the 'public' version of the class method with the same name.
-    :param conditions: either a truth table or a conditions object.
+    :param rules: either a truth table or a rules object.
     :param function_args: the arguments of the function.
     :return: truth table (ie set with tuples).
     """
-    if isinstance(conditions, Conditions):
-        return conditions.get_truth_tables(function_args)
-    elif isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):  # raw set case.
-        return from_raw_set_to_dict_table(conditions)
+    if isinstance(rules, Rules):
+        return rules.get_truth_tables(function_args)
+    elif isinstance(rules, set) or isinstance(rules, LastUpdateSet):  # raw set case.
+        return from_raw_set_to_dict_table(rules)
     else:
-        raise ConditionsTypeError(conditions, TYPE_ERROR)
+        raise RulesTypeError(rules, TYPE_ERROR)
 
 
-def valid_conditions(conditions):
+def valid_rules(rules):
     """
-    Valid conditions must be sets, LastUpdateSet, inherit from set or be a Conditions object.
-    - set case:  When the input is a raw table. If conditions is a set then all rows have to be tuples or inherit
+    Valid rules must be sets, LastUpdateSet, inherit from set or be a Rules object.
+    - set case:  When the input is a raw table. If rules is a set then all rows have to be tuples or inherit
     from tuple.
     - LastUpdateSet case: same as set.
-    - Conditions case: When the input is a Conditions object.
-    :param conditions: truth table or a conditions object.
+    - Rules case: When the input is a Rules object.
+    :param rules: truth table or a rules object.
     :return: boolean.
     """
-    if not isinstance(conditions, set)\
-            and not isinstance(conditions, Conditions)\
-            and not isinstance(conditions, LastUpdateSet):
-        raise ConditionsTypeError(conditions, TYPE_ERROR)
+    if not isinstance(rules, set)\
+            and not isinstance(rules, Rules)\
+            and not isinstance(rules, LastUpdateSet):
+        raise RulesTypeError(rules, TYPE_ERROR)
 
     # only for set and LastUpdateSet.
-    if isinstance(conditions, set) or isinstance(conditions, LastUpdateSet):
-        for row in conditions:
+    if isinstance(rules, set) or isinstance(rules, LastUpdateSet):
+        for row in rules:
             if not isinstance(row, tuple):
-                raise ConditionsTypeError(row, ROW_ERROR)
+                raise RulesTypeError(row, ROW_ERROR)
 
             # when the output is explicit, check for 2 elements of outer tuple.
             if isinstance(row[0], tuple):
                 if len(row) != 2:
-                    raise ConditionsTypeError(row, EXPLICIT_ROW_ERROR)
+                    raise RulesTypeError(row, EXPLICIT_ROW_ERROR)
 
     return True

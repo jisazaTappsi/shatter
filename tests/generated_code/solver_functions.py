@@ -2,7 +2,7 @@
 
 """Functions for solver.py tests"""
 
-from boolean_solver import solver as s
+from mastermind import solver as s
 
 __author__ = 'juan pablo isaza'
 

@@ -2,7 +2,7 @@
 
 """Functions for test_tester.py"""
 
-from boolean_solver.solver import *
+from mastermind.solver import *
 
 __author__ = 'juan pablo isaza'
 

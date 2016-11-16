@@ -4,10 +4,10 @@
 
 import warnings
 
-from boolean_solver.output import Output
-from boolean_solver.code import Code
-from boolean_solver.util import helpers
-from boolean_solver.constants import *
+from mastermind.output import Output
+from mastermind.code import Code
+from mastermind.util import helpers
+from mastermind.constants import *
 
 __author__ = 'juan pablo isaza'
 

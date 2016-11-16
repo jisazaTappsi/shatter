@@ -4,7 +4,7 @@
 
 from collections import OrderedDict, MutableMapping
 
-from boolean_solver.code import Code
+from mastermind.code import Code
 
 __author__ = 'Juan Pablo Isaza'
 

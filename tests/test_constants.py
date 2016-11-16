@@ -5,7 +5,7 @@
 import unittest
 import re
 
-from boolean_solver import constants as cts
+from mastermind import constants as cts
 
 __author__ = 'juan pablo isaza'
 

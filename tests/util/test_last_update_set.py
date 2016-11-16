@@ -4,7 +4,7 @@
 
 import unittest
 
-from boolean_solver.util.last_update_set import LastUpdateSet
+from mastermind.util.last_update_set import LastUpdateSet
 
 __author__ = 'juan pablo isaza'
 

@@ -3,8 +3,8 @@
 """Example of a use case."""
 
 import unittest
-from boolean_solver import solver
-from boolean_solver import start_sample
+from mastermind import solver
+from mastermind import start_sample
 
 __author__ = 'juan pablo isaza'
 
@@ -19,13 +19,13 @@ class MyTest(unittest.TestCase):
     def test_AND_function(self):
 
         # The output is explicitly set to true
-        cond = solver.Conditions(a=True, b=True, output=True)
+        cond = solver.Rules(a=True, b=True, output=True)
         cond.solve(start_sample.and_function, self)
 
     def test_OR_function(self):
 
         # The output is implicitly set to true
-        cond = solver.Conditions(a=False, b=True)
+        cond = solver.Rules(a=False, b=True)
         cond.add(a=True, b=False)
         cond.add(a=True, b=True)
 
@@ -33,14 +33,14 @@ class MyTest(unittest.TestCase):
 
     def test_XOR_function(self):
 
-        cond = solver.Conditions(a=False, b=True)
+        cond = solver.Rules(a=False, b=True)
         cond.add(a=True, b=False)
 
         cond.solve(start_sample.xor_function, self)
 
     def test_AND_3_VARIABLES_function(self):
 
-        cond = solver.Conditions(a=True, b=True, c=True)
+        cond = solver.Rules(a=True, b=True, c=True)
         cond.solve(start_sample.and_function_3_variables, self)
 
 print("We have solved the riddle, go run start_sample.py, again!!!")

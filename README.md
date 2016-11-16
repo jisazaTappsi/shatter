@@ -20,7 +20,7 @@ Short Example
 -------------
 Add new script(`start.py`) with a mock function:
 
-    from boolean_solver import solver as s
+    from mastermind import solver as s
 
     @s.solve()
     def and_function(a, b):
@@ -29,21 +29,21 @@ Add new script(`start.py`) with a mock function:
 Add a unittest(`test.py`) with specs:
 
     import unittest
-    from boolean_solver import solver
+    from mastermind import solver
     import start
     
     
     class MyTest(unittest.TestCase):
         """
-        1. Set conditions of your boolean function (for True outputs)
-        2. Run solver.execute(self, callable, table) where callable is the boolean function
+        1. Set rules of your function
+        2. Run solve(callable, self) where callable is a function
          with the decorator=@solve().
          See examples below:
         """
         def test_AND_function(self):
 
             # The output is explicitly set to true
-            cond = solver.Conditions(a=True, b=True, output=True)
+            cond = solver.Rules(a=True, b=True, output=True)
             cond.solve(self, start.and_function)
 
 Then run `$ python -m unittest test`. In `start.py` the result should be:
@@ -68,7 +68,7 @@ Add `test_ifs(self)` to `MyTest(unittest.TestCase)` class in `test.py`:
         """
         Testing ifs.
         """
-        cond = solver.Conditions(a=False, b=True, output=1)  # non-boolean output
+        cond = solver.Rules(a=False, b=True, output=1)  # non-boolean output
         cond.add(a=True, b=False, output=0)  # non-boolean output
         cond.solve(self, start.if_function)
 
@@ -102,7 +102,7 @@ Add `test_recursive_function(self)` to `MyTest(unittest.TestCase)` class in `tes
         args = {'a': solver.Code('not a')}
         out = solver.Output(start.recursive, args)
 
-        cond = solver.Conditions(a=False, output=0, default=out)
+        cond = solver.Rules(a=False, output=0, default=out)
         cond.solve(self, start.recursive)
 
 The result this time will be a recursive function :)
@@ -131,7 +131,7 @@ Add `test_internal_code(self)` to `MyTest(unittest.TestCase)` class in `test.py`
         """
         Testing internal pieces of code
         """
-        cond = solver.Conditions(any_non_input_name=solver.Code('isinstance(a, str)'), output=2)
+        cond = solver.Rules(any_non_input_name=solver.Code('isinstance(a, str)'), output=2)
         cond.solve(self, start.internal_code)
 
 The result should be:
@@ -153,8 +153,8 @@ Setup with source code
 
 Intro Example with source code
 ------------------------------
-1.  Enter `boolean_solver`:
-    `cd boolean_solver`
+1.  Enter `mastermind`:
+    `cd mastermind`
 
 2.  Run:
     `python start_sample.py`
@@ -187,7 +187,7 @@ You just solved 4 boolean expressions: `and`, `or`, `xor` & `and3`. Specs for th
 
 How does Boolean Solver works?
 ------------------------------
-Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@boolean_solver()`.
+Takes a function and a truth_table which is processed using the [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm). Then finds a optimal boolean expression. This expression is inserted in the method definition with the decorator `@solve()`.
 
 Arguments of `cond.solve(test, function)`
 -------------------------------------------------------------------
@@ -198,9 +198,9 @@ Arguments of `cond.solve(test, function)`
     line 2: signature eg: `def my_function(a, b)`
     line 3: body: only one line, eg: `return False`. This line will be replaced by the boolean expression.
 
-3. a. `solver.Conditions()` instance: An object that can handle logical conditions with named arguments eg:
+3. a. `solver.Rules()` instance: An object that can handle logical rules with named arguments eg:
 
-        cond = solver.Conditions(a=True, b=False)
+        cond = solver.Rules(a=True, b=False)
     
         cond.add(a=True, b=True)
 
@@ -218,7 +218,7 @@ Arguments of `cond.solve(test, function)`
      
         {tuple_inputs(a, b, ...), ...}
 
-Arguments of `solver.Conditions() and cond.add()`
+Arguments of `solver.Rules() and cond.add()`
 -------------------------------------------------------------------
 
 These are specified as a dictionary containing certain keywords as well as the function inputs.
@@ -229,7 +229,7 @@ Keywords are:
 
 `output_args`: Dictionary with the values for the arguments when output is a function.
  
-`default`: Value returned when non of the conditions are True.
+`default`: Value returned when non of the rules are True.
 
 
 Helper Classes
@@ -244,6 +244,6 @@ Helper Classes
 
 `solver.Solution`: Class that contains the solution of the problem it includes:
     
-  - `conditions`: The information given by the user.
+  - `rules`: The information given by the user.
   - `implementation`: Plain code.
   - `ast`: Abstract syntax tree

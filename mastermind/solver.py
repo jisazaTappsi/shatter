@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 """This is the main file. Calls QM algorithm and code generation functions."""
-from boolean_solver import qm
-from boolean_solver.solution import Solution
-from boolean_solver.tester import test_implementation
-from boolean_solver.code_generator import *
-from boolean_solver.processed_conditions import *
+from mastermind import qm
+from mastermind.solution import Solution
+from mastermind.tester import test_implementation
+from mastermind.code_generator import *
+from mastermind.processed_rules import *
 
-#  TODO: from boolean_solver import solver as production_solver
+#  TODO: from mastermind import solver as production_solver
 
 __author__ = 'juan pablo isaza'
 
@@ -16,7 +16,7 @@ __author__ = 'juan pablo isaza'
 # def my_function(existing_arg)
 #   pass
 #
-# Conditions(non_exiting_arg=True, output=True)
+# Rules(non_exiting_arg=True, output=True)
 
 
 # TODO: add a decorator when function optimization is to be ignored. @ignore_solver()
@@ -100,7 +100,7 @@ def from_table_to_ones(table):
     for row in table:
 
         # case 1: when the output is explicit.
-        if Conditions.is_explicit(row):
+        if Rules.is_explicit(row):
             if row[1]:  # only do it for true outputs.# TODO change for non booleans.
                 ones.append(''.join(list(map(h.from_bool_to_bit, list(row[0])))))
 
@@ -125,16 +125,16 @@ def alter_file(line_number, input_file_list, implementation, input_path):
     h.rewrite_file(input_path, input_file_list)
 
 
-def get_empty_solution(function, conditions):
+def get_empty_solution(function, rules):
     """
     Wrapper to return an empty solution
     :param function: any function
-    :param conditions: Conditions object.
+    :param rules: Rules object.
     :return : solution object.
     """
     return Solution(function=function,
-                    conditions=conditions,
-                    processed_conditions=ProcessedConditions())
+                    rules=rules,
+                    processed_rules=ProcessedRules())
 
 
 def get_returning_implementation(implementation, definition, returning_value):
@@ -149,42 +149,42 @@ def get_returning_implementation(implementation, definition, returning_value):
     return implementation + ['', indent + '    return ' + print_object(returning_value)]
 
 
-def add_default_return(definition, processed_conditions, implementation):
+def add_default_return(definition, processed_rules, implementation):
     """
     Modify source code to include a default return if no True key is present.
     :param definition: function def
-    :param processed_conditions: obj containing dict with tables.
+    :param processed_rules: obj containing dict with tables.
     :param implementation: source code
     :return: source code
     """
-    if processed_conditions.default:
-        return get_returning_implementation(implementation, definition, processed_conditions.default)
-    elif not h.has_true_key(processed_conditions.tables):
+    if processed_rules.default:
+        return get_returning_implementation(implementation, definition, processed_rules.default)
+    elif not h.has_true_key(processed_rules.tables):
         return get_returning_implementation(implementation, definition, False)
 
     return implementation
 
 
-def get_input_values(conditions, function_inputs, output):
+def get_input_values(rules, function_inputs, output):
     """
     Adds to the original inputs other possible implicit inputs, such as code.
-    :param conditions: Conditions obj
+    :param rules: Rules obj
     :param function_inputs: explicit function inputs
     :param output: the output of the function.
     :return: a list with all the inputs.
     """
-    if isinstance(conditions, Conditions):
-        return conditions.get_input_values(function_inputs, output)
-    else:  # when there is no conditions obj, then all inputs are explicitly named in the function.
+    if isinstance(rules, Rules):
+        return rules.get_input_values(function_inputs, output)
+    else:  # when there is no rules obj, then all inputs are explicitly named in the function.
         return list(function_inputs)
 
 
-def return_solution(f, conditions, unittest):
+def return_solution(f, rules, unittest):
     """
     Solves the riddle, Writes it and tests it.
     :param unittest: the unittest object that is passed to test stuff
     :param f: any function object.
-    :param conditions: condition or object or partial truth table (explicit, implicit or mix).
+    :param rules: condition or object or partial truth table (explicit, implicit or mix).
     :return: True for successful operation, False if not.
     """
     f_path = h.get_function_path(f)
@@ -199,11 +199,11 @@ def return_solution(f, conditions, unittest):
 
         # init variables
         implementation = get_initial_implementation(definition)
-        processed_conditions = get_processed_conditions(conditions, function_args)
+        processed_rules = get_processed_rules(rules, function_args)
 
-        for the_output, table in processed_conditions.tables.items():
+        for the_output, table in processed_rules.tables.items():
 
-            all_inputs = get_input_values(conditions, function_args, the_output)
+            all_inputs = get_input_values(rules, function_args, the_output)
             expression = get_function_expression(table, all_inputs)
 
             if len(expression) > 0:
@@ -212,15 +212,15 @@ def return_solution(f, conditions, unittest):
                                                             definition=definition,
                                                             the_output=the_output)
 
-        implementation = add_default_return(definition, processed_conditions, implementation)
+        implementation = add_default_return(definition, processed_rules, implementation)
         solution = Solution(implementation=implementation,
                             function=f,
-                            conditions=conditions,
-                            processed_conditions=processed_conditions)
+                            rules=rules,
+                            processed_rules=processed_rules)
         test_implementation(unittest, solution)
 
         alter_file(f_line, file_code, implementation, f_path)
         print("Solved and tested " + f.__name__)
         return solution
 
-    return get_empty_solution(f, conditions)
+    return get_empty_solution(f, rules)

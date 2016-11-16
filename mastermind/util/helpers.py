@@ -7,7 +7,7 @@ import os
 import re
 import importlib
 
-import boolean_solver.constants as cts
+import mastermind.constants as cts
 
 __author__ = 'juan pablo isaza'
 

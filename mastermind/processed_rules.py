@@ -2,21 +2,21 @@
 
 """Contains data after processing is done."""
 
-from boolean_solver.conditions import *
-from boolean_solver.constants import *
-from boolean_solver.frozen_dict import FrozenDict
-from boolean_solver.code import Code
+from mastermind.rules import *
+from mastermind.constants import *
+from mastermind.frozen_dict import FrozenDict
+from mastermind.code import Code
 
 __author__ = 'juan pablo isaza'
 
 
-class ProcessedConditions:
+class ProcessedRules:
     """
     Contains the default value of the output and tables. Tables is a dict() containing keys which are the output and
     values that are sets of rows. This sets of rows represent tables. So we have a collection of tables each one with
     its output as keys.
     General form:
-    >>>ProcessedConditions().tables
+    >>>ProcessedRules().tables
     is of the form:
     >>>output1 = 1; output2 = 2
     >>>{output1:{(True, Code('1==3')), (False, False)}, output2:{(...), (...), (...) ...}}
@@ -27,14 +27,14 @@ class ProcessedConditions:
         self.default = default
 
 
-def get_default_output(conditions):
+def get_default_output(rules):
     """
     Gets the default value by iterating over all rows until a default word is caught.
-    :param conditions: a Conditions obj.
-    :return: the default value or False if None is found or if conditions is not a obj.
+    :param rules: a Rules obj.
+    :return: the default value or False if None is found or if rules is not a obj.
     """
-    if isinstance(conditions, Conditions) and conditions:
-        for row in conditions:
+    if isinstance(rules, Rules) and rules:
+        for row in rules:
             if KEYWORDS[DEFAULT] in row:
                 return row[KEYWORDS[DEFAULT]]
 
@@ -43,11 +43,11 @@ def get_default_output(conditions):
         return False
 
 
-def get_processed_conditions(conditions, function_args):
+def get_processed_rules(rules, function_args):
     """
-    :param conditions:
+    :param rules:
     :param function_args: args
-    :return: processConditions instance
+    :return: processedRules instance
     """
-    tables = get_truth_tables(conditions, function_args)
-    return ProcessedConditions(tables, get_default_output(conditions))
+    tables = get_truth_tables(rules, function_args)
+    return ProcessedRules(tables, get_default_output(rules))

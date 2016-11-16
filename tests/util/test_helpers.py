@@ -4,9 +4,9 @@
 
 import unittest
 
-from boolean_solver.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number,\
+from mastermind.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number,\
     is_private_call, retrieve_name
-from boolean_solver.code import Code
+from mastermind.code import Code
 
 __author__ = 'juan pablo isaza'
 

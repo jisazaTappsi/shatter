@@ -1,7 +1,8 @@
 import unittest
 
-from boolean_solver import solver
-from boolean_solver.code import Code
+# TODO: check imports fucks!
+from mastermind import solver
+from mastermind.code import Code
 from examples.bowling import start_bowling
 
 
@@ -9,22 +10,22 @@ class BowlingTest(unittest.TestCase):
 
     def test_is_strike(self):
 
-        cond = solver.Conditions(rule=solver.Code(code_str='frame[0] == 10'), output=True)
+        cond = solver.Rules(rule=solver.Code(code_str='frame[0] == 10'), output=True)
         cond.solve(start_bowling.is_strike, self)
 
     def test_is_spare(self):
 
-        cond = solver.Conditions(rule1=solver.Code(code_str='frame[0] < 10'),
-                                 rule2=solver.Code(code_str='frame[0] + frame[1] == 10'),
-                                 output=True)
+        cond = solver.Rules(rule1=solver.Code(code_str='frame[0] < 10'),
+                            rule2=solver.Code(code_str='frame[0] + frame[1] == 10'),
+                            output=True)
         cond.solve(start_bowling.is_spare, self)
 
     def test_get_next_throw(self):
 
         i = Code()
 
-        cond = solver.Conditions(before_last=(i < 9),
-                                 output=solver.Code(code_str='game[i+1][0]'))
+        cond = solver.Rules(before_last=(i < 9),
+                            output=solver.Code(code_str='game[i+1][0]'))
         cond.add(last_bonus_thow=(i == 9), output=solver.Code(code_str='game[i][2]'))
         cond.solve(start_bowling.get_next_throw, self)
 
@@ -32,8 +33,8 @@ class BowlingTest(unittest.TestCase):
 
         i = Code()
 
-        cond = solver.Conditions(last_bonus_throw=(i == 9),
-                                 output=solver.Code(code_str='game[i][1] + game[i][2]'))
+        cond = solver.Rules(last_bonus_throw=(i == 9),
+                            output=solver.Code(code_str='game[i][1] + game[i][2]'))
 
         cond.add(i == 8,
                  solver.Code(code_str='is_strike(game[i+1])'),
@@ -49,9 +50,9 @@ class BowlingTest(unittest.TestCase):
 
     def test_get_frame_score(self):
 
-        cond = solver.Conditions(not_strike=solver.Code(code_str='not is_strike(frame)'),
-                                 not_spare=solver.Code(code_str='not is_spare(frame)'),
-                                 output=solver.Code(code_str='frame[0] + frame[1]'))
+        cond = solver.Rules(not_strike=solver.Code(code_str='not is_strike(frame)'),
+                            not_spare=solver.Code(code_str='not is_spare(frame)'),
+                            output=solver.Code(code_str='frame[0] + frame[1]'))
 
         cond.add(is_spare=solver.Code(code_str='is_spare(frame)'),
                  output=solver.Code(code_str='frame[0] + frame[1] + get_next_throw(i, game)'))
@@ -62,9 +63,9 @@ class BowlingTest(unittest.TestCase):
 
     def test_recursive_get_score(self):
 
-        cond = solver.Conditions(solver.Code(code_str='i == len(game)'),
-                                 output=0,
-                                 default=solver.Code(code_str='recursive_get_score(game, i + 1) + get_frame_score(game[i], game, i)'))
+        cond = solver.Rules(solver.Code(code_str='i == len(game)'),
+                            output=0,
+                            default=solver.Code(code_str='recursive_get_score(game, i + 1) + get_frame_score(game[i], game, i)'))
         cond.solve(start_bowling.recursive_get_score, self)
 
     def test_gutter_balls(self):
