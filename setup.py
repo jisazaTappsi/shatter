@@ -31,7 +31,7 @@ setup(
 	description='Faster and better development with generated code.',
 	long_description=pypandoc.convert('README.md', 'rst'),
 	license=open("LICENSE.txt").read(),
-	keywords='Quine McCluskey, Boolean, code, automatic code generation, expression, Boolean expression',
+	keywords='Quine McCluskey, Machine Learning, code, automatic code generation, expression',
 	url='https://github.com/jisazaTappsi/BooleanSolver',
 	packages=setuptools.find_packages(),
 	classifiers=[
