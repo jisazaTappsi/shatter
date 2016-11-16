@@ -153,7 +153,7 @@ class CodeTest(unittest.TestCase):
         i = Code()
         cond = Conditions(i == 9, output=i*2)
         cond.add(i == 7, output=i*2)
-        solution = cond.solve(self, function)
+        solution = cond.solve(function, self)
 
         self.assertEqual(solution.implementation, code)
 
@@ -179,7 +179,7 @@ class CodeTest(unittest.TestCase):
                           i < 1,
                           output=i * j)
         cond.add(i > j, output=i * j)
-        solution = cond.solve(self, function)
+        solution = cond.solve(function, self)
 
         self.assertEqual(solution.implementation, code)
 

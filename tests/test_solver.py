@@ -63,7 +63,7 @@ class SolverTest(unittest.TestCase):
         """
         Factoring test.
         """
-        solution = c.solve(self, a_callable, conditions)
+        solution = c.solve(a_callable, conditions, self)
         expected_code = ["def " + signature + ":", "    return " + expression]
         self.assertListEqual(solution.implementation, expected_code)
 
@@ -90,17 +90,17 @@ class SolverTest(unittest.TestCase):
         # case 1: table not set
         wrong_table = ''
         with self.assertRaises(c.ConditionsTypeError):
-            c.solve(self, f.any_method, wrong_table)
+            c.solve(f.any_method, wrong_table, self)
 
         # case 2: at least 1 row not a tuple
         wrong_table = {(), True}
         with self.assertRaises(c.ConditionsTypeError):
-            c.solve(self, f.any_method, wrong_table)
+            c.solve(f.any_method, wrong_table, self)
 
         # case 3: more than one explicit output.
         wrong_table = {((True, True), True, True)}
         with self.assertRaises(c.ConditionsTypeError):
-            c.solve(self, f.any_method, wrong_table)
+            c.solve(f.any_method, wrong_table, self)
 
     def test_implicit_table_output(self):
         """

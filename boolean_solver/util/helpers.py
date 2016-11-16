@@ -260,18 +260,6 @@ def is_function(f):
     return hasattr(f, '__call__')
 
 
-def reload_function(f):
-    """
-    Reloads the function, to make sure that any metadata is up to date (such as func_code)
-    :param f: function
-    :return: updated function
-    """
-    module = inspect.getmodule(f)
-    importlib.reload(module)
-    # TODO: find nested methods or inside classes: difficult!!!
-    return getattr(module, f.__name__)
-
-
 def remove_list_from_list(all_list, list_to_remove):
     """
     :param all_list: original list

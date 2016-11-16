@@ -15,3 +15,8 @@ def collision(a):
 @solve()
 def non_collision(a, b, c, d):
     pass
+
+
+@solve()
+def basic_if(a, b):
+    pass

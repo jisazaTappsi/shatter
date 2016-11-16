@@ -81,7 +81,7 @@ class ConditionsTest(unittest.TestCase):
         """
         non_callable = ''
         with self.assertRaises(TypeError):
-            solve(self, non_callable, cts.and_table)
+            solve(non_callable, cts.and_table, self)
 
     # --------- test validation --------- #
 
