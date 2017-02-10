@@ -42,8 +42,8 @@ from __future__ import print_function
 
 import math
 
-from mastermind.util.last_update_set import LastUpdateSet
-from mastermind.util.inverse_tree_set import InverseTreeSet
+from shatter.util.last_update_set import LastUpdateSet
+from shatter.util.inverse_tree_set import InverseTreeSet
 
 
 class QuineMcCluskey:

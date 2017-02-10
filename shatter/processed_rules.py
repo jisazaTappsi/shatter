@@ -2,10 +2,10 @@
 
 """Contains data after processing is done."""
 
-from mastermind.rules import *
-from mastermind.constants import *
-from mastermind.frozen_dict import FrozenDict
-from mastermind.code import Code
+from shatter.rules import *
+from shatter.constants import *
+from shatter.frozen_dict import FrozenDict
+from shatter.code import Code
 
 __author__ = 'juan pablo isaza'
 

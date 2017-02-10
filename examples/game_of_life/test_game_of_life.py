@@ -1,7 +1,7 @@
 import unittest
 
 # TODO: check imports fucks!
-from mastermind.solver import Rules, Code
+from shatter.solver import Rules, Code
 from examples.game_of_life.game_of_life import is_alive, valid_indexes, get_neighbors, me, solve
 
 
@@ -16,13 +16,13 @@ class GameOfLifeTest(unittest.TestCase):
         4. Any dead cell with exactly three live neighbours becomes a live cell.
         """
 
-        cond = Rules(rule1=Code(code_str='sum(neighbors) < 2'), output=False)
-        cond.add(rule2=Code('sum(neighbors) > 3'), output=False)
-        cond.add(alive=True, rule3=Code(code_str='sum(neighbors) == 2'), output=True)
-        cond.add(alive=True, rule4=Code(code_str='sum(neighbors) == 3'), output=True)
-        cond.add(alive=False, rule5=Code(code_str='sum(neighbors) == 3'), output=True)
+        r = Rules(rule1=Code(code_str='sum(neighbors) < 2'), output=False)
+        r.add(rule2=Code('sum(neighbors) > 3'), output=False)
+        r.add(alive=True, rule3=Code(code_str='sum(neighbors) == 2'), output=True)
+        r.add(alive=True, rule4=Code(code_str='sum(neighbors) == 3'), output=True)
+        r.add(alive=False, rule5=Code(code_str='sum(neighbors) == 3'), output=True)
 
-        cond.solve(is_alive, self)
+        r.solve(is_alive, self)
 
     def test_valid_indexes(self):
 
@@ -32,12 +32,12 @@ class GameOfLifeTest(unittest.TestCase):
         max_idx2 = Code()
 
         # TODO: ERROR when output is not present. FIX
-        cond = Rules(more_than1=idx1 >= 0,
+        r = Rules(more_than1=idx1 >= 0,
                      less_than1=idx1 < max_idx1,
                      more_than2=idx2 >= 0,
                      less_than2=idx2 < max_idx2, output=True)
 
-        cond.solve(valid_indexes, self)
+        r.solve(valid_indexes, self)
 
     def test_me(self):
 
@@ -50,9 +50,9 @@ class GameOfLifeTest(unittest.TestCase):
         x = Code()
         y = Code()
 
-        cond = Rules(different1=idx == x,
+        r = Rules(different1=idx == x,
                      different2=idy == y, output=True)
-        cond.solve(me, self)
+        r.solve(me, self)
 
     def test_get_neighbors(self):
 

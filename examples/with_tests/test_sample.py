@@ -3,8 +3,9 @@
 """Example of a use case."""
 
 import unittest
-from mastermind import solver
-from mastermind import start_sample
+
+from examples.with_tests import start_sample
+from shatter import solver
 
 __author__ = 'juan pablo isaza'
 
@@ -19,28 +20,28 @@ class MyTest(unittest.TestCase):
     def test_AND_function(self):
 
         # The output is explicitly set to true
-        cond = solver.Rules(a=True, b=True, output=True)
-        cond.solve(start_sample.and_function, self)
+        r = solver.Rules(a=True, b=True, output=True)
+        r.solve(start_sample.and_function, self)
 
     def test_OR_function(self):
 
         # The output is implicitly set to true
-        cond = solver.Rules(a=False, b=True)
-        cond.add(a=True, b=False)
-        cond.add(a=True, b=True)
+        r = solver.Rules(a=False, b=True)
+        r.add(a=True, b=False)
+        r.add(a=True, b=True)
 
-        cond.solve(start_sample.or_function, self)
+        r.solve(start_sample.or_function, self)
 
     def test_XOR_function(self):
 
-        cond = solver.Rules(a=False, b=True)
-        cond.add(a=True, b=False)
+        r = solver.Rules(a=False, b=True)
+        r.add(a=True, b=False)
 
-        cond.solve(start_sample.xor_function, self)
+        r.solve(start_sample.xor_function, self)
 
     def test_AND_3_VARIABLES_function(self):
 
-        cond = solver.Rules(a=True, b=True, c=True)
-        cond.solve(start_sample.and_function_3_variables, self)
+        r = solver.Rules(a=True, b=True, c=True)
+        r.solve(start_sample.and_function_3_variables, self)
 
 print("We have solved the riddle, go run start_sample.py, again!!!")

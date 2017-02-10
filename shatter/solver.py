@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 """This is the main file. Calls QM algorithm and code generation functions."""
-from mastermind import qm
-from mastermind.solution import Solution
-from mastermind.tester import test_implementation
-from mastermind.code_generator import *
-from mastermind.processed_rules import *
+from shatter import qm
+from shatter.solution import Solution
+from shatter.tester import test_implementation
+from shatter.code_generator import *
+from shatter.processed_rules import *
+from shatter.util import helpers as h
 
-#  TODO: from mastermind import solver as production_solver
+#  TODO: from shatter import solver as production_solver
 
 __author__ = 'juan pablo isaza'
 
@@ -205,6 +206,10 @@ def return_solution(f, rules, unittest):
 
             all_inputs = get_input_values(rules, function_args, the_output)
             expression = get_function_expression(table, all_inputs)
+
+            # no solution found, let's go crazy:
+            #if expression == '':
+            #    return
 
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,

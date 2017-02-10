@@ -2,7 +2,7 @@
 
 """Functions for test_tester.py"""
 
-from mastermind.solver import *
+from shatter.solver import *
 
 __author__ = 'juan pablo isaza'
 
@@ -14,9 +14,26 @@ def collision(a):
 
 @solve()
 def non_collision(a, b, c, d):
-    pass
+
+    if a and b and c:
+        return 0
+
+    if not a and b and d:
+        return 1
+
+    if a and not c and d:
+        return 2
+
+    if b and not c and not d:
+        return 3
+
+    return False
 
 
 @solve()
 def basic_if(a, b):
-    pass
+
+    if b:
+        return "le"
+
+    return False

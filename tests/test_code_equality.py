@@ -4,10 +4,10 @@
 
 import unittest
 
-from mastermind.code import Code
+from shatter.code import Code
 from tests.generated_code import code_functions as f
 from tests.testing_helpers import common_testing_code
-from mastermind.custom_operator import CustomOperator
+from shatter.custom_operator import CustomOperator
 
 __author__ = 'juan pablo isaza'
 

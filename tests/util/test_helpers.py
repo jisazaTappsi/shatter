@@ -4,9 +4,9 @@
 
 import unittest
 
-from mastermind.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number,\
+from shatter.util.helpers import get_function_path, read_file, get_function_code, get_function_line_number,\
     is_private_call, retrieve_name
-from mastermind.code import Code
+from shatter.code import Code
 
 __author__ = 'juan pablo isaza'
 

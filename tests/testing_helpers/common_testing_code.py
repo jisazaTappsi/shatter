@@ -5,8 +5,8 @@
 import copy
 import re
 
-from mastermind import constants as cts
-from mastermind.util import helpers as h
+from shatter import constants as cts
+from shatter.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 

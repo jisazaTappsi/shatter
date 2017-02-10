@@ -2,13 +2,15 @@
 
 """setup the python package.py"""
 
-from mastermind.helpers import read_file
+from shatter.helpers import read_file
 import os
 import re
 from subprocess import call
 
 
 __author__ = 'juan pablo isaza'
+
+# TODO: this didn't worked with the old readme as it was too complex, try with the new simpler one.
 
 
 def has_code(line):

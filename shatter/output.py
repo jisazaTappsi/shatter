@@ -4,7 +4,7 @@
 
 import warnings
 
-from mastermind.util import helpers
+from shatter.util import helpers
 
 __author__ = 'juan pablo isaza'
 
@@ -30,4 +30,4 @@ class Output:
             self.function = function
             self.arguments = arguments
         else:
-            warnings.warn('function: ' + function.__name__ + ' has wrong arguments', UserWarning)
+            raise Exception("function named: '{}' has wrong or missing arguments.".format(function.__name__))

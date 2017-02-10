@@ -6,9 +6,9 @@ import unittest
 
 from tests.generated_code import tester_functions as f
 from tests.testing_helpers import common_testing_code
-from mastermind.rules import Rules
-from mastermind import tester
-from mastermind.solution import Solution
+from shatter.rules import Rules
+from shatter import tester
+from shatter.solution import Solution
 
 __author__ = 'juan pablo isaza'
 
@@ -23,22 +23,22 @@ class TesterTest(unittest.TestCase):
         """
         The internal test should fail, because the rules have no internal consistency, they are bull...
         """
-        cond = Rules(a=True, output=1)  # first condition
-        cond.add(a=False, output=1)  # contradictory condition.
+        r = Rules(a=True, output=1)  # first condition
+        r.add(a=False, output=1)  # contradictory condition.
 
         with self.assertRaises(AssertionError):
-            cond.solve(f.collision, self)
+            r.solve(f.collision, self)
 
     def test_non_collision(self):
         """
         Testing bigger stuff. Multiple ifs with multiple boolean variables
         """
-        cond = Rules(a=True, b=True, c=True, output=0)  # leave d out
-        cond.add(a=False, b=True, d=True, output=1)  # leave c out
-        cond.add(a=True, c=False, d=True, output=2)  # leave b out
-        cond.add(b=True, c=False, d=False, output=3)  # leave a out
+        r = Rules(a=True, b=True, c=True, output=0)  # leave d out
+        r.add(a=False, b=True, d=True, output=1)  # leave c out
+        r.add(a=True, c=False, d=True, output=2)  # leave b out
+        r.add(b=True, c=False, d=False, output=3)  # leave a out
 
-        cond.solve(f.non_collision, self)
+        r.solve(f.non_collision, self)
 
     def test_unittest_validation(self):
         """
@@ -67,12 +67,12 @@ class TesterTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        cond = Rules(a=True,
+        r = Rules(a=True,
                      b=True,
                      output=ouput)
-        cond.add(b=True, output=ouput)
+        r.add(b=True, output=ouput)
 
-        solution = cond.solve(function)
+        solution = r.solve(function)
         self.assertEqual(solution.implementation, code)
 
 

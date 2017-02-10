@@ -10,7 +10,8 @@ from tests.testing_helpers import common_testing_code
 __author__ = 'juan pablo isaza'
 
 # On this files will only reset functions with @solve() decorator.
-SOFT_FILES = ['start.py', 'examples/bowling/start_bowling.py', 'mastermind/start_sample.py']
+SOFT_FILES = ['examples/start_here/start.py', 'examples/bowling/start_bowling.py',
+              'examples/with_tests/start_sample.py', 'examples/game_of_life/game_of_life.py']
 
 # On this files will reset every function.
 HARD_FILES = []

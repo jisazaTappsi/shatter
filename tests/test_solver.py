@@ -4,9 +4,9 @@
 
 import unittest
 
-from mastermind import solver as s, rules as c
-from mastermind.code_generator import translate_to_python_expression
-from mastermind.util.last_update_set import LastUpdateSet
+from shatter import solver as s, rules as c
+from shatter.code_generator import translate_to_python_expression
+from shatter.util.last_update_set import LastUpdateSet
 from tests.generated_code import solver_functions as f
 from tests.testing_helpers import constants as cts
 from tests.testing_helpers import common_testing_code
@@ -129,18 +129,18 @@ class SolverTest(unittest.TestCase):
         """
 
         # case 1: simple 2 argument and.
-        cond = c.Rules(a=True, b=True)
+        r = c.Rules(a=True, b=True)
 
-        self.factor_execute(rules=cond,
+        self.factor_execute(rules=r,
                             a_callable=f.and_function,
                             signature=f.and_function.__name__ + '(a, b)',
                             expression=cts.exp_and)
 
         # case 2: multiple adds() with mix output: xor.
-        cond = c.Rules(a=True, b=False, output=True)
-        cond.add(a=False, b=True)
+        r = c.Rules(a=True, b=False, output=True)
+        r.add(a=False, b=True)
 
-        self.factor_execute(rules=cond,
+        self.factor_execute(rules=r,
                             a_callable=f.mix_xor_function,
                             signature=f.mix_xor_function.__name__ + '(a, b)',
                             expression=cts.exp_xor)

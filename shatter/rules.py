@@ -4,14 +4,14 @@
 
 import warnings
 
-from mastermind.constants import *
-from mastermind.output import Output
-from mastermind.util import helpers
-from mastermind.util.last_update_dict import LastUpdateDict
-from mastermind.util.last_update_set import LastUpdateSet
-from mastermind.util.code_dict import CodeDict
-from mastermind import solver
-from mastermind.util import helpers as h
+from shatter.constants import *
+from shatter.output import Output
+from shatter.util import helpers
+from shatter.util.last_update_dict import LastUpdateDict
+from shatter.util.last_update_set import LastUpdateSet
+from shatter.util.code_dict import CodeDict
+from shatter import solver
+from shatter.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 
@@ -175,9 +175,9 @@ class Rules(list):
         >>>def f(a, b):
         >>>    return a + b
 
-        >>>cond = Rules(c=1, d=2, output=out)
-        >>>cond.add(x=3, y=4, output='other_stuff')
-        >>>cond.add(e=3, f=4, output=out)
+        >>>r = Rules(c=1, d=2, output=out)
+        >>>r.add(x=3, y=4, output='other_stuff')
+        >>>r.add(e=3, f=4, output=out)
 
         >>>cond.get_input_keys(helpers.get_function_inputs(f), out)
         >>>LastUpdateSet(['a', 'b', 'c', 'd', 'e', 'f'])

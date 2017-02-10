@@ -15,7 +15,7 @@ __author__ = 'juan pablo isaza'
 # or execute manual commands.
 
 # To add update requirements do:
-# $ cd .. && pipreqs BooleanSolver/ --force
+# $ cd .. && pipreqs shatter/ --force
 
 REQ = os.path.dirname(os.path.realpath(__file__))+"/requirements.txt"
 install_requirements = parse_requirements(REQ, session=False)
@@ -24,7 +24,7 @@ install_requirements = parse_requirements(REQ, session=False)
 requirements = [str(ir.req) for ir in install_requirements]
 
 setup(
-	name='mastermind',
+	name='shatter',
 	version='0.5.2',
 	author='Juan Pablo Isaza',
 	author_email='biosolardecolombia@gmail.com',
@@ -32,7 +32,7 @@ setup(
 	long_description=pypandoc.convert('README.md', 'rst'),
 	license=open("LICENSE.txt").read(),
 	keywords='Quine McCluskey, Machine Learning, code, automatic code generation, expression',
-	url='https://github.com/jisazaTappsi/BooleanSolver',
+	url='https://github.com/jisazaTappsi/shatter',
 	packages=setuptools.find_packages(),
 	classifiers=[
 		'Development Status :: 3 - Alpha',

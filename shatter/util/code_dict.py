@@ -4,7 +4,7 @@
 
 from collections import OrderedDict, MutableMapping
 
-from mastermind.code import Code
+from shatter.code import Code
 
 __author__ = 'Juan Pablo Isaza'
 

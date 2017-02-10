@@ -2,8 +2,8 @@
 
 """A class that defines a code, with a string."""
 
-from mastermind.custom_operator import CustomOperator
-from mastermind.util import helpers as h
+from shatter.custom_operator import CustomOperator
+from shatter.util import helpers as h
 
 __author__ = 'juan pablo isaza'
 

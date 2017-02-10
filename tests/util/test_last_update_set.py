@@ -4,7 +4,7 @@
 
 import unittest
 
-from mastermind.util.last_update_set import LastUpdateSet
+from shatter.util.last_update_set import LastUpdateSet
 
 __author__ = 'juan pablo isaza'
 

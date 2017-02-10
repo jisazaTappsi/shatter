@@ -4,9 +4,9 @@
 
 import unittest
 
-from mastermind.code import Code
+from shatter.code import Code
 from tests.generated_code import code_functions as f
-from mastermind.rules import Rules
+from shatter.rules import Rules
 from tests.testing_helpers import common_testing_code
 
 
@@ -14,6 +14,11 @@ __author__ = 'juan pablo isaza'
 
 
 class CodeTest(unittest.TestCase):
+
+
+## TODO: REMINDER THE ISINSTANCE OF A FUNCTION AND METHOD SHOULD BE LIKE:
+#        elif not isinstance(self.build_fn, types.FunctionType) and not isinstance(self.build_fn, types.MethodType):
+
 
     @classmethod
     def setUpClass(cls):
@@ -151,9 +156,9 @@ class CodeTest(unittest.TestCase):
                 '    return False']
 
         i = Code()
-        cond = Rules(i == 9, output=i * 2)
-        cond.add(i == 7, output=i*2)
-        solution = cond.solve(function, self)
+        r = Rules(i == 9, output=i * 2)
+        r.add(i == 7, output=i*2)
+        solution = r.solve(function, self)
 
         self.assertEqual(solution.implementation, code)
 
@@ -175,11 +180,11 @@ class CodeTest(unittest.TestCase):
 
         i = Code()
         j = Code()
-        cond = Rules(i != 0,
+        r = Rules(i != 0,
                      i < 1,
                      output=i * j)
-        cond.add(i > j, output=i * j)
-        solution = cond.solve(function, self)
+        r.add(i > j, output=i * j)
+        solution = r.solve(function, self)
 
         self.assertEqual(solution.implementation, code)
 

@@ -32,7 +32,7 @@ class CustomOperator:
                 #'intersection': 'and',  # LOGICAL
                 #'union': 'or',
                 #'negation': 'not'
-    }
+                 }
 
     def __init__(self, method):
         self.method = method

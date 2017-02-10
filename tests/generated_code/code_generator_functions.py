@@ -2,7 +2,7 @@
 
 """Functions for test_code_generator.py"""
 
-from mastermind import solver as s
+from shatter import solver as s
 
 __author__ = 'juan pablo isaza'
 
@@ -25,67 +25,135 @@ def xor_function(a, b):
 
 @s.solve()
 def non_boolean_and(a, b):
-    pass
+
+    if a and b:
+        return 1
+
+    return False
 
 
 @s.solve()
 def mix_true_values(a, b):
-    pass
+
+    if a and not b or not a and b:
+        return 1
+
+    return False
 
 
 @s.solve()
 def mix_false_values(a, b):
-    pass
+
+    if not a and b:
+        return 0
+
+    return False
 
 
 @s.solve()
 def ordered_expression(a, b):
-    pass
+    return a or b
 
 
 @s.solve()
 def fun2(a, b):
-    pass
+
+    if not a and b:
+        return 2
+
+    if a and not b:
+        return 3
+
+    return False
 
 
 @s.solve()
 def fun3(a, b):
-    pass
+
+    if not a and b:
+        return 2.12345
+
+    if a and not b:
+        return 3.12345
+
+    return False
 
 
 @s.solve()
 def fun4(a, b):
-    pass
+
+    if not a and b:
+        return "3"
+
+    if a and not b:
+        return "2"
+
+    return False
 
 
 @s.solve()
 def fun5(a, b):
-    pass
+
+    if not a and b:
+        return 3j
+
+    if a and not b:
+        return 2j
+
+    return False
 
 
 @s.solve()
 def fun6(a, b):
-    pass
+
+    if not a and b:
+        return 3, 3
+
+    if a and not b:
+        return 2, 2
+
+    return False
 
 
 @s.solve()
 def fun7(a, b):
-    pass
+
+    if not a and b:
+        return 2
+
+    if a and not b:
+        return "3"
+
+    return False
 
 
 @s.solve()
 def fun8(a, b):
-    pass
+
+    if not a and b:
+        return 3.12345
+
+    if a and not b:
+        return 3, 3
+
+    return False
 
 
 @s.solve()
 def output_function_obj(a, b):
-    pass
+
+    if not a and b:
+        return fun8
+
+    return False
 
 
 @s.solve()
 def mix_output(a, b):
-    pass
+
+    if not a and b:
+        return "a"
+    return a and b
 
 
 # auxiliary function.
@@ -95,27 +163,47 @@ def no_args():
 
 @s.solve()
 def another_call(a, b):
-    pass
+
+    if not a and b:
+        return no_args()
+
+    return False
 
 
 @s.solve()
 def another_call2(a, b):
-    pass
+
+    if not a and b:
+        return another_call(a, b)
+
+    return False
 
 
 @s.solve()
 def recursive(a):
-    pass
+
+    if not a:
+        return 0
+
+    return recursive(not a)
 
 
 @s.solve()
 def recursive_iteration(array):
-    pass
+
+    if len(array) == 0:
+        return 0
+
+    return recursive_iteration(array[1:])
 
 
 @s.solve()
 def with_default_value(a, b):
-    pass
+
+    if not a and b:
+        return 3
+
+    return 5
 
 
 @s.solve()
@@ -130,39 +218,67 @@ def g(a):
 
 @s.solve()
 def nested_call(a):
-    pass
+
+    if not a:
+        return f(g(a))
+
+    return False
 
 
 @s.solve()
 def with_internal_code_arg(a):
-    pass
+
+    if isinstance(a, str):
+        return 2
+
+    return False
 
 
 @s.solve()
 def right_expression_order(array):
-    pass
+
+    if len(array) > 1 and array[0] and isinstance(array[0], int):
+        return "right order!!!"
+
+    return False
 
 
 @s.solve()
 def factor_pieces_of_code(array):
-    pass
+
+    if isinstance(array[0], int) and isinstance(array[1], int) or isinstance(array[2], int):
+        return "factoring!!!"
+
+    return False
 
 
 @s.solve()
 def factor_ordered_pieces_of_code(array):
-    pass
+
+    if isinstance(array[0], int) and isinstance(array[1], int) or isinstance(array[2], int):
+        return "factoring!!!"
+
+    return False
 
 
 @s.solve()
 def factor_ordered_pieces_with_redundancy(array):
-    pass
+
+    if isinstance(array[1], int):
+        return "factoring!!!"
+
+    return False
 
 
 @s.solve()
 def basic(a, b):
-    pass
+    return b
 
 
 @s.solve()
 def basic_if(a, b):
-    pass
+
+    if b:
+        return "le"
+
+    return False

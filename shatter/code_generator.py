@@ -4,10 +4,10 @@
 
 import warnings
 
-from mastermind.output import Output
-from mastermind.code import Code
-from mastermind.util import helpers
-from mastermind.constants import *
+from shatter.output import Output
+from shatter.code import Code
+from shatter.util import helpers
+from shatter.constants import *
 
 __author__ = 'juan pablo isaza'
 

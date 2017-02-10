@@ -5,9 +5,8 @@ import inspect
 import warnings
 import os
 import re
-import importlib
-
-import mastermind.constants as cts
+import types
+import shatter.constants as cts
 
 __author__ = 'juan pablo isaza'
 
@@ -257,6 +256,7 @@ def is_function(f):
     :param f: function
     :return: boolean
     """
+    #return isinstance(f, types.FunctionType)#and not isinstance(self.build_fn, types.MethodType):
     return hasattr(f, '__call__')
 
 

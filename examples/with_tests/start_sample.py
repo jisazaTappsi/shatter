@@ -2,7 +2,7 @@
 
 """Example of a use case."""
 
-from mastermind.solver import *
+from shatter.solver import *
 
 __author__ = 'juan pablo isaza'
 
@@ -26,12 +26,10 @@ def xor_function(a, b):
 def and_function_3_variables(a, b, c):
     pass
 
-txt_fail = '''Sorry, run:
-$ python -m unittest test_sample
+txt_fail = '''Sorry, run: test_smaple.py
 first, to solve the riddle :)'''
 
-txt_success = '''You made it, Congrats !!!
-Now, see the functions, enjoy :)'''
+txt_success = '''You made it, enjoy :)'''
 
 if __name__ == "__main__":
     and_result = and_function(True, True)  # should be: 'True and True = True', after running test1.

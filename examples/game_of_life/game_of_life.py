@@ -1,4 +1,4 @@
-from mastermind.solver import solve
+from shatter.solver import solve
 
 
 @solve()

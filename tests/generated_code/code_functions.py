@@ -2,7 +2,7 @@
 
 """Functions for test_code.py"""
 
-from mastermind import solver as s
+from shatter import solver as s
 
 __author__ = 'juan pablo isaza'
 

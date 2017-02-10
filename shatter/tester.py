@@ -3,8 +3,8 @@
 """Implements the functions to test generated code."""
 import traceback
 
-from mastermind.code import Code
-from mastermind.util.helpers import *
+from shatter.code import Code
+from shatter.util.helpers import *
 
 __author__ = 'juan pablo isaza'
 
