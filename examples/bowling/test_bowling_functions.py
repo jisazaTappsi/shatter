@@ -1,58 +1,72 @@
 import unittest
 
-from boolean_solver import solver
+# TODO: check imports fucks!
+from shatter import solver
+from shatter.code import Code
 from examples.bowling import start_bowling
 
 
-class MyTest(unittest.TestCase):
+class BowlingTest(unittest.TestCase):
 
     def test_is_strike(self):
 
-        cond = solver.Conditions(rule=solver.Code('frame[0] == 10'), output=True)
-        solver.execute(self, start_bowling.is_strike, cond)
+        r = solver.Rules(rule=solver.Code(code_str='frame[0] == 10'), output=True)
+        r.solve(start_bowling.is_strike, self)
 
     def test_is_spare(self):
 
-        cond = solver.Conditions(rule1=solver.Code('frame[0] < 10'),
-                                 rule2=solver.Code('frame[0] + frame[1] == 10'),
-                                 output=True)
-        solver.execute(self, start_bowling.is_spare, cond)
+        r = solver.Rules(rule1=solver.Code(code_str='frame[0] < 10'),
+                            rule2=solver.Code(code_str='frame[0] + frame[1] == 10'),
+                            output=True)
+        r.solve(start_bowling.is_spare, self)
 
     def test_get_next_throw(self):
 
-        cond = solver.Conditions(before_last=solver.Code('i < 9'),
-                                 output=solver.Code('game[i+1][0]'))
-        cond.add(last_bonus_thow=solver.Code('i == 9'), output=solver.Code('game[i][2]'))
-        solver.execute(self, start_bowling.get_next_throw, cond)
+        i = Code()
+
+        r = solver.Rules(before_last=(i < 9),
+                            output=solver.Code(code_str='game[i+1][0]'))
+        r.add(last_bonus_thow=(i == 9), output=solver.Code(code_str='game[i][2]'))
+        r.solve(start_bowling.get_next_throw, self)
 
     def test_get_next_2_throws(self):
 
-        cond = solver.Conditions(last_bonus_throw=solver.Code('i == 9'), output=solver.Code('game[i][1] + game[i][2]'))
+        i = Code()
 
-        cond.add(solver.Code('i == 8'),
-                 solver.Code('is_strike(game[i+1])'),
-                 output=solver.Code('game[i+1][0] + game[i+1][1]'))
+        r = solver.Rules(last_bonus_throw=(i == 9),
+                            output=solver.Code(code_str='game[i][1] + game[i][2]'))
 
-        cond.add(next_is_not_strike=solver.Code('not is_strike(game[i+1])'),
-                 output=solver.Code('game[i+1][0] + game[i+1][1]'))
+        r.add(i == 8,
+                 solver.Code(code_str='is_strike(game[i+1])'),
+                 output=solver.Code(code_str='game[i+1][0] + game[i+1][1]'))
 
-        cond.add(next_is_strike=solver.Code('is_strike(game[i+1])'),
-                 output=solver.Code('game[i+1][0] + game[i+2][0]'))
+        r.add(next_is_not_strike=solver.Code(code_str='not is_strike(game[i+1])'),
+                 output=solver.Code(code_str='game[i+1][0] + game[i+1][1]'))
 
-        solver.execute(self, start_bowling.get_next_2_throws, cond)
+        r.add(next_is_strike=solver.Code(code_str='is_strike(game[i+1])'),
+                 output=solver.Code(code_str='game[i+1][0] + game[i+2][0]'))
+
+        r.solve(start_bowling.get_next_2_throws, self)
 
     def test_get_frame_score(self):
 
-        cond = solver.Conditions(not_strike=solver.Code('not is_strike(frame)'),
-                                 not_spare=solver.Code('not is_spare(frame)'),
-                                 output=solver.Code('frame[0] + frame[1]'))
+        r = solver.Rules(not_strike=solver.Code(code_str='not is_strike(frame)'),
+                            not_spare=solver.Code(code_str='not is_spare(frame)'),
+                            output=solver.Code(code_str='frame[0] + frame[1]'))
 
-        cond.add(is_spare=solver.Code('is_spare(frame)'),
-                 output=solver.Code('frame[0] + frame[1] + get_next_throw(i, game)'))
+        r.add(is_spare=solver.Code(code_str='is_spare(frame)'),
+                 output=solver.Code(code_str='frame[0] + frame[1] + get_next_throw(i, game)'))
 
-        cond.add(is_strike=solver.Code('is_strike(frame)'),
-                 output=solver.Code('frame[0] + get_next_2_throws(i, game)'))
-        solver.execute(self, start_bowling.get_frame_score, cond)
+        r.add(is_strike=solver.Code(code_str='is_strike(frame)'),
+                 output=solver.Code(code_str='frame[0] + get_next_2_throws(i, game)'))
+        r.solve(start_bowling.get_frame_score, self)
+
+    def test_recursive_get_score(self):
+
+        r = solver.Rules(solver.Code(code_str='i == len(game)'),
+                            output=0,
+                            default=solver.Code(code_str='recursive_get_score(game, i + 1) + get_frame_score(game[i], game, i)'))
+        r.solve(start_bowling.recursive_get_score, self)
 
     def test_gutter_balls(self):
         game = ((0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0), (0, 0))

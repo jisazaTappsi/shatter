@@ -9,6 +9,13 @@ from tests.testing_helpers import common_testing_code
 
 __author__ = 'juan pablo isaza'
 
+# On this files will only reset functions with @solve() decorator.
+SOFT_FILES = ['examples/start_here/start.py', 'examples/bowling/start_bowling.py',
+              'examples/with_tests/start_sample.py', 'examples/game_of_life/game_of_life.py']
+
+# On this files will reset every function.
+HARD_FILES = []
+
 
 def find(pattern, path):
     """
@@ -32,9 +39,14 @@ def clean_functions():
     """
     path = os.path.dirname(os.path.abspath(__file__))
     path = '/'.join(path.split('/')) + '/tests/'
-    res = find('*_functions.py', path)
+    testing_files = find('*_functions.py', path)
 
-    for a_file in res:
-        common_testing_code.reset_functions_file(a_file)
+    # soft reset.
+    for a_file in SOFT_FILES:
+        common_testing_code.reset_functions_file(a_file, hard_reset=False)
+
+    # hard reset
+    for a_file in testing_files + HARD_FILES:
+        common_testing_code.reset_functions_file(a_file, hard_reset=True)
 
 clean_functions()

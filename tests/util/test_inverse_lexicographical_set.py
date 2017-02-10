@@ -4,7 +4,7 @@
 
 import unittest
 
-from boolean_solver.util.inverse_tree_set import InverseTreeSet
+from shatter.util.inverse_tree_set import InverseTreeSet
 
 __author__ = 'juan pablo isaza'
 
@@ -28,3 +28,6 @@ class InverseTreeSetTest(unittest.TestCase):
 
         self.assertEqual(new_list, ['4', '3', '2', '1'])
 
+
+if __name__ == '__main__':
+    unittest.main()

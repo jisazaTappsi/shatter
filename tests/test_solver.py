@@ -4,16 +4,21 @@
 
 import unittest
 
-from boolean_solver import solver as s, conditions as c
-from boolean_solver.code_generator import translate_to_python_expression
-from boolean_solver.util.last_update_set import LastUpdateSet
-from tests.generated_code import solver as f
+from shatter import solver as s, rules as c
+from shatter.code_generator import translate_to_python_expression
+from shatter.util.last_update_set import LastUpdateSet
+from tests.generated_code import solver_functions as f
 from tests.testing_helpers import constants as cts
+from tests.testing_helpers import common_testing_code
 
 __author__ = 'juan pablo isaza'
 
 
 class SolverTest(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        common_testing_code.reset_functions_file(f.__file__, hard_reset=True)
 
     def qm_algorithm_and_translate(self, var_names, qm_input, expected_qm_output, expected_exp):
         """
@@ -54,11 +59,11 @@ class SolverTest(unittest.TestCase):
                                         expected_qm_output={'10', '01'},
                                         expected_exp='a and not b or not a and b')
 
-    def factor_execute(self, conditions, a_callable, signature, expression):
+    def factor_execute(self, rules, a_callable, signature, expression):
         """
         Factoring test.
         """
-        solution = s.execute(self, a_callable, conditions)
+        solution = c.solve(a_callable, rules, self)
         expected_code = ["def " + signature + ":", "    return " + expression]
         self.assertListEqual(solution.implementation, expected_code)
 
@@ -78,28 +83,24 @@ class SolverTest(unittest.TestCase):
         """
         self.factor_execute(cts.and_table, f.and_missing_decorator, 'and_missing_decorator(a, b)', cts.exp_and)
 
-    def test_non_callable(self):
-        """
-        Checks that the function passed is valid.
-        """
-        non_callable = ''
-        self.assertEqual(len(s.execute(self, non_callable, cts.and_table).ast.body), 0)
-
     def test_wrong_table(self):
         """
         Checks that the table is a set and that the rows are all tuples
         """
         # case 1: table not set
         wrong_table = ''
-        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
+        with self.assertRaises(c.RulesTypeError):
+            c.solve(f.any_method, wrong_table, self)
 
         # case 2: at least 1 row not a tuple
         wrong_table = {(), True}
-        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
+        with self.assertRaises(c.RulesTypeError):
+            c.solve(f.any_method, wrong_table, self)
 
         # case 3: more than one explicit output.
         wrong_table = {((True, True), True, True)}
-        self.assertEqual(len(s.execute(self, f.any_method, wrong_table).ast.body), 0)
+        with self.assertRaises(c.RulesTypeError):
+            c.solve(f.any_method, wrong_table, self)
 
     def test_implicit_table_output(self):
         """
@@ -109,7 +110,7 @@ class SolverTest(unittest.TestCase):
         # case 1: all rows are implicit
         implicit_output_xor_table = LastUpdateSet([(True, False), (False, True)])
 
-        self.factor_execute(conditions=implicit_output_xor_table,
+        self.factor_execute(rules=implicit_output_xor_table,
                             a_callable=f.implicit_xor_function,
                             signature=f.implicit_xor_function.__name__ + '(a, b)',
                             expression=cts.exp_xor)
@@ -117,29 +118,33 @@ class SolverTest(unittest.TestCase):
         # case 2: some rows are explicit and some implicit.
         mix_output_xor_table = LastUpdateSet([((True, False), True), (False, True), ((True, True), False)])
 
-        self.factor_execute(conditions=mix_output_xor_table,
+        self.factor_execute(rules=mix_output_xor_table,
                             a_callable=f.mix_xor_function,
                             signature=f.mix_xor_function.__name__ + '(a, b)',
                             expression=cts.exp_xor)
 
-    def test_conditions_input(self):
+    def test_rules_input(self):
         """
-        Test for different inputs given as a conditions object.
+        Test for different inputs given as a rules object.
         """
 
         # case 1: simple 2 argument and.
-        cond = c.Conditions(a=True, b=True)
+        r = c.Rules(a=True, b=True)
 
-        self.factor_execute(conditions=cond,
+        self.factor_execute(rules=r,
                             a_callable=f.and_function,
                             signature=f.and_function.__name__ + '(a, b)',
                             expression=cts.exp_and)
 
         # case 2: multiple adds() with mix output: xor.
-        cond = c.Conditions(a=True, b=False, output=True)
-        cond.add(a=False, b=True)
+        r = c.Rules(a=True, b=False, output=True)
+        r.add(a=False, b=True)
 
-        self.factor_execute(conditions=cond,
+        self.factor_execute(rules=r,
                             a_callable=f.mix_xor_function,
                             signature=f.mix_xor_function.__name__ + '(a, b)',
                             expression=cts.exp_xor)
+
+
+if __name__ == '__main__':
+    unittest.main()

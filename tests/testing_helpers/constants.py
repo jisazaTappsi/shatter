@@ -2,7 +2,7 @@
 
 """cts to use on the tests"""
 
-from boolean_solver.util.last_update_set import LastUpdateSet
+from shatter.util.last_update_set import LastUpdateSet
 
 __author__ = 'juan pablo isaza'
 
@@ -13,7 +13,7 @@ and_table = LastUpdateSet([((False, False), False),
                            ((True, True), True)])
 
 # or table in reverse order, because of expression order and short circuiting
-# (see test_conditions_input_order_is_respected in code generator tests)
+# (see test_rules_input_order_is_respected in code generator tests)
 or_table = LastUpdateSet([((True, True), True),
                           ((True, False), True),
                           ((False, True), True),
