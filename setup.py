@@ -25,10 +25,10 @@ requirements = [str(ir.req) for ir in install_requirements]
 
 setup(
 	name='shatter',
-	version='0.5.2',
+	version='0.5.3',
 	author='Juan Pablo Isaza',
 	author_email='biosolardecolombia@gmail.com',
-	description='Faster and better development with generated code.',
+	description='Data Driven Programming',
 	long_description=pypandoc.convert('README.md', 'rst'),
 	license=open("LICENSE.txt").read(),
 	keywords='Quine McCluskey, Machine Learning, code, automatic code generation, expression',
