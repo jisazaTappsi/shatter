@@ -28,7 +28,7 @@ setup(
 	version='0.5.3',
 	author='Juan Pablo Isaza',
 	author_email='biosolardecolombia@gmail.com',
-	description='Data Driven Programming',
+	description='Data Driven Development',
 	long_description=pypandoc.convert('README.md', 'rst'),
 	license=open("LICENSE.txt").read(),
 	keywords='Quine McCluskey, Machine Learning, code, automatic code generation, expression',
