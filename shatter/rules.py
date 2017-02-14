@@ -356,7 +356,22 @@ def solve(function, rules, unittest=None):
     """
     This is the static version of rules.solve()
     :param function: the function to be coded.
-    :param rules: Rules object or table.
+    :param rules: Rules object or truth table. The table can be represented in 2 ways:
+
+    Representation 1: Can be specified as a set containing tuples, where each table row is a tuple; general form is:
+
+            {table_row_tuple(), ...}
+
+        Where each table_row_tuple has inputs and an output:
+
+            (tuple_inputs(a, b, ...), output)
+
+    Representation 2: Another simpler way of representing a truth table is with an implicit `True` output:
+
+            {tuple_inputs(a, b, ...), ...}
+
+        Note: this representation is limited to outputs that are boolean, if not use Representation 1.
+
     :param unittest: optional, the current test being run eg: 'self'.
     :return: Solution object.
     """
