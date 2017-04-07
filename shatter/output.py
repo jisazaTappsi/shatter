@@ -2,8 +2,6 @@
 
 """Defines a class containing possible outputs"""
 
-import warnings
-
 from shatter.util import helpers
 
 __author__ = 'juan pablo isaza'

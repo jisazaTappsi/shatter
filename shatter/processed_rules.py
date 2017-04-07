@@ -12,14 +12,23 @@ __author__ = 'juan pablo isaza'
 
 class ProcessedRules:
     """
-    Contains the default value of the output and tables. Tables is a dict() containing keys which are the output and
-    values that are sets of rows. This sets of rows represent tables. So we have a collection of tables each one with
+    Has 2 properties, the 'default' value of the output and the 'tables'.
+
+    Tables is a dict() where each (key, value) pair are a truth table. Tables has:
+    Keys = possible function outputs
+    Values = Sets containing tuples (eg {(...), (...) ...}). This tuples are rows of the truth table where the function
+    should return the output value (the key).
+
+    So we have a collection of tables each one with
     its output as keys.
-    General form:
-    >>>ProcessedRules().tables
+
+    Example:
+    >>> ProcessedRules().tables
     is of the form:
-    >>>output1 = 1; output2 = 2
-    >>>{output1:{(True, Code('1==3')), (False, False)}, output2:{(...), (...), (...) ...}}
+    >>> {1: {(True, Code('1==3')), (False, False)}, 2: {(False, True), (True, False)}}
+
+    In this case 1 and 2 are the outputs while (True, Code('1==3')), (False, False) are the rows of the truth table
+    , ie the cases where 1 should be returned.
     """
 
     def __init__(self, tables=FrozenDict(), default=False):
