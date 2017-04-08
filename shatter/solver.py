@@ -211,7 +211,7 @@ def return_solution(f, rules, unittest):
 
             # no solution found, let's go crazy:
             if expression == '':
-                expresion = non_deterministic.get_model(table, all_inputs)
+                expression = non_deterministic.get_model(table, all_inputs)
 
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,

@@ -15,10 +15,8 @@ __author__ = 'juan pablo isaza'
 
 class CodeTest(unittest.TestCase):
 
-
-## TODO: REMINDER THE ISINSTANCE OF A FUNCTION AND METHOD SHOULD BE LIKE:
+# TODO: REMINDER THE ISINSTANCE OF A FUNCTION AND METHOD SHOULD BE LIKE:
 #        elif not isinstance(self.build_fn, types.FunctionType) and not isinstance(self.build_fn, types.MethodType):
-
 
     @classmethod
     def setUpClass(cls):
@@ -91,7 +89,6 @@ class CodeTest(unittest.TestCase):
         self.assertTrue(isinstance(i not j, Code))
     """
 
-    # TODO: missing the real part of composition!.
     def test_composition(self):
         """
         Complex expression is assembled, should print out the same value.
