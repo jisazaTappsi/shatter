@@ -19,7 +19,7 @@ def get_model(table, all_inputs):
 	"""
 
 	# train the model
-	pass
+	return ''
 
 
 
