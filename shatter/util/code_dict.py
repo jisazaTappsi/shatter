@@ -2,7 +2,7 @@
 
 """Works on top of orderDict to define a dictionary which compares Code object only by their content."""
 
-from collections import OrderedDict, MutableMapping
+from collections import MutableMapping
 
 from shatter.code import Code
 
@@ -14,8 +14,8 @@ class CodeDict(MutableMapping):
     else behaves like an standard ordered dict."""
 
     def __init__(self, *args, **kwargs):
-        self.store = OrderedDict()
-        self.update(OrderedDict(*args, **kwargs))  # use the free update to set keys
+        self.store = dict()
+        self.update(dict(*args, **kwargs))  # use the free update to set keys
 
     def __getitem__(self, key):
 
