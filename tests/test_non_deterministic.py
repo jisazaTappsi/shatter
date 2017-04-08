@@ -11,13 +11,6 @@ __author__ = 'juan pablo isaza'
 
 
 class NonDeterministicTest(unittest.TestCase):
-    pass
-
-    #def simplest_non_deterministic(self):
-    #    """
-    #    Simplest non-deterministic problem.
-    #    """
-    #    pass
 
     @classmethod
     def setUpClass(cls):

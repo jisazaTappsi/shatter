@@ -16,3 +16,8 @@ def factor_code_with_code(i):
 @s.solve()
 def factor_ordered_with_code(i, j):
     pass
+
+
+@s.solve()
+def minimal_code(a):
+    pass
