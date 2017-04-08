@@ -210,7 +210,7 @@ class CodeTest(unittest.TestCase):
 
         lets test all representations!!!
         """
-
+        a = Code()
         solution = ['def {}(a):'.format(f.minimal_code.__name__),
                     '    return a']
 
@@ -221,8 +221,6 @@ class CodeTest(unittest.TestCase):
         r = Rules(a=True)
         s = r.solve(f.minimal_code)
         self.assertEqual(s.implementation, solution)
-
-        a = Code()
 
         r = Rules(a, output=True)
         s = r.solve(f.minimal_code)
