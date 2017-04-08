@@ -3,17 +3,17 @@ from shatter.solver import solve
 
 @solve()
 def is_alive(alive, neighbors):
-    return alive and sum(neighbors) == 2 or alive and sum(neighbors) == 3 or not alive and sum(neighbors) == 3 or sum(neighbors) == 2 and sum(neighbors) == 3 or sum(neighbors) == 3 and sum(neighbors) == 3
+    pass
 
 
 @solve()
 def valid_indexes(idx1, idx2, max_idx1, max_idx2):
-    return idx1 >= 0 and idx1 < max_idx1 and idx2 >= 0 and idx2 < max_idx2
+    pass
 
 
 @solve()
 def me(x, y, idx, idy):
-    return idx == x and idy == y
+    pass
 
 
 def get_neighbors(x, y, cells):

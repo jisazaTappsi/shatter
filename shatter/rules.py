@@ -100,6 +100,8 @@ class Rules(list):
         :param kwargs:
         :return:
         """
+
+        # TODO: add comment: what is this? Can still pass all tests without this.
         list.__init__(list())
 
         if len(kwargs) > 0:
