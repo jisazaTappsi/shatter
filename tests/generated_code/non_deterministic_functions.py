@@ -2,5 +2,5 @@ from shatter import solver as s
 
 
 @s.solve()
-def simple():
+def simple(a):
     pass

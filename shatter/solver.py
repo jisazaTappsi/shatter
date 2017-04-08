@@ -7,8 +7,10 @@ from shatter.tester import test_implementation
 from shatter.code_generator import *
 from shatter.processed_rules import *
 from shatter.util import helpers as h
+from shatter import non_deterministic
 
-#  TODO: from shatter import solver as production_solver
+# TODO: from shatter import solver as production_solver: ie use the production shatter to speed up development of
+# TODO: shatter itself.
 
 __author__ = 'juan pablo isaza'
 
@@ -208,8 +210,8 @@ def return_solution(f, rules, unittest):
             expression = get_function_expression(table, all_inputs)
 
             # no solution found, let's go crazy:
-            #if expression == '':
-            #    return
+            if expression == '':
+                expresion = non_deterministic.get_model(table, all_inputs)
 
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,
@@ -222,6 +224,7 @@ def return_solution(f, rules, unittest):
                             function=f,
                             rules=rules,
                             processed_rules=processed_rules)
+
         test_implementation(unittest, solution)
 
         alter_file(f_line, file_code, implementation, f_path)
