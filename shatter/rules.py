@@ -7,7 +7,6 @@ import warnings
 from shatter.constants import *
 from shatter.output import Output
 from shatter.util import helpers
-from shatter.util.last_update_dict import LastUpdateDict
 from shatter.util.last_update_set import LastUpdateSet
 from shatter.util.code_dict import CodeDict
 from shatter import solver
@@ -68,7 +67,7 @@ class Rules(list):
                     return key
         return None
 
-    def get_ordered_dict(self, args, kwargs):
+    def get_dict(self, args, kwargs):
         """
         Big issue solved here. Adds args, to have positional args always in the same order as the user inputs.
         Therefore the user can have short circuiting for logical operators, by having inputs in the right order.
@@ -76,7 +75,7 @@ class Rules(list):
         :param kwargs: a common dict
         :return: the right dict for the job a LastUpdatedOrderedDict.
         """
-        ordered_dict = LastUpdateDict()
+        a_dict = dict()
 
         # Adds args
         start_idx = self.get_max_positional_arg()
@@ -84,15 +83,15 @@ class Rules(list):
 
             repeating_var = self.search_repeating_variable(e)
             if repeating_var is None:  # first time: declares new value.
-                ordered_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
+                a_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
             else:  # has been previously declared.
-                ordered_dict[repeating_var] = e
+                a_dict[repeating_var] = e
 
         # Adds kwargs
         for k in kwargs.keys():
-            ordered_dict[k] = kwargs[k]
+            a_dict[k] = kwargs[k]
 
-        return ordered_dict
+        return a_dict
 
     def __init__(self, *args, **kwargs):
         """
@@ -104,8 +103,8 @@ class Rules(list):
         # TODO: add comment: what is this? Can still pass all tests without this.
         list.__init__(list())
 
-        if len(kwargs) > 0:
-            self.append(self.get_ordered_dict(args, kwargs))
+        if len(args) + len(kwargs) > 0:
+            self.append(self.get_dict(args, kwargs))
 
     def add(self, *args, **kwargs):
         """
@@ -113,8 +112,8 @@ class Rules(list):
         :param kwargs: dictionary like parameters.
         :return: void
         """
-        if len(kwargs) > 0:
-            self.append(self.get_ordered_dict(args, kwargs))
+        if len(args) + len(kwargs) > 0:
+            self.append(self.get_dict(args, kwargs))
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 
@@ -268,9 +267,9 @@ class Rules(list):
         return True
 
     @staticmethod
-    def row_has_non_keyword_keys(row):
+    def row_has_no_keyword_keys(row):
         """
-        Boolean output indicating whether a row (dict) has non keyword keys.
+        Boolean output indicating whether a row (dict) has no keyword keys.
         :param row: dict.
         :return: True if there is at least 1 input different from a keyword.
         """
@@ -329,7 +328,7 @@ class Rules(list):
         truth_tables = CodeDict()
 
         for row in self:
-            if self.row_has_non_keyword_keys(row):
+            if self.row_has_no_keyword_keys(row):
                 truth_tables = self.add_truth_table(truth_tables, row, function_args)
 
         return truth_tables

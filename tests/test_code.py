@@ -190,6 +190,51 @@ class CodeTest(unittest.TestCase):
         name = Code()
         self.assertEqual(str(name), 'name')
 
+    # TODO: STUPID BUG HERE!!! Last representation is NOT working
+    def test_simple(self):
+        """There are 4 equivalent representations of the identity function:
+
+        1. Boring:
+        >>> Rules(a=True, output=True)
+
+        2. Implicit True:
+        >>> Rules(a=True)
+
+        3. Using Code() magic:
+        >>> a = Code()
+        >>> Rules(a, output=True)
+
+        4. Using both Code() magic and implicit True output:
+        >>> a = Code()
+        >>> Rules(a)
+
+        lets test all representations!!!
+        """
+
+        solution = ['def {}(a):'.format(f.minimal_code.__name__),
+                    '    return a']
+
+        r = Rules(a=True, output=True)
+        s = r.solve(f.minimal_code)
+        self.assertEqual(s.implementation, solution)
+
+        r = Rules(a=True)
+        s = r.solve(f.minimal_code)
+        self.assertEqual(s.implementation, solution)
+
+        a = Code()
+
+        r = Rules(a, output=True)
+        s = r.solve(f.minimal_code)
+        self.assertEqual(s.implementation, solution)
+
+        # TODO: pass this test:
+        """
+        r = Rules(a)
+        s = r.solve(f.minimal_code)
+        self.assertEqual(s.implementation, solution)
+        """
+
 
 if __name__ == '__main__':
     unittest.main()
