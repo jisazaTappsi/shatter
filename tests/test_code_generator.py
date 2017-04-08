@@ -293,7 +293,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return {0}({1})'.format(function.__name__, array_1)]
 
-        r = Rules(s.Code(code_str=array_len_0), output=0, default=out)
+        r = Rules(r1=s.Code(code_str=array_len_0), output=0, default=out)
         solution = r.solve(function, self)
         self.assertEqual(solution.implementation, code)
 
@@ -349,9 +349,9 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        r = Rules(s.Code(code_str=code1_str),
-                  s.Code(code_str=code2_str),
-                  s.Code(code_str=code3_str),
+        r = Rules(r1=s.Code(code_str=code1_str),
+                  r2=s.Code(code_str=code2_str),
+                  r3=s.Code(code_str=code3_str),
                   output=right_str)
         solution = r.solve(function, self)
         self.assertEqual(solution.implementation, code)
@@ -399,8 +399,8 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        r = Rules(s.Code(code_str=code1_str),
-                  s.Code(code_str=code2_str),
+        r = Rules(r1=s.Code(code_str=code1_str),
+                  r2=s.Code(code_str=code2_str),
                   output=right_str)
 
         r.add(s.Code(code_str=code3_str), output=right_str)
@@ -424,7 +424,7 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        r = Rules(s.Code(code_str=code1_str), output=s.Code(code_str=output_code))
+        r = Rules(r1=s.Code(code_str=code1_str), output=s.Code(code_str=output_code))
         r.add(s.Code(code_str=code2_str), output=s.Code(code_str=output_code))
 
         solution = r.solve(function, self)
@@ -445,8 +445,8 @@ class GeneratorTest(unittest.TestCase):
                 '',
                 '    return False']
 
-        r = Rules(s.Code(code_str=code0_str),
-                  s.Code(code_str=code1_str),
+        r = Rules(r1=s.Code(code_str=code0_str),
+                  r2=s.Code(code_str=code1_str),
                   output=right_str)
 
         r.add(s.Code(code_str=code1_str), output=right_str)

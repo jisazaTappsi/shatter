@@ -177,9 +177,7 @@ class CodeTest(unittest.TestCase):
 
         i = Code()
         j = Code()
-        r = Rules(i != 0,
-                     i < 1,
-                     output=i * j)
+        r = Rules(i != 0, i < 1, output=i * j)
         r.add(i > j, output=i * j)
         solution = r.solve(function, self)
 
