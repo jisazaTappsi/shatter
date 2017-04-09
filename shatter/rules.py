@@ -7,7 +7,7 @@ import warnings
 from shatter.constants import *
 from shatter.output import Output
 from shatter.util import helpers
-from shatter.util.last_update_set import LastUpdateSet
+from shatter.util.ordered_set import OrderedSet
 from shatter.util.code_dict import CodeDict
 from shatter import solver
 from shatter.util import helpers as h
@@ -73,7 +73,7 @@ class Rules(list):
         Therefore the user can have short circuiting for logical operators, by having inputs in the right order.
         :param args: positional args. Used when specific order required.
         :param kwargs: a common dict
-        :return: the right dict for the job a LastUpdatedOrderedDict.
+        :return: a dict (which as of python 3.6 preserves insertion order)
         """
         a_dict = dict()
 
@@ -167,33 +167,33 @@ class Rules(list):
         """
         Scans the whole rules object looking for input keys. Will add inputs (such as code pieces), that are not
         explicitly declared as function inputs.
-        Uses LastOrderSets because order is very important. The order is:
+        Uses OrderedSet because order is very important. The order is:
         first the f_inputs (ordered from right to left), then args added on the condition object from right to left and
         top to bottom.
         Example:
-        >>>out = -1
+        >>> out = -1
 
-        >>>def f(a, b):
-        >>>    return a + b
+        >>> def f(a, b):
+        >>>     return a + b
 
-        >>>r = Rules(c=1, d=2, output=out)
-        >>>r.add(x=3, y=4, output='other_stuff')
-        >>>r.add(e=3, f=4, output=out)
+        >>> r = Rules(c=1, d=2, output=out)
+        >>> r.add(x=3, y=4, output='other_stuff')
+        >>> r.add(e=3, f=4, output=out)
 
-        >>>cond.get_input_keys(helpers.get_function_inputs(f), out)
-        >>>LastUpdateSet(['a', 'b', 'c', 'd', 'e', 'f'])
+        >>> cond.get_input_keys(helpers.get_function_inputs(f), out)
+        >>> OrderedSet(['a', 'b', 'c', 'd', 'e', 'f'])
 
         :param f_inputs: function inputs.
         :param output: the output of the row.
         :return: All possible inputs that are not keywords.
         """
         # TODO: missing optional args(kwargs) of the input function.
-        f_inputs = LastUpdateSet(f_inputs)
-        new_inputs = LastUpdateSet()
+        f_inputs = OrderedSet(f_inputs)
+        new_inputs = OrderedSet()
 
         for row in self:
             if KEYWORDS[OUTPUT] in row and row[KEYWORDS[OUTPUT]] == output:
-                new_inputs |= LastUpdateSet(row.keys()) - f_inputs  # adds inputs who are not already args.
+                new_inputs |= OrderedSet(row.keys()) - f_inputs  # adds inputs who are not already args.
 
         all_elements = f_inputs | new_inputs
 
@@ -202,20 +202,20 @@ class Rules(list):
     @staticmethod
     def add_element_to_tuples(tuples_set, new_element):
         """
-        Adds additional element to a tuple set.
+        Adds additional element to a tuple list.
         :param tuples_set: a set containing tuples.
         :param new_element: any element to add in last position.
         :return: tuple set
         """
-        new_tuples = LastUpdateSet()
+        new_tuples = list()
         for tuple_element in tuples_set:
-            new_tuples.add(tuple_element + (new_element,))
+            new_tuples.append(tuple_element + (new_element,))
 
         return new_tuples
 
     def get_tuples_from_args(self, row, function_args, output):
         """
-        Get a set containing tuples (with implicit or explicit rows).
+        Get a list containing tuples (with implicit or explicit rows).
         :param row: dict with index as key and value as input value.
         :param function_args: function
         :param output: the output of the row.
@@ -223,10 +223,10 @@ class Rules(list):
         """
 
         if helpers.var_is_false(output):
-            return LastUpdateSet()
+            return list()
 
         # starts with 1 tuple
-        tuples = LastUpdateSet([()])
+        tuples = [()]
         for variable in self.get_input_keys(function_args, output):
 
             if variable in row:
@@ -236,7 +236,7 @@ class Rules(list):
                 # All possible outcomes for undetermined boolean variable: duplicates number of tuples.
                 true_tuples = self.add_element_to_tuples(tuples, True)
                 false_tuples = self.add_element_to_tuples(tuples, False)
-                tuples = true_tuples | false_tuples
+                tuples = true_tuples + false_tuples
 
         # add explicit output to tuples, if necessary.
         return tuples
@@ -307,10 +307,10 @@ class Rules(list):
         if output in truth_tables:  # uses existing table.
             truth_table = truth_tables[output]
         else:  # adds new truth table
-            truth_table = LastUpdateSet()
+            truth_table = list()
 
         condition_rows = self.get_tuples_from_args(row, function_args, output)
-        truth_table = truth_table | condition_rows  # concat sets.
+        truth_table = truth_table + condition_rows  # concat lists.
 
         truth_tables[output] = truth_table  # add to tables dict.
 
@@ -346,9 +346,9 @@ def add_to_dict_table(table, key, value):
     # will ignore key=False
     if key:
         if key in table:  # add value to set in already existing key value pair.
-            table[key] = table[key] | LastUpdateSet([value])
+            table[key] = table[key] + [value]
         else:  # create new key value pair.
-            table[key] = LastUpdateSet([value])
+            table[key] = [value]
 
     return table
 
@@ -367,7 +367,7 @@ def solve(function, rules, unittest=None):
                                   unittest=unittest)
 
 
-def from_raw_set_to_dict_table(rules):
+def from_raw_list_to_dict_table(rules):
     """
     Convert raw case to general format.
     :param rules: obj
@@ -390,7 +390,7 @@ EXPLICIT_ROW_ERROR = 'explicit_row_error'
 class RulesTypeError(TypeError):
     def __init__(self, error_object, error_type):
         if TYPE_ERROR == error_type:
-            message = 'Rules variable is not a set nor a Rules object, but rather type {}'\
+            message = 'Rules variable is not a list nor a Rules object, but rather type {}'\
                 .format(type(error_object))
         elif ROW_ERROR:
             message = '{} row in truth table is not a tuple'.format(error_object)
@@ -411,29 +411,28 @@ def get_truth_tables(rules, function_args):
     """
     if isinstance(rules, Rules):
         return rules.get_truth_tables(function_args)
-    elif isinstance(rules, set) or isinstance(rules, LastUpdateSet):  # raw set case.
-        return from_raw_set_to_dict_table(rules)
+    elif isinstance(rules, list):  # raw list case.
+        return from_raw_list_to_dict_table(rules)
     else:
         raise RulesTypeError(rules, TYPE_ERROR)
 
 
 def valid_rules(rules):
     """
-    Valid rules must be sets, LastUpdateSet, inherit from set or be a Rules object.
-    - set case:  When the input is a raw table. If rules is a set then all rows have to be tuples or inherit
+    Valid rules objects must be lists, inherit from list or be a Rules object.
+    - list case:  When the input is a raw table. If rules is a list then all rows have to be tuples or inherit
     from tuple.
-    - LastUpdateSet case: same as set.
     - Rules case: When the input is a Rules object.
     :param rules: truth table or a rules object.
     :return: boolean.
     """
-    if not isinstance(rules, set)\
-            and not isinstance(rules, Rules)\
-            and not isinstance(rules, LastUpdateSet):
+
+    if not isinstance(rules, list) and not isinstance(rules, Rules):
         raise RulesTypeError(rules, TYPE_ERROR)
 
-    # only for set and LastUpdateSet.
-    if isinstance(rules, set) or isinstance(rules, LastUpdateSet):
+    # only for list. Explicitly forbids Rules class as Rules class inherits from list and would be easily mistaken for a
+    # standard list.
+    if isinstance(rules, list) and not isinstance(rules, Rules):
         for row in rules:
             if not isinstance(row, tuple):
                 raise RulesTypeError(row, ROW_ERROR)

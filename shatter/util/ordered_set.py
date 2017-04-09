@@ -7,7 +7,7 @@ import collections
 __author__ = 'http://code.activestate.com/recipes/576694/'
 
 
-class LastUpdateSet(collections.MutableSet):
+class OrderedSet(collections.MutableSet):
 
     def __init__(self, iterable=None):
         self.end = end = []
@@ -61,6 +61,6 @@ class LastUpdateSet(collections.MutableSet):
         return '%s(%r)' % (self.__class__.__name__, list(self))
 
     def __eq__(self, other):
-        if isinstance(other, LastUpdateSet):
+        if isinstance(other, OrderedSet):
             return len(self) == len(other) and list(self) == list(other)
         return set(self) == set(other)

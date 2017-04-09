@@ -18,12 +18,12 @@ class RulesTest(unittest.TestCase):
 
         # case 1: single condition added on constructor
         r = Rules(a=True, b=True)
-        self.assertEqual(r.get_truth_tables(['a', 'b']), {True: {(True, True)}})
+        self.assertEqual(r.get_truth_tables(['a', 'b']), {True: [(True, True)]})
 
         # case 2: adding rules on constructor and with add method.
         r = Rules(a=True, b=True)
         r.add(a=True, b=False)
-        self.assertEqual(r.get_truth_tables(['a', 'b']), {True: {(True, True), (True, False)}})
+        self.assertEqual(r.get_truth_tables(['a', 'b']), {True: [(True, True), (True, False)]})
 
         # case 3: adding 2 arguments, one of them with an output.
         r = Rules()
@@ -31,7 +31,7 @@ class RulesTest(unittest.TestCase):
         r.add(a=True)
 
         self.assertEqual(r.get_truth_tables(['a', 'b']),
-                         {True: {(True, False), (True, True)}, 3: {(False, False), (False, True)}})
+                         {3: [(False, True), (False, False)], True: [(True, True), (True, False)]})
 
     # case 0: empty dict.
     def test_empty_dict_max_positional_arg(self):
@@ -71,7 +71,7 @@ class RulesTest(unittest.TestCase):
         r.add(e=3, f=4, output=out)
 
         self.assertEqual(r.get_input_keys(helpers.get_function_inputs(f), out),
-                         LastUpdateSet(['a', 'b', 'c', 'd', 'e', 'f']))
+                         OrderedSet(['a', 'b', 'c', 'd', 'e', 'f']))
 
     # --------- test validation --------- #
 

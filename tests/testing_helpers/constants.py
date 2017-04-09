@@ -2,34 +2,32 @@
 
 """cts to use on the tests"""
 
-from shatter.util.last_update_set import LastUpdateSet
-
 __author__ = 'juan pablo isaza'
 
 #                b1     b0   output
-and_table = LastUpdateSet([((False, False), False),
-                           ((False, True), False),
-                           ((True, False), False),
-                           ((True, True), True)])
+and_table = [((False, False), False),
+             ((False, True), False),
+             ((True, False), False),
+             ((True, True), True)]
 
 # or table in reverse order, because of expression order and short circuiting
 # (see test_rules_input_order_is_respected in code generator tests)
-or_table = LastUpdateSet([((True, True), True),
-                          ((True, False), True),
-                          ((False, True), True),
-                          ((False, False), False)])
+or_table = [((True, True), True),
+            ((True, False), True),
+            ((False, True), True),
+            ((False, False), False)]
 
-xor_table = LastUpdateSet([((True, True), False),
-                           ((True, False), True),
-                           ((False, True), True),
-                           ((False, False), False)])
+xor_table = [((True, True), False),
+             ((True, False), True),
+             ((False, True), True),
+             ((False, False), False)]
 
-nand_truth_table = LastUpdateSet([((False, False), True),
-                                  ((False, True), True),
-                                  ((True, False), True),
-                                  ((True, True), False)])
+nand_truth_table = [((False, False), True),
+                    ((False, True), True),
+                    ((True, False), True),
+                    ((True, True), False)]
 
-and3_table = LastUpdateSet([((True, True, True), True)])
+and3_table = [((True, True, True), True)]
 
 sig_and = "and_function(a, b)"
 exp_and = "a and b"

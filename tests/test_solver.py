@@ -6,7 +6,6 @@ import unittest
 
 from shatter import solver as s, rules as c
 from shatter.code_generator import translate_to_python_expression
-from shatter.util.last_update_set import LastUpdateSet
 from tests.generated_code import solver_functions as f
 from tests.testing_helpers import constants as cts
 from tests.testing_helpers import common_testing_code
@@ -108,7 +107,7 @@ class SolverTest(unittest.TestCase):
         it can work with table = {(inputs), ...}. As the output is redundant.
         """
         # case 1: all rows are implicit
-        implicit_output_xor_table = LastUpdateSet([(True, False), (False, True)])
+        implicit_output_xor_table = [(True, False), (False, True)]
 
         self.factor_execute(rules=implicit_output_xor_table,
                             a_callable=f.implicit_xor_function,
@@ -116,7 +115,7 @@ class SolverTest(unittest.TestCase):
                             expression=cts.exp_xor)
 
         # case 2: some rows are explicit and some implicit.
-        mix_output_xor_table = LastUpdateSet([((True, False), True), (False, True), ((True, True), False)])
+        mix_output_xor_table = [((True, False), True), (False, True), ((True, True), False)]
 
         self.factor_execute(rules=mix_output_xor_table,
                             a_callable=f.mix_xor_function,
