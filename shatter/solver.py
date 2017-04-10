@@ -210,14 +210,17 @@ def return_solution(f, rules, unittest):
             expression = get_function_expression(table, all_inputs)
 
             # no solution found, let's go crazy:
+            is_model = False
             if expression == '':
                 expression = non_deterministic.get_model(table, all_inputs)
+                is_model = True
 
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,
                                                             bool_expression=expression,
                                                             definition=definition,
-                                                            the_output=the_output)
+                                                            the_output=the_output,
+                                                            is_model=is_model)
 
         implementation = add_default_return(definition, processed_rules, implementation)
         solution = Solution(implementation=implementation,

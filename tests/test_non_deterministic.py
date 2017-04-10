@@ -16,18 +16,34 @@ class NonDeterministicTest(unittest.TestCase):
     def setUpClass(cls):
         common_testing_code.reset_functions_file(f.__file__, hard_reset=True)
 
-    # TODO: pass test.
-    #def test_code_generation_with_if(self):
-    #    """
-    #    Test a non deterministic case when a is True 66% of the time.
-    #    """
-    #    r = Rules(a=True, output=True)
-    #    r.add(a=False, output=True)
-    #    solution = r.solve(f.simple, self)
+    def test_double_input_will_not_have_effect(self):
+        """Even though the input is fed twice the result is the same."""
 
-    #    code = ['def {}(a):'.format(f.simple.__name__),
-    #            '    return a']
-    #    self.assertEqual(solution.implementation, code)
+        solution = ['def {}(a):'.format(f.double_input.__name__),
+                    '    return a']
+
+        r = Rules(a=True, output=True)
+        r.add(a=True, output=True)
+        s = r.solve(f.double_input)
+        self.assertEqual(s.implementation, solution)
+
+    # TODO: pass test.
+    def test_simplest(self):
+        """
+        Test a non deterministic case when input 'a' is True 66% of the time.
+        """
+        r = Rules(a=True, output=True)
+        r.add(a=False, output=True)
+        r.add(a=True, output=True)
+        r.solve(f.simple)
+
+        with_true = f.simple(True)
+        with_false = f.simple(False)
+
+        self.assertTrue(with_true)
+        self.assertFalse(with_false)
+
+        #self.assertEqual(solution.implementation, code)
 
 
 if __name__ == '__main__':

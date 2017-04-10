@@ -233,6 +233,5 @@ class CodeTest(unittest.TestCase):
         self.assertEqual(s.implementation, solution)
         """
 
-
 if __name__ == '__main__':
     unittest.main()
