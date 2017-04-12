@@ -2,18 +2,14 @@
 
 """Defines methods to solve non-deterministic tables."""
 
-from keras.models import Sequential
-from keras.layers import Dense
-from keras.callbacks import EarlyStopping
-from sklearn import svm
-
-
-# TODO: remove from shatter.util import helpers
-
 __author__ = 'juan pablo isaza'
 
 
 def get_neural_network():
+
+    from keras.models import Sequential
+    from keras.layers import Dense
+    from keras.callbacks import EarlyStopping
 
     dim = 1
     neuron_num = 1
@@ -26,15 +22,18 @@ def get_neural_network():
     return model
 
 
-def get_model(table, all_inputs):
+def get_model(solution):
     """
     Output code of a model that will predict correct outcome with "high" probability
-    :param table: list with tuples as rows.
-    Example:
+    :param solution: object with lots of stuff.
+    Including the tables object Example:
     >>> [(True,), (False,), (True,)]
-    :param all_inputs: all possible function inputs.
     :return: a valid executable python code expression.
     """
+    function_inputs = solution.function_inputs
+    tables = solution.rules.get_truth_tables()  # TODO: not sure here.
+
+    print('Solving non deterministic problem (with possible contradictions)')
 
     # train the model with a neural network
     nn = get_neural_network()

@@ -5,6 +5,7 @@ import traceback
 
 from shatter.code import Code
 from shatter.util.helpers import *
+from shatter import non_deterministic
 
 __author__ = 'juan pablo isaza'
 
@@ -39,18 +40,6 @@ def get_used_inputs(tables):
     return set([item for k, set_v in tables.items() for item in set_v])
 
 
-def get_inputs_with_default_output(inputs, tables):
-    """
-    Gets a set with all tuples going to default value.
-    :param inputs: function ins.
-    :param tables: as in processed_rules.
-    :return: tuples that output default value.
-    """
-    all_tuples = get_all_possible_inputs(inputs)
-    used_tuples = get_used_inputs(tables)
-    return all_tuples.difference(used_tuples)
-
-
 def print_inputs_of_tuple(a_tuple):
     """
     Prints parts of the tuple which have inputs.
@@ -75,13 +64,19 @@ def run_single_test(test_class, a_tuple, solution, expected_value):
 
     try:
         exec("\n".join(solution.implementation))
-        given_out = eval(function_call_code)
+        returned = eval(function_call_code)
     except:
         w_str = "Cannot test function, probably lack of context, exception is: "
         warnings.warn(w_str, UserWarning)
         traceback.print_exc()
     else:
-        test_class.assertEqual(given_out, expected_value)
+
+        #try:
+        test_class.assertEqual(returned, expected_value)
+        #except AssertionError:
+            # Here a contradiction was detected, will use the non_deterministic module to clean the contradiction
+            # new_tables = non_deterministic.get_model(solution)
+        #    pass  # TODO
 
 
 def has_code_args(tables):
@@ -121,10 +116,7 @@ def test_implementation(test_class, solution):
 
     validate(test_class)
 
-    inputs = get_function_inputs(solution.function)
     tables = solution.processed_rules.tables
-    default_set = set(get_inputs_with_default_output(inputs, tables))
-    tables[solution.processed_rules.default] = default_set
 
     if has_code_args(tables):
         warnings.warn("Cannot test function, it has added code", UserWarning)

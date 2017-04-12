@@ -166,3 +166,13 @@ def basic(a, b):
 @s.solve()
 def basic_if(a, b):
     pass
+
+
+@s.solve()
+def simple_constant_output(a):
+    pass
+
+
+@s.solve()
+def many_outputs(a):
+    pass

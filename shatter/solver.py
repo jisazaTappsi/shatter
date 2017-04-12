@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 
 """This is the main file. Calls QM algorithm and code generation functions."""
+import inspect
+
 from shatter import qm
 from shatter.solution import Solution
 from shatter.tester import test_implementation
 from shatter.code_generator import *
 from shatter.processed_rules import *
 from shatter.util import helpers as h
-from shatter import non_deterministic
 
 # TODO: from shatter import solver as production_solver: ie use the production shatter to speed up development of
 # TODO: shatter itself.
@@ -46,7 +47,7 @@ def solve():
         """
         def wrapped_f(*args, **kwargs):
             """
-            same as wrap(f), but with *args
+            same as wrap(f), but with *args and *kwargs
             :param args: of function
             :param kwargs: of function
             :return: eval of f with args.
@@ -57,6 +58,9 @@ def solve():
         wrapped_f.__name__ = f.__name__
         wrapped_f.__module__ = f.__module__
         wrapped_f.internal_code = f.__code__
+
+        sig = inspect.signature(f)
+        wrapped_f.internal_parameters = tuple(sig.parameters.keys())
 
         return wrapped_f
     return wrap
@@ -77,7 +81,7 @@ def execute_qm_algorithm(ones):
     return qm_obj.simplify_los(ones)
 
 
-def get_function_expression(table, inputs):
+def get_function_expression(table, inputs, the_output):
     """
     Get boolean expression. Can return empty string.
     solution provided by mc algorithm.
@@ -88,9 +92,14 @@ def get_function_expression(table, inputs):
     ones = from_table_to_ones(table)
     if len(ones) > 0:
         qm_output = execute_qm_algorithm(ones)
-        return translate_to_python_expression(inputs, qm_output)
+        expression = translate_to_python_expression(inputs, qm_output)
     else:
-        return ''
+        expression = ''
+
+    if expression == '':
+        return '{}'.format(the_output)  # This happens when regardless of the input the output is the same
+    else:
+        return expression
 
 
 def from_table_to_ones(table):
@@ -173,7 +182,7 @@ def get_input_values(rules, function_inputs, output):
     Adds to the original inputs other possible implicit inputs, such as code.
     :param rules: Rules obj
     :param function_inputs: explicit function inputs
-    :param output: the output of the function.
+    :param output: thing returned to the outside world
     :return: a list with all the inputs.
     """
     if isinstance(rules, Rules):
@@ -207,24 +216,27 @@ def return_solution(f, rules, unittest):
         for the_output, table in processed_rules.tables.items():
 
             all_inputs = get_input_values(rules, function_args, the_output)
-            expression = get_function_expression(table, all_inputs)
+            expression = get_function_expression(table, all_inputs, the_output)
 
             # no solution found, let's go crazy:
-            is_model = False
-            if expression == '':
-                expression = non_deterministic.get_model(table, all_inputs)
-                is_model = True
+            uses_model = False
+            # TODO: this is wrong an empty expression means the output not a contradiction!!
+            # TODO: A contradiction is tested by the tester module
+            #if expression == '':
+            #    expression = non_deterministic.get_model(table, all_inputs)
+            #    uses_model = True
 
             if len(expression) > 0:
                 implementation = add_code_to_implementation(current_implementation=implementation,
                                                             bool_expression=expression,
                                                             definition=definition,
                                                             the_output=the_output,
-                                                            is_model=is_model)
+                                                            is_model=uses_model)
 
         implementation = add_default_return(definition, processed_rules, implementation)
         solution = Solution(implementation=implementation,
                             function=f,
+                            function_inputs=all_inputs,
                             rules=rules,
                             processed_rules=processed_rules)
 

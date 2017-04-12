@@ -148,7 +148,7 @@ class Rules(list):
         """
         Scans the whole rules object looking for input values, adds them with the function inputs.
         :param f_inputs: function inputs.
-        :param output: the output of the row.
+        :param output: thing returned
         :return: All possible inputs that are not keywords.
         """
         remove_elements = KEYWORDS.values()
@@ -221,9 +221,6 @@ class Rules(list):
         :param output: the output of the row.
         :return: set containing tuples.
         """
-
-        if helpers.var_is_false(output):
-            return list()
 
         # starts with 1 tuple
         tuples = [()]
