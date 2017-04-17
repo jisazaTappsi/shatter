@@ -7,5 +7,5 @@ def double_input(a):
 
 
 @s.solve()
-def simple(a):
+def identity(a):
     pass

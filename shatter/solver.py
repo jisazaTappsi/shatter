@@ -9,6 +9,7 @@ from shatter.tester import test_implementation
 from shatter.code_generator import *
 from shatter.processed_rules import *
 from shatter.util import helpers as h
+from shatter import non_deterministic
 
 # TODO: from shatter import solver as production_solver: ie use the production shatter to speed up development of
 # TODO: shatter itself.
@@ -191,6 +192,41 @@ def get_input_values(rules, function_inputs, output):
         return list(function_inputs)
 
 
+def find_candidate_solution(f, definition, rules, processed_rules, function_args):
+    """
+    Finds a possible solution with the Quine-McCluskey algorithm.
+    :param f: function object.
+    :param definition: function definition.
+    :param rules: condition or object or partial truth table (explicit, implicit or mix).
+    :param processed_rules: obj containing dict with tables.
+    :param function_args: arguments to the function object.
+    :return: Solution object. Can be the optimal solution or not.
+    """
+    implementation = get_initial_implementation(definition)
+
+    for the_output, table in processed_rules.tables.items():
+
+        # will not solve anything when the output is False, as with True values is enough to specify a logical output
+        if the_output or not isinstance(the_output, bool):
+
+            all_inputs = get_input_values(rules, function_args, the_output)
+            expression = get_function_expression(table, all_inputs, the_output)
+
+            if len(expression) > 0:
+                implementation = add_code_to_implementation(current_implementation=implementation,
+                                                            bool_expression=expression,
+                                                            definition=definition,
+                                                            the_output=the_output)
+
+    implementation = add_default_return(definition, processed_rules, implementation)
+    solution = Solution(implementation=implementation,
+                        function=f,
+                        rules=rules,
+                        processed_rules=processed_rules)
+
+    return solution
+
+
 def return_solution(f, rules, unittest):
     """
     Solves the riddle, Writes it and tests it.
@@ -209,40 +245,33 @@ def return_solution(f, rules, unittest):
         definition = file_code[f_line]
         function_args = h.get_function_inputs(f)
 
-        # init variables
-        implementation = get_initial_implementation(definition)
         processed_rules = get_processed_rules(rules, function_args)
+        solution = find_candidate_solution(f=f,
+                                           definition=definition,
+                                           rules=rules,
+                                           processed_rules=processed_rules,
+                                           function_args=function_args)
 
-        for the_output, table in processed_rules.tables.items():
+        try:
+            test_implementation(unittest, solution)
+        except AssertionError:
+            # A contradiction was detected, will use the non_deterministic module to clean the contradiction
+            # and output a table object free of contradictions.
 
-            all_inputs = get_input_values(rules, function_args, the_output)
-            expression = get_function_expression(table, all_inputs, the_output)
+            tables = solution.rules.get_truth_tables(function_args)
+            new_tables = non_deterministic.correct_truth_table(tables)
 
-            # no solution found, let's go crazy:
-            uses_model = False
-            # TODO: this is wrong an empty expression means the output not a contradiction!!
-            # TODO: A contradiction is tested by the tester module
-            #if expression == '':
-            #    expression = non_deterministic.get_model(table, all_inputs)
-            #    uses_model = True
+            processed_rules.tables = new_tables
+            solution = find_candidate_solution(f=f,
+                                               definition=definition,
+                                               rules=rules,
+                                               processed_rules=processed_rules,
+                                               function_args=function_args)
 
-            if len(expression) > 0:
-                implementation = add_code_to_implementation(current_implementation=implementation,
-                                                            bool_expression=expression,
-                                                            definition=definition,
-                                                            the_output=the_output,
-                                                            is_model=uses_model)
+            # Final test if not passes something really wrong is happening
+            test_implementation(unittest, solution)
 
-        implementation = add_default_return(definition, processed_rules, implementation)
-        solution = Solution(implementation=implementation,
-                            function=f,
-                            function_inputs=all_inputs,
-                            rules=rules,
-                            processed_rules=processed_rules)
-
-        test_implementation(unittest, solution)
-
-        alter_file(f_line, file_code, implementation, f_path)
+        alter_file(f_line, file_code, solution.implementation, f_path)
         print("Solved and tested " + f.__name__)
         return solution
 

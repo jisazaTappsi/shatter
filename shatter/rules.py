@@ -340,12 +340,10 @@ def add_to_dict_table(table, key, value):
     :param value: to be added to dict
     :return: modified table
     """
-    # will ignore key=False
-    if key:
-        if key in table:  # add value to set in already existing key value pair.
-            table[key] = table[key] + [value]
-        else:  # create new key value pair.
-            table[key] = [value]
+    if key in table:  # add value to set in already existing key value pair.
+        table[key] = table[key] + [value]
+    else:  # create new key value pair.
+        table[key] = [value]
 
     return table
 

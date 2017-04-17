@@ -74,24 +74,18 @@ def get_if_code(indent, boolean_exp, output, returning):
             indent + '        ' + r + print_object(output)]
 
 
-def get_code_piece(bool_expression, indent, the_output, is_model):
+def get_code_piece(bool_expression, indent, the_output):
     """
     Gives a line of code with a boolean expression and its return keyword, or an if statement.
     :param bool_expression: just booleans
     :param indent: function indent
     :param the_output: the value to be returned.
-    :param is_model: boolean indicating if the expression is
     :return: string list with code.
     """
-    if is_model:
-        # TODO: add correct indent to multiline expressions.
-        #return [indent + bool_expression]
-        return [bool_expression]
+    if isinstance(the_output, bool):
+        return [indent + "    return " + bool_expression]
     else:
-        if isinstance(the_output, bool):
-            return [indent + "    return " + bool_expression]
-        else:
-            return get_if_code(indent, bool_expression, the_output, True)
+        return get_if_code(indent, bool_expression, the_output, True)
 
 
 def get_initial_implementation(definition):
@@ -106,21 +100,20 @@ def get_initial_implementation(definition):
     return ["{indent}def {sig}:".format(indent=indent, sig=signature)]
 
 
-def add_code_to_implementation(current_implementation, bool_expression, definition, the_output, is_model):
+def add_code_to_implementation(current_implementation, bool_expression, definition, the_output):
     """
     Given definition and expression gets the function implementation.
     :param current_implementation: current code.
     :param bool_expression: a boolean expression that can be evaluated.
     :param definition:   def function(input1, input2, ...).
     :param the_output: the value to be returned.
-    :param is_model: boolean indicating if the expression is a non deterministic model.
     :return: string list with implementation.
     """
     signature = get_signature_from_definition(definition)
     indent = helpers.get_indent_from_definition(definition)
     if bool_expression and len(bool_expression) > 0:
 
-        new_code = get_code_piece(bool_expression, indent, the_output, is_model)
+        new_code = get_code_piece(bool_expression, indent, the_output)
         return current_implementation + new_code
     else:
         warnings.warn('Function: ' + signature + ' has no boolean expression; cannot be implemented', UserWarning)

@@ -11,7 +11,7 @@ __author__ = 'Juan Pablo Isaza'
 
 class CodeDict(MutableMapping):
     """If type Code Compares pieces by their content(code_str)
-    else behaves like an standard ordered dict."""
+    else behaves like an standard dict."""
 
     def __init__(self, *args, **kwargs):
         self.store = dict()

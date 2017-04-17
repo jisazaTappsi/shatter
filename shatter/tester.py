@@ -70,13 +70,7 @@ def run_single_test(test_class, a_tuple, solution, expected_value):
         warnings.warn(w_str, UserWarning)
         traceback.print_exc()
     else:
-
-        #try:
         test_class.assertEqual(returned, expected_value)
-        #except AssertionError:
-            # Here a contradiction was detected, will use the non_deterministic module to clean the contradiction
-            # new_tables = non_deterministic.get_model(solution)
-        #    pass  # TODO
 
 
 def has_code_args(tables):

@@ -9,6 +9,7 @@ from shatter.code_generator import translate_to_python_expression
 from tests.generated_code import solver_functions as f
 from tests.testing_helpers import constants as cts
 from tests.testing_helpers import common_testing_code
+from shatter.rules import Rules
 
 __author__ = 'juan pablo isaza'
 
@@ -144,6 +145,17 @@ class SolverTest(unittest.TestCase):
                             signature=f.mix_xor_function.__name__ + '(a, b)',
                             expression=cts.exp_xor)
 
+    def test_identity_explicit(self):
+        """
+        Identity will yield same result even though False and True inputs are explicit specified.
+        """
+        code = ['def {}(a):'.format(f.identity.__name__),
+                '    return a']
+
+        r = Rules(a=True, output=True)
+        r.add(a=False, output=False)
+        solution = r.solve(f.identity)
+        self.assertEqual(solution.implementation, code)
 
 if __name__ == '__main__':
     unittest.main()

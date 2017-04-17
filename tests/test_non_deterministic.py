@@ -30,34 +30,27 @@ class NonDeterministicTest(unittest.TestCase):
     # TODO: pass test.
     def test_simple(self):
         """
-        Test a non deterministic case when input 'a' is True 66% of the time.
+        Test the identity function when the input 'a' has 1 outlier out of 5 samples.
         """
 
-        # TODO: change representation and the table inside non_deterministic.py should be the same.
-        # TODO: Also, be able to represent 'a=False' as the more natural 'not a'.
-        #from shatter.solver import Code
-        #a = Code()
-        #r = Rules(a)
-        #r.add(a=False)
-        #r.add(a)
-        #r.solve(f.simple)
-        return
-        """
+        code = ['def {}(a):'.format(f.identity.__name__),
+                '    return a']
+
+        # True -> True: 2 samples where the output is True given True input.
         r = Rules(a=True, output=True)
-        r.add(a=False, output=True)  # this example is an outlier of the last 2 examples: the model should avoid it.
         r.add(a=True, output=True)
+
+        # False -> False: 2 samples where the output is False given the False input.
         r.add(a=False, output=False)
         r.add(a=False, output=False)
-        r.solve(f.simple, self)
 
-        should_be_true = f.simple(True)
-        should_be_false = f.simple(False)
+        # Outlier of the False -> False samples, the model should learn to ignore it.
+        r.add(a=False, output=True)
+        solution = r.solve(f.identity, self)
 
-        self.assertTrue(should_be_true)
-        self.assertFalse(should_be_false)
-        """
-        # TODO: the neural network can clean data before applying QM again
-        #self.assertEqual(solution.implementation, code)
+        self.assertTrue(f.identity(True))
+        self.assertFalse(f.identity(False))
+        self.assertEqual(solution.implementation, code)
 
 
 if __name__ == '__main__':

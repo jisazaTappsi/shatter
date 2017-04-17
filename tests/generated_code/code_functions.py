@@ -19,5 +19,5 @@ def factor_ordered_with_code(i, j):
 
 
 @s.solve()
-def minimal_code(a):
-    pass
+def identity(a):
+    return a

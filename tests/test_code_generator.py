@@ -55,8 +55,7 @@ class GeneratorTest(unittest.TestCase):
         code = s.add_code_to_implementation(current_implementation=s.get_initial_implementation(definition),
                                             bool_expression=expression,
                                             definition=definition,
-                                            the_output=True,
-                                            is_model=False)
+                                            the_output=True)
         self.assertListEqual(code, expected_code)
 
     def test_get_function_implementation(self):

@@ -12,7 +12,7 @@ class Solution:
     """
     Contains the data describing the solution to the puzzle.
     """
-    def __init__(self, function, function_inputs, rules, processed_rules, implementation=[]):
+    def __init__(self, function, rules, processed_rules, implementation=[]):
         """
         :param function: a callable.
         :param rules: object of type rules.
@@ -23,7 +23,6 @@ class Solution:
         """
         self.implementation = implementation
         self.function = function
-        self.function_inputs = function_inputs
         self.rules = rules
         self.processed_rules = processed_rules
         self.ast = ast.parse("\n".join(implementation))
