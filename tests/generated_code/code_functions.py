@@ -20,4 +20,4 @@ def factor_ordered_with_code(i, j):
 
 @s.solve()
 def identity(a):
-    return a
+    pass

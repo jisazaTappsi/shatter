@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 
-"""Defines methods to solve non-deterministic tables."""
+"""
+Defines methods to solve non-deterministic tables.
+Notice: Keras and Numpy imports are defined withing functions, this is done in order to keep these libraries plus
+TensorFlow as optional (only necessary for neural computing) and to shorten loading time as TensorFlow is very slow to
+load.
+"""
 
 from shatter.util.code_dict import CodeDict
 
@@ -11,7 +16,7 @@ def get_neural_network():
 
     from keras.models import Sequential
     from keras.layers import Dense
-    from keras.callbacks import EarlyStopping
+    import numpy as np
 
     dim = 1
     neuron_num = 1
@@ -20,6 +25,12 @@ def get_neural_network():
 
     layer = Dense(neuron_num, input_dim=dim, init='normal', activation='sigmoid')
     model.add(layer)
+
+    # weights per layer:
+    w1 = np.array([[1]])
+    b1 = np.array([0] * dim)
+
+    model.set_weights([w1, b1])
 
     return model
 
@@ -111,13 +122,10 @@ def correct_truth_table(truth_tables):
 
     data = from_dict_to_lists(truth_tables)
 
-
-    #x_train = [1, 0, 1, 0, 0]
-    #y_train = [1, 1, 1, 0, 0]
     epochs = 5000
 
     from keras.callbacks import EarlyStopping
-    early_stopping_call_back = EarlyStopping(monitor='loss', min_delta=0, patience=0, verbose=0, mode='auto')
+    early_stopping_call_back = EarlyStopping(monitor='loss', min_delta=0, patience=100, verbose=0, mode='auto')
 
     nn.fit(data.x, data.y, nb_epoch=epochs, batch_size=10, verbose=True, callbacks=[early_stopping_call_back])
 

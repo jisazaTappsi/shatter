@@ -9,3 +9,13 @@ def double_input(a):
 @s.solve()
 def identity(a):
     pass
+
+
+@s.solve()
+def not_identity(a):
+    pass
+
+
+@s.solve()
+def hard_identity(a):
+    pass
