@@ -19,3 +19,8 @@ def not_identity(a):
 @s.solve()
 def hard_identity(a):
     pass
+
+
+@s.solve()
+def and_f(a, b):
+    pass

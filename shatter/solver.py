@@ -4,12 +4,12 @@
 import inspect
 
 from shatter import qm
+from shatter.code_generator import *
+from shatter.machine_learning import learner
+from shatter.processed_rules import *
 from shatter.solution import Solution
 from shatter.tester import test_implementation
-from shatter.code_generator import *
-from shatter.processed_rules import *
 from shatter.util import helpers as h
-from shatter import non_deterministic
 
 # TODO: from shatter import solver as production_solver: ie use the production shatter to speed up development of
 # TODO: shatter itself.
@@ -259,7 +259,7 @@ def return_solution(f, rules, unittest):
             # and output a table object free of contradictions.
 
             tables = solution.rules.get_truth_tables(function_args)
-            new_tables = non_deterministic.correct_truth_table(tables)
+            new_tables = learner.correct_truth_table(tables)
 
             processed_rules.tables = new_tables
             solution = find_candidate_solution(f=f,

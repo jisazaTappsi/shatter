@@ -4,7 +4,7 @@
 import unittest
 
 from shatter.solver import Rules
-from tests.generated_code import non_deterministic_functions as f
+from tests.generated_code import learner_functions as f
 from tests.testing_helpers import common_testing_code
 
 __author__ = 'juan pablo isaza'
@@ -29,55 +29,39 @@ class NonDeterministicTest(unittest.TestCase):
 
     def test_identity(self):
         """
-        Test the identity function when the input 'a' has 1 outlier out of 5 samples.
+        Test the identity function when the input 'a' has 1 outlier out of 3 samples.
         """
 
         code = ['def {}(a):'.format(f.identity.__name__),
                 '    return a']
 
-        # True -> True: 2 samples where the output is True given True input.
+        # 2 correct samples.
         r = Rules(a=True, output=True)
         r.add(a=True, output=True)
 
-        # False -> False: 2 samples where the output is False given the False input.
-        r.add(a=False, output=False)
-        r.add(a=False, output=False)
-
-        # Outlier of the False -> False samples, the model should learn to ignore it.
-        r.add(a=False, output=True)
+        # 1 outlier, the model should learn to ignore it.
+        r.add(a=True, output=False)
         solution = r.solve(f.identity, self)
 
         self.assertEqual(solution.implementation, code)
 
     def test_hard_identity(self):
         """
-        Test the identity function when the input 'a' has 7 outliers out of 18 samples.
+        Test the identity function when the input 'a' has 4 outliers out of 9 samples.
         """
         function = f.hard_identity
         code = ['def {}(a):'.format(function.__name__),
                 '    return a']
 
-        # True -> True: samples where the output is True given True input.
+        # Correct samples
         r = Rules(a=True, output=True)
         r.add(a=True, output=True)
         r.add(a=True, output=True)
         r.add(a=True, output=True)
         r.add(a=True, output=True)
 
-        # False -> False: samples where the output is False given the False input.
-        r.add(a=False, output=False)
-        r.add(a=False, output=False)
-        r.add(a=False, output=False)
-        r.add(a=False, output=False)
-        r.add(a=False, output=False)
-
-        # Outliers of the False -> False samples, the model should learn to ignore these.
-        r.add(a=False, output=True)
-        r.add(a=False, output=True)
-        r.add(a=False, output=True)
-        r.add(a=False, output=True)
-
-        # Outliers of the True -> True samples, the model should learn to ignore these.
+        # Outliers
+        r.add(a=True, output=False)
         r.add(a=True, output=False)
         r.add(a=True, output=False)
         r.add(a=True, output=False)
@@ -86,42 +70,69 @@ class NonDeterministicTest(unittest.TestCase):
 
         self.assertEqual(solution.implementation, code)
 
-    def test_almost_identity(self):
+    def test_not_identity(self):
         """
-        Test the not-identity function when the input 'a' has 7 outliers out of 18 samples.
+        Test the not-identity function when the input 'a' has 4 outliers out of 9 samples.
         """
         function = f.not_identity
         code = ['def {}(a):'.format(function.__name__),
                 '    return not a']
 
-        # True -> True: samples where the output is True given True input.
-        r = Rules(a=True, output=False)
-        r.add(a=True, output=False)
-        r.add(a=True, output=False)
-        r.add(a=True, output=False)
-        r.add(a=True, output=False)
-
-        # False -> True: samples where the output is False given the False input.
-        r.add(a=False, output=True)
+        # Correct samples
+        r = Rules(a=False, output=True)
         r.add(a=False, output=True)
         r.add(a=False, output=True)
         r.add(a=False, output=True)
         r.add(a=False, output=True)
 
-        # Outliers of the False -> True samples, the model should learn to ignore these.
+        # Outliers
         r.add(a=False, output=False)
         r.add(a=False, output=False)
         r.add(a=False, output=False)
-
-        # Outliers of the True -> False samples, the model should learn to ignore these.
-        r.add(a=True, output=True)
-        r.add(a=True, output=True)
-        r.add(a=True, output=True)
-        r.add(a=True, output=True)
+        r.add(a=False, output=False)
 
         solution = r.solve(function, self)
 
         self.assertEqual(solution.implementation, code)
+
+    def test_and(self):
+        """
+        Test the and function when the input has 1 outlier out of 3 samples.
+        """
+        function = f.and_f
+        code = ['def {}(a, b):'.format(function.__name__),
+                '    return a and b']
+
+        # 2 correct samples
+        r = Rules(a=True, b=True, output=True)
+        r.add(a=True, b=True, output=True)
+
+        # 1 outlier, the model should learn to ignore it.
+        r.add(a=True, b=True, output=False)
+        solution = r.solve(function, self)
+
+        self.assertEqual(solution.implementation, code)
+
+    def test_xor(self):
+        """
+        Test the and function when the input has 1 outlier out of 4 samples.
+        """
+        function = f.and_f
+        code = ['def {}(a, b):'.format(function.__name__),
+                '    return a and not b or not a and b']
+
+        # 3 correct samples.
+        r = Rules(a=False, b=True, output=True)
+
+        r.add(a=True, b=False, output=True)
+        r.add(a=True, b=False, output=True)
+
+        # 1 outlier, the model should learn to ignore it.
+        r.add(a=True, b=False, output=False)
+        solution = r.solve(function, self)
+
+        self.assertEqual(solution.implementation, code)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -5,7 +5,6 @@ import traceback
 
 from shatter.code import Code
 from shatter.util.helpers import *
-from shatter import non_deterministic
 
 __author__ = 'juan pablo isaza'
 
