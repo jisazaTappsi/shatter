@@ -3,6 +3,8 @@
 """
 Defines the neural network architecture, weights and any other specifics.
 """
+import itertools
+import numpy as np
 
 __author__ = 'juan pablo isaza'
 
@@ -29,6 +31,26 @@ def get_layer_sequence(n):
     #return [math.ceil((x+2)/2) for x in reversed(range(n*2 - 1))]
 
 
+# TODO: add case when the input_dim is bigger than all combinations of first_layer_dim over [-1, 1]
+def get_first_layer_weights(first_layer_dim, input_dim):
+    """
+    :param first_layer_dim: num neurons on the first layer
+    :param input_dim: number of input features.
+    :return: Returns a list containing 'input_dim' number of the most heterogenous combinations.
+    """
+
+    # find all permutations for first_layer_dim
+    permutations = list(itertools.product([-1, 1], repeat=first_layer_dim))
+
+    # find the absolute sum
+    sums = {e: abs(sum(e)) for e in permutations}
+
+    # prioritize heterogenous combinations
+    pairs = sorted(sums.items(), key=lambda x: x[1])
+
+    return np.array([list(e[0]) for e in pairs][:input_dim])
+
+
 def set_weights(model, first_layer_dim, input_dim):
     """
     weights per layer:
@@ -36,7 +58,6 @@ def set_weights(model, first_layer_dim, input_dim):
     :param first_layer_dim: a int for the dimension of the base layer.
     :return: modified network with preset weights.
     """
-    import numpy as np
 
     if first_layer_dim == 1:
         w1 = np.array([[1]])
@@ -44,16 +65,15 @@ def set_weights(model, first_layer_dim, input_dim):
         model.set_weights([w1, b1])
 
     if first_layer_dim == 2:
-        # weights per layer:
-        w1 = np.array([[1, -1], [-1, 1]])
+
+        w1 = get_first_layer_weights(first_layer_dim, input_dim)
         w2 = np.array([[0], [0]])
 
         model.set_weights([w1, np.array([0] * first_layer_dim), w2, np.array([0] * 1)])
 
     if first_layer_dim == 3:
-        w1 = np.array([[1, 1, -1],
-                      [1, -1, 1],
-                      [-1, 1, 1]])
+
+        w1 = get_first_layer_weights(first_layer_dim, input_dim)
         w2 = np.array([[-1, 1, 1],
                       [1, -1, 1],
                       [1, 1, -1]])
@@ -68,10 +88,8 @@ def set_weights(model, first_layer_dim, input_dim):
            w5, np.array([0]*1), ])
 
     if first_layer_dim == 4:
-        w1 = np.array([[-1, -1, 1, 1],
-                       [1, -1, -1, 1],
-                       [1, 1, -1, -1],
-                       [-1, 1, 1, -1]])
+
+        w1 = get_first_layer_weights(first_layer_dim, input_dim)
         w2 = np.array([[-1, 1, 1, -1],
                        [1, 1, -1, -1],
                        [1, -1, -1, 1],

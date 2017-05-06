@@ -6,13 +6,16 @@ Notice: Keras and Numpy imports are defined withing functions, this is done in o
 TensorFlow as optional (only necessary for neural computing) and to shorten loading time as TensorFlow is very slow to
 load.
 """
+
+import numpy as np
+
 from shatter.machine_learning.labeled_data import from_lists_to_dict, from_dict_to_lists
 from shatter.machine_learning.neural_network import get_neural_network, round_neural_predictions
 
 __author__ = 'juan pablo isaza'
 
 EPOCHS = 1
-BATCH_SIZE = 250
+BATCH_SIZE = 500
 DATA_SIZE_MUTIPLIER = 5000
 
 
@@ -27,8 +30,6 @@ def correct_truth_table(truth_tables):
     >>> {True: [(True,), (False,), (True,)], False: [(False,), (False,)]}
     :return: corrected truth table
     """
-    import numpy as np
-
     print("""Solving non-deterministic problem (with possible contradictions), will use neural networks,
      can take a few minutes ...""")
 

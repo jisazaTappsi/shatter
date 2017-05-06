@@ -34,3 +34,8 @@ def xor_f(a, b):
 @s.solve()
 def complex(a, b, c, d):
     pass
+
+
+@s.solve()
+def complex_2(a, b, c, d, e):
+    pass

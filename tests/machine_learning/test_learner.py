@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """Test non deterministic systems work"""
+import copy
 import unittest
 
 from shatter.solver import Rules
@@ -153,6 +154,32 @@ class LearnerTest(unittest.TestCase):
 
         self.assertEqual(solution.implementation, code)
 
+    def test_complex_function2(self):
+        """
+        Test a 10 input function.
+        """
+        function = f.complex_2
+        code = ['def {}(a, b, c, d, e):'.format(function.__name__),
+                '    return a and b and c and d and e']
+
+        # Random rules.
+        r = Rules()
+
+        kwargs = {'a': True, 'b': True, 'c': True, 'd': True, 'e': True}
+
+        true_kwargs = copy.copy(kwargs)
+        true_kwargs['output'] = True
+        r.add(**true_kwargs)
+        r.add(**true_kwargs)
+
+        # 1 outlier, the model should learn to ignore it.
+        false_kwargs = copy.copy(kwargs)
+        false_kwargs['output'] = False
+        r.add(**false_kwargs)
+
+        solution = r.solve(function, self)
+
+        self.assertEqual(solution.implementation, code)
 
 if __name__ == '__main__':
     unittest.main()
