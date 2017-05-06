@@ -54,32 +54,3 @@ def correct_truth_table(truth_tables):
     prediction = round_neural_predictions(nn.predict([np.array(possible_inputs)]))
 
     return from_lists_to_dict(possible_inputs, prediction)
-
-    # evaluate the model
-    #scores = model.evaluate(x_test, y_test)
-
-    #for layer in nn.layers:
-    #    weights = layer.get_weights()  # list of numpy arrays
-
-    # weights per layer:
-    #w1 = np.array([[1, -1], [-1, 1]])
-    #w2 = np.array([[0], [0]])
-
-    #model.set_weights([w1, np.array([0] * dim),
-    #       w2, np.array([0] * 1)])
-
-    #return """
-    #from keras.models import Sequential
-    #from keras.layers import Dense
-    #from numpy import array
-    #from numpy import float32
-#
-    #model = Sequential()
-    #layer = Dense(1, input_dim=1, init='normal', activation='sigmoid')
-    #model.add(layer)
-    #model.compile(loss='mean_squared_error', optimizer='adam')
-    #model.set_weights({weights})
-#
-    #prediction = model.predict([array([int(a)])])
-#
-    #return bool(round(prediction[0][0]))""".format(weights=weights.__repr__())
