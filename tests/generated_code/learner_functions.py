@@ -24,3 +24,13 @@ def hard_identity(a):
 @s.solve()
 def and_f(a, b):
     pass
+
+
+@s.solve()
+def xor_f(a, b):
+    pass
+
+
+@s.solve()
+def complex(a, b, c, d):
+    pass

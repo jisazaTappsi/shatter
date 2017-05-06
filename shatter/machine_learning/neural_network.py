@@ -29,7 +29,7 @@ def get_layer_sequence(n):
     #return [math.ceil((x+2)/2) for x in reversed(range(n*2 - 1))]
 
 
-def set_weights(model, first_layer_dim):
+def set_weights(model, first_layer_dim, input_dim):
     """
     weights per layer:
     :param model: neural network
@@ -48,16 +48,15 @@ def set_weights(model, first_layer_dim):
         w1 = np.array([[1, -1], [-1, 1]])
         w2 = np.array([[0], [0]])
 
-        model.set_weights([w1, np.array([0] * first_layer_dim),
-           w2, np.array([0] * 1)])
+        model.set_weights([w1, np.array([0] * first_layer_dim), w2, np.array([0] * 1)])
 
     if first_layer_dim == 3:
         w1 = np.array([[1, 1, -1],
-           [1, -1, 1],
-           [-1, 1, 1]])
+                      [1, -1, 1],
+                      [-1, 1, 1]])
         w2 = np.array([[-1, 1, 1],
-           [1, -1, 1],
-           [1, 1, -1]])
+                      [1, -1, 1],
+                      [1, 1, -1]])
         w3 = np.array([[0, 0], [0, 0], [0, 0]])
         w4 = np.array([[1, -1], [-1, 1]])
         w5 = np.array([[0], [0]])
@@ -66,31 +65,31 @@ def set_weights(model, first_layer_dim):
            w2, np.array([0]*3),
            w3, np.array([0]*2),
            w4, np.array([0]*2),
-           w5, np.array([0]*1),])
+           w5, np.array([0]*1), ])
 
     if first_layer_dim == 4:
         w1 = np.array([[-1, -1, 1, 1],
-           [1, -1, -1, 1],
-           [1, 1, -1, -1],
-           [-1, 1, 1, -1]])
+                       [1, -1, -1, 1],
+                       [1, 1, -1, -1],
+                       [-1, 1, 1, -1]])
         w2 = np.array([[-1, 1, 1, -1],
-           [1, 1, -1, -1],
-           [1, -1, -1, 1],
-           [-1, -1, 1, 1]])
+                       [1, 1, -1, -1],
+                       [1, -1, -1, 1],
+                       [-1, -1, 1, 1]])
         w3 = np.array([[-1, -1, 1, 1],
-           [1, -1, -1, 1],
-           [1, 1, -1, -1],
-           [-1, 1, 1, -1]])
+                       [1, -1, -1, 1],
+                       [1, 1, -1, -1],
+                       [-1, 1, 1, -1]])
         w4 = np.array([[0, 0, 0],
-           [0, 0, 0],
-           [0, 0, 0],
-           [0, 0, 0]])
+                       [0, 0, 0],
+                       [0, 0, 0],
+                       [0, 0, 0]])
         w5 = np.array([[-1, 1, 1],
-           [1, -1, 1],
-           [1, 1, -1]])
+                       [1, -1, 1],
+                       [1, 1, -1]])
         w6 = np.array([[1, 1, -1],
-           [1, -1, 1],
-           [-1, 1, 1]])
+                       [1, -1, 1],
+                       [-1, 1, 1]])
         w7 = np.array([[0, 0], [0, 0], [0, 0]])
         w8 = np.array([[1, -1], [-1, 1]])
         w9 = np.array([[1, -1], [-1, 1]])
@@ -110,11 +109,12 @@ def set_weights(model, first_layer_dim):
     return model
 
 
-def add_layers(model, first_layer_dim):
+def add_layers(model, first_layer_dim, input_dim):
     """
     Adds the layers of the sequence to the model
     :param model:
     :param first_layer_dim: dimension as a int.
+    :param input_dim: the number of dimension that the first layer receives.
     :return: net model
     """
     from keras.layers import Dense
@@ -122,11 +122,10 @@ def add_layers(model, first_layer_dim):
     for neuron_num in get_layer_sequence(first_layer_dim):
 
         if len(model.layers) == 0 and first_layer_dim > 1:
-            activation = 'relu'
+            layer = Dense(neuron_num, input_dim=input_dim, init='normal', activation='relu')
         else:
-            activation = 'sigmoid'
+            layer = Dense(neuron_num, input_dim=input_dim, init='normal', activation='sigmoid')
 
-        layer = Dense(neuron_num, input_dim=first_layer_dim, init='normal', activation=activation)
         model.add(layer)
 
     return model
@@ -141,12 +140,13 @@ def get_neural_network(data):
     from keras.models import Sequential
 
     first_layer_dim = define_first_layer_dim(data.x)
+    input_dim = len(data.x[0])
 
     model = Sequential()
 
-    model = add_layers(model, first_layer_dim)
+    model = add_layers(model, first_layer_dim, input_dim)
 
-    model = set_weights(model, first_layer_dim)
+    model = set_weights(model, first_layer_dim, input_dim)
 
     return model
 

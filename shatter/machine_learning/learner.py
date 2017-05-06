@@ -11,6 +11,10 @@ from shatter.machine_learning.neural_network import get_neural_network, round_ne
 
 __author__ = 'juan pablo isaza'
 
+EPOCHS = 1
+BATCH_SIZE = 250
+DATA_SIZE_MUTIPLIER = 5000
+
 
 def correct_truth_table(truth_tables):
     """
@@ -30,18 +34,20 @@ def correct_truth_table(truth_tables):
 
     data = from_dict_to_lists(truth_tables)
 
+    # multiplies data to use big batch_size and speed up training.
+    data.x = [e for e in data.x * DATA_SIZE_MUTIPLIER]
+    data.y = [e for e in data.y * DATA_SIZE_MUTIPLIER]
+
     # train the model with a neural network
     nn = get_neural_network(data)
 
     # Compile model
     nn.compile(loss='mean_squared_error', optimizer='adam')
 
-    epochs = 5000
-
     from keras.callbacks import EarlyStopping
     early_stopping_call_back = EarlyStopping(monitor='loss', min_delta=0, patience=100, verbose=0, mode='auto')
 
-    nn.fit(data.x, data.y, nb_epoch=epochs, batch_size=10, verbose=True, callbacks=[early_stopping_call_back])
+    nn.fit(data.x, data.y, nb_epoch=EPOCHS, batch_size=BATCH_SIZE, verbose=True, callbacks=[early_stopping_call_back])
 
     possible_inputs = list(set(data.x))
     prediction = round_neural_predictions(nn.predict([np.array(possible_inputs)]))

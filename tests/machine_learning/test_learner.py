@@ -10,7 +10,7 @@ from tests.testing_helpers import common_testing_code
 __author__ = 'juan pablo isaza'
 
 
-class NonDeterministicTest(unittest.TestCase):
+class LearnerTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -117,7 +117,7 @@ class NonDeterministicTest(unittest.TestCase):
         """
         Test the and function when the input has 1 outlier out of 4 samples.
         """
-        function = f.and_f
+        function = f.xor_f
         code = ['def {}(a, b):'.format(function.__name__),
                 '    return a and not b or not a and b']
 
@@ -129,6 +129,26 @@ class NonDeterministicTest(unittest.TestCase):
 
         # 1 outlier, the model should learn to ignore it.
         r.add(a=True, b=False, output=False)
+        solution = r.solve(function, self)
+
+        self.assertEqual(solution.implementation, code)
+
+    def test_complex_function(self):
+        """
+        Test a bit more complex function
+        """
+        function = f.complex
+        code = ['def {}(a, b, c, d):'.format(function.__name__),
+                '    return a and b and c or d']
+
+        # 3 correct samples.
+        r = Rules(a=True, b=True, c=True, output=True)
+
+        r.add(d=True, output=True)
+        r.add(d=True, output=True)
+
+        # 1 outlier, the model should learn to ignore it.
+        r.add(d=True, output=False)
         solution = r.solve(function, self)
 
         self.assertEqual(solution.implementation, code)
