@@ -2,10 +2,10 @@
 
 """Contains data after processing is done."""
 
-from shatter.rules import *
-from shatter.constants import *
-from shatter.frozen_dict import FrozenDict
 from shatter.code import Code
+from shatter.constants import *
+from shatter.rules import *
+from shatter.util.frozen_dict import FrozenDict
 
 __author__ = 'juan pablo isaza'
 
@@ -14,18 +14,20 @@ class ProcessedRules:
     """
     Has 2 properties, the 'default' value of the output and the 'tables'.
 
-    Tables is a dict() where each (key, value) pair are a truth table. Tables has:
-    Keys = possible function outputs
-    Values = Sets containing tuples (eg {(...), (...) ...}). This tuples are rows of the truth table where the function
-    should return the output value (the key).
+    Tables is a dict() where each (key, value) pair are a truth table. Tables have:
+    Keys = possible function outputs.
+    Values = Are the tables represented with lists containing tuples eg:
 
-    So we have a collection of tables each one with
-    its output as keys.
+    >>> [(True, False), (False, True)]
+
+    These tuples are rows of the truth table where the function should return the output value (the key).
+
+    So we have a collection of tables; each one with its own output as key.
 
     Example:
     >>> ProcessedRules().tables
     is of the form:
-    >>> {1: {(True, Code('1==3')), (False, False)}, 2: {(False, True), (True, False)}}
+    >>> {1: [(True, Code('1==3')), (False, False)], 2: [(False, True), (True, False)]}
 
     In this case 1 and 2 are the outputs while (True, Code('1==3')), (False, False) are the rows of the truth table
     , ie the cases where 1 should be returned.

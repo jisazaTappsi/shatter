@@ -8,6 +8,7 @@ __author__ = 'juan pablo isaza'
 
 PACKAGE_NAME = 'shatter'
 INTERNAL_CODE = 'internal_code'
+INTERNAL_PARAMETERS = 'internal_parameters'
 
 COMMENT_PATTERN = re.compile(r"\s*(#.*)?$")
 INDENT = re.compile(r"^\s*")

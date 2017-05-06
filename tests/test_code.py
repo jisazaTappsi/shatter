@@ -191,7 +191,7 @@ class CodeTest(unittest.TestCase):
         self.assertEqual(str(name), 'name')
 
     # TODO: STUPID BUG HERE!!! Last representation is NOT working
-    def test_simple(self):
+    def test_identity_representation(self):
         """There are 4 equivalent representations of the identity function:
 
         1. Boring:
@@ -211,19 +211,19 @@ class CodeTest(unittest.TestCase):
         lets test all representations!!!
         """
         a = Code()
-        solution = ['def {}(a):'.format(f.minimal_code.__name__),
+        solution = ['def {}(a):'.format(f.identity.__name__),
                     '    return a']
 
         r = Rules(a=True, output=True)
-        s = r.solve(f.minimal_code)
+        s = r.solve(f.identity)
         self.assertEqual(s.implementation, solution)
 
         r = Rules(a=True)
-        s = r.solve(f.minimal_code)
+        s = r.solve(f.identity)
         self.assertEqual(s.implementation, solution)
 
         r = Rules(a, output=True)
-        s = r.solve(f.minimal_code)
+        s = r.solve(f.identity)
         self.assertEqual(s.implementation, solution)
 
         # TODO: pass this test:
@@ -232,6 +232,8 @@ class CodeTest(unittest.TestCase):
         s = r.solve(f.minimal_code)
         self.assertEqual(s.implementation, solution)
         """
+
+    # TODO: Do test to be able to represent 'a=False' as the more natural 'not a', with Code() objects
 
 
 if __name__ == '__main__':

@@ -5,7 +5,7 @@ import inspect
 import warnings
 import os
 import re
-import types
+
 import shatter.constants as cts
 
 __author__ = 'juan pablo isaza'
@@ -136,8 +136,9 @@ def get_function_inputs(f):
     :param f: a callable function
     :return: input names on a tuple.
     """
-    if hasattr(f, cts.INTERNAL_CODE):
-        return f.internal_code.co_varnames
+    if hasattr(f, cts.INTERNAL_PARAMETERS):
+        # 'internal_parameters' is defined inside the solver() annotation, see solver.py for details.
+        return f.internal_parameters
     else:
         return f.__code__.co_varnames
 

@@ -21,13 +21,12 @@ class TesterTest(unittest.TestCase):
 
     def test_collision(self):
         """
-        The internal test should fail, because the rules have no internal consistency, they are bull...
+        Even though the rules are absurd and are a contradiction. The non deterministic model should choose and solve
+        the problem at random between the identity ('return a') and its negation ('return not a').
         """
-        r = Rules(a=True, output=1)  # first condition
-        r.add(a=False, output=1)  # contradictory condition.
-
-        with self.assertRaises(AssertionError):
-            r.solve(f.collision, self)
+        r = Rules(a=True, output=True)  # first condition
+        r.add(a=True, output=False)  # contradictory condition.
+        r.solve(f.collision, self)
 
     def test_non_collision(self):
         """

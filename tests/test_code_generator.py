@@ -9,6 +9,7 @@ from shatter.rules import Rules
 from shatter.util.helpers import get_function_inputs
 from tests.generated_code import code_generator_functions as f
 from tests.testing_helpers import constants as cts, common_testing_code
+from shatter.solver import Code
 
 __author__ = 'juan pablo isaza'
 
@@ -49,7 +50,7 @@ class GeneratorTest(unittest.TestCase):
         expected_code = ["def " + signature + ":", "    return " + expression_expected]
 
         inputs = get_function_inputs(fun)
-        expression = s.get_function_expression(table, inputs)
+        expression = s.get_function_expression(table, inputs, 2)
         definition = 'def ' + signature
         code = s.add_code_to_implementation(current_implementation=s.get_initial_implementation(definition),
                                             bool_expression=expression,
@@ -90,7 +91,7 @@ class GeneratorTest(unittest.TestCase):
         """
         code = ['def mix_false_values(a, b):',
                 '',
-                '    if not a and b:',
+                '    if a and not b or not a and b:',
                 '        return 0',
                 '',
                 '    return False']
@@ -146,7 +147,7 @@ class GeneratorTest(unittest.TestCase):
 
         r = Rules(a=False, b=True, output=out1)  # non-boolean output
         r.add(a=True, b=False, output=out2)  # non-boolean condition
-        solution = r.solve(function, self)
+        solution = r.solve(function)
         self.assertEqual(solution.implementation, code)
 
     def test_multiple_outputs(self):
@@ -180,7 +181,7 @@ class GeneratorTest(unittest.TestCase):
                 '    return False']
 
         r = Rules(a=False, b=True, output=out1)  # non-boolean output
-        solution = r.solve(function, self)
+        solution = r.solve(function)
         self.assertEqual(solution.implementation, code)
 
     def test_mix_output_boolean(self):
@@ -214,7 +215,7 @@ class GeneratorTest(unittest.TestCase):
                 '    return False']
 
         r = Rules(a=False, b=True, output=out, output_args={})  # non-boolean output
-        solution = r.solve(function, self)
+        solution = r.solve(function)
         self.assertEqual(solution.implementation, code)
 
     def test_calling_another_function_with_args(self):
@@ -232,7 +233,7 @@ class GeneratorTest(unittest.TestCase):
                 '    return False']
 
         r = Rules(a=False, b=True, output=out_f, output_args=args)  # non-boolean output
-        solution = r.solve(function, self)
+        solution = r.solve(function)
         self.assertEqual(solution.implementation, code)
 
     def test_default_keyword(self):
@@ -274,7 +275,7 @@ class GeneratorTest(unittest.TestCase):
                 '    return {0}({1})'.format(function.__name__, not_a)]
 
         r = Rules(a=False, output=0, default=out)
-        solution = r.solve(function, self)
+        solution = r.solve(function)
         self.assertEqual(solution.implementation, code)
 
     def test_recursive_iteration(self):
@@ -311,7 +312,7 @@ class GeneratorTest(unittest.TestCase):
                 '    return False']
 
         r = Rules(a=False, output=out_obj)
-        solution = r.solve(function, self)
+        solution = r.solve(function)
         self.assertEqual(solution.implementation, code)
 
     def test_internal_code_arguments(self):
@@ -488,6 +489,44 @@ class GeneratorTest(unittest.TestCase):
 
         solution = r.solve(function, self)
         self.assertEqual(solution.implementation, code)
+
+    def test_simple_constant_output(self):
+        """
+        When the result output of the QM algorithm is an empty expression, that means that regardless
+        of the input the output is constant.
+        """
+        function = f.simple_constant_output
+        code = ['def {}(a):'.format(function.__name__),
+                '    return True']
+
+        r = Rules(a=True, output=True)
+        r.add(a=False, output=True)
+
+        solution = r.solve(function, self)
+        self.assertEqual(solution.implementation, code)
+
+    def test_inner_inputs_with_different_outputs(self):
+        """
+        Inner inputs are not function arguments but are for example pieces of code, that act as inputs to the tables.
+
+        Inside function 'return_solution', on module solver.py:
+        On each table iteration the all_inputs variable has to be calculated inside the main function of solver.py
+        This is because if not this test fails.
+        """
+        function = f.many_outputs
+        input1 = 'isinstance(a, int)'
+        input2 = 'isinstance(a, str)'
+
+        r = Rules(r1=Code(code_str=input1), output=1)
+        r.add(r1=Code(code_str='isinstance(a, str)'), output=2)
+
+        solution = r.solve(function, self)
+
+        print(solution.implementation)
+
+        # is taking the correct inputs
+        self.assertEqual(solution.implementation[2], '    if {}:'.format(input1))
+        self.assertEqual(solution.implementation[5], '    if {}:'.format(input2))
 
 
 if __name__ == '__main__':
