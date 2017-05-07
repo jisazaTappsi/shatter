@@ -102,7 +102,7 @@ Run this code:
     args = {'a': a + 1}
     out = Output(function=recursive, arguments=args)
     
-    r = Rules(return_condition=  a > 2, output=a, default=out)
+    r = Rules(stopping_condition=  a > 2, output=a, default=out)
     solution = r.solve(recursive)
 
 The result this time will be a recursive counting function :)

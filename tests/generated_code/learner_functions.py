@@ -27,6 +27,11 @@ def and_f(a, b):
 
 
 @s.solve()
+def false_and(a, b):
+    pass
+
+
+@s.solve()
 def xor_f(a, b):
     pass
 
@@ -37,5 +42,5 @@ def complex(a, b, c, d):
 
 
 @s.solve()
-def complex_2(a, b, c, d, e):
+def complex_2(a, b, c, d, e, f, g, h, i, j):
     pass
