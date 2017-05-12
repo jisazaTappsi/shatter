@@ -48,7 +48,7 @@ class TesterTest(unittest.TestCase):
 
     def test_no_unittests_performed(self):
         """
-        Should not perform tests if unittest=None.
+        Should not perform tests if there are no tables.
         """
         self.assertFalse(tester.test_implementation(None, Solution(None, None, None)))
 

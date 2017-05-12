@@ -114,6 +114,30 @@ class LearnerTest(unittest.TestCase):
 
         self.assertEqual(solution.implementation, code)
 
+    # TODO: discussion:
+    # This seems like a NAND so should be not(a and b) = not a or not b but it gives 'False'
+    # because of a design principle which assumes that all non stated truth table possibilities are 'False'
+    # rather than assuming they are unknown with equal probability of being 'True' or 'False'
+    def test_false_and(self):
+        """Has the same combination twice with a output=False while having another one with a contradiction """
+        function = f.false_and
+        code = ['def {}(a, b):'.format(function.__name__),
+                '',
+                '    return False']
+
+        r = Rules()
+
+        # 2 correct samples.
+        r.add(a=True, b=True, output=False)
+        r.add(a=True, b=True, output=False)
+
+        # 1 outlier, the model should learn to ignore it.
+        r.add(a=True, b=True, output=True)
+
+        solution = r.solve(function)
+
+        self.assertEqual(solution.implementation, code)
+
     def test_xor(self):
         """
         Test the and function when the input has 1 outlier out of 4 samples.
@@ -159,13 +183,14 @@ class LearnerTest(unittest.TestCase):
         Test a 10 input function.
         """
         function = f.complex_2
-        code = ['def {}(a, b, c, d, e):'.format(function.__name__),
-                '    return a and b and c and d and e']
+        code = ['def {}(a, b, c, d, e, f, g, h, i, j):'.format(function.__name__),
+                '    return a and b and c and d and e and f and g and h and i and j']
 
         # Random rules.
         r = Rules()
 
-        kwargs = {'a': True, 'b': True, 'c': True, 'd': True, 'e': True}
+        kwargs = {'a': True, 'b': True, 'c': True, 'd': True, 'e': True, 'f': True, 'g': True, 'h': True, 'i': True,
+                  'j': True}
 
         true_kwargs = copy.copy(kwargs)
         true_kwargs['output'] = True

@@ -2,6 +2,7 @@
 
 """Implements the functions to test generated code."""
 import traceback
+import unittest
 
 from shatter.code import Code
 from shatter.util.helpers import *
@@ -105,10 +106,17 @@ def test_implementation(test_class, solution):
     :return: False if not test done, True if success or raises error if test doesn't pass.
     """
     if test_class is None:
-        return False  # if enters here then unittest was not given or set to None on public function solve().
+
+        # assigns a local class to perform tests.
+        class MyTest(unittest.TestCase):
+            pass
+
+        test_class = MyTest()
 
     validate(test_class)
 
+    if solution.processed_rules is None:
+        return False
     tables = solution.processed_rules.tables
 
     if has_code_args(tables):
