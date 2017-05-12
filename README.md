@@ -5,7 +5,7 @@ Data driven programming; input data and output nice functional code ;)
 
 
 Introduction
-------------
+=============
 
 This is a [python 3.6+ project](https://pypi.python.org/pypi/shatter) that uses algorithms to transform a set of
 conditions into functional python code. See some [examples](https://github.com/jisazaTappsi/shatter/tree/master/examples).
@@ -13,12 +13,16 @@ conditions into functional python code. See some [examples](https://github.com/j
 
 Package Setup
 -------------
-1.  Install shatter package:
+
+Install:
 
         $ pip install shatter
 
 
-Short Example
+Examples
+=============
+
+Get Started
 -------------
 Copy paste this snippet:
 
@@ -38,8 +42,9 @@ logical `and` operator.
 We can add further conditions and `shatter` will compute the optimal function to get there.
 
 
-Add more conditions:
+Adding more conditions
 -------------
+
 Now we add 2 additional conditions with `r.add()`:
 
     from shatter.solver import Rules
@@ -57,8 +62,8 @@ Now we add 2 additional conditions with `r.add()`:
 In this case the solution is `a or b`.
 
 
-If Conditionals
--------------------
+If conditionals
+-------------
 
 What if the output for a given logical condition is not a boolean? In that case a programmer would use an if.
 In the next example this package solves this case:
@@ -87,8 +92,34 @@ The solution will be:
 Returns `1` or `False` otherwise.
 
 
-Cool stuff
----------------------
+Adding pieces of code
+-------------
+
+Say you want to add a arbitrary piece of code that evaluates to boolean, then:
+
+    from shatter.solver import Rules, Code
+
+
+    def any_code(a):
+        pass
+    
+    r = Rules(condition=Code(code_str='isinstance(a, str)'), output=2)
+    r.solve(any_code)
+
+The result should be:
+
+    def internal_code(a):
+    
+        if isinstance(a, str):
+            return 2
+    
+        return False
+
+Here the piece of code `isinstance(a, str)` was added as the if condition to output `2`
+
+
+Iteration
+-------------
 
 Run this code:
 
@@ -126,88 +157,41 @@ After `out` is passed via `default` keyword when initializing the `Rules` object
 is used to override the last return statement of the `recursive` function.
 
 
-Expression behaving like boolean inputs
----------------------
+Going deeper
+=============
 
-Say you want to add a arbitrary piece of code that evaluates to boolean, then:
+Setup
+-------------
 
-    from shatter.rules import Rules
-    from shatter.code import Code
-    
-    
-    def any_code(a):
-        pass
-    
-    r = Rules(condition=Code(code_str='isinstance(a, str)'), output=2)
-    r.solve(any_code)
+Clone repository:
 
-The result should be:
-
-    def internal_code(a):
-    
-        if isinstance(a, str):
-            return 2
-    
-        return False
-
-Here the piece of code `isinstance(a, str)` was added as the if condition to output `2`
-
-Source Code
------------
-
-Setup with source code
-----------------------
-1.  Clone repository:
     `git clone git@github.com:jisazaTappsi/shatter.git`
 
-Examples
-------------------------------
-See the [examples](https://github.com/jisazaTappsi/shatter/tree/master/examples).
+More examples
+-------------
+
+See [examples](https://github.com/jisazaTappsi/shatter/tree/master/examples).
 
 
 How does shatter work?
-------------------------------
+-------------
+
 Takes a function and a truth table which is processed using the
 [Quine-McCluskey Algorithm](https://en.wikipedia.org/wiki/Quine%E2%80%93McCluskey_algorithm).
 Then finds an optimal boolean expression. This expression is inserted in the method definition.
 
-Arguments of `Rules.solve(function, unittest=None)`
--------------------------------------------------------------------
 
-1. A function to optimize, passed as a callable (with no arguments). This function needs a 3 mock line definition with:
-    line 1: decorator = `@solve()`
-    line 2: signature eg: `def my_function(a, b)`
-    line 3: body: only one line, eg: `return False`. This line will be replaced by the boolean expression.
+Rules Class
+=============
 
-2. Test Case to be able to perform tests.
-See [example](https://github.com/jisazaTappsi/shatter/tree/master/examples/with_tests)
+Is initialized with one rule. Other rules can be added with `Rules.add()` method. To generate
+the solution call `Rules.solve()` method.
 
-3. a. `solver.Rules()` instance: An object that can handle logical rules with named arguments eg:
+Each rule
+-------------
 
-        r = solver.Rules(a=True, b=False)
-    
-        r.add(a=True, b=True)
-
-    The reserved word `output` allows:
-    
-        r.add(a=False, b=False, output=False)
-    
-    Meaning that when `a=False, b=False` I want the `output` to be `False`
-
-    b. Truth table: Alternatively a truth table can be specified (as a set containing tuples). Where each row is a tuple, the general form is:
-    
-        {tuple_row(tuple_inputs(a, b, ...), output), ...}
-    
-    or with a implicit `True` output:
-     
-        {tuple_inputs(a, b, ...), ...}
-
-Arguments of `solver.Rules() and r.add()`
--------------------------------------------------------------------
-
-These are specified as a dictionary containing certain keywords as well as the function inputs.
-
-Keywords are:
+The arguments of each rule are specified as optional arguments inside a `Rules` constructor or inside a
+`Rules.add()` call. There are reserved keywords:
 
 `output`: Determines the value to be returned when the given condition is True.
 
@@ -216,23 +200,40 @@ Keywords are:
 `default`: Value returned when non of the rules are True.
 
 
-Helper Classes
---------------
+Arguments of `Rules.solve()`
+-------------
+
+ - `function`: passed as a callable. This function is going to be filled with the solution to the present task.
+ 
+ - `unittest=None`: Test Case to be able to run and test the code generated each time the test runs.
+See [example](https://github.com/jisazaTappsi/shatter/tree/master/examples/with_tests) for a deeper understanding.
+
+
+Output Class
+-------------
 
 `solver.Output`: Class that helps define a function with arguments as an output. Has fields:
   
   - `function`: A callable object.
   - `arguments` Dictionary with the function inputs.
 
-`solver.Code`: Class that helps output pieces of code. The code is fed as a string (with optinal arg str_code)
+Code class
+-------------
+
+`solver.Code`: Class that helps represent pieces of code. The code is fed as a string (with optional argument `str_code`)
 or it can be declared as variables. eg:
 
     from shatter.solver import Code
+    
     a = Code()
     b = Code()
     print(a > b)
 
-Will literally print string `a > b` rather than the objects or any result.
+This will literally print the code `a > b` rather than the objects or any result.
+
+
+Solution class
+-------------
 
 `solver.Solution`: Class that contains the solution of the problem it includes:
     
