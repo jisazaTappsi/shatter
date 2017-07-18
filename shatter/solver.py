@@ -3,13 +3,15 @@
 """This is the main file. Calls QM algorithm and code generation functions."""
 import inspect
 
-from shatter import qm
+#from shatter import qm
 from shatter.code_generator import *
 from shatter.machine_learning import learner
 from shatter.processed_rules import *
 from shatter.solution import Solution
-from shatter.tester import test_implementation
+from shatter.tester import test_implementation, SolvableWithMLImplementation
 from shatter.util import helpers as h
+from shatter.float_input import get_float_classification
+from shatter import QM_helper
 
 # TODO: from shatter import solver as production_solver: ie use the production shatter to speed up development of
 # TODO: shatter itself.
@@ -67,60 +69,62 @@ def solve():
     return wrap
 
 
-def execute_qm_algorithm(ones):
-    """
-    Quine McCluskey algorithm.
-    outputs the minimal boolean expression. Assumes that all none ones have a False output.
-    :param ones: input combinations for which output is true
-    :return: set containing lists of boolean expressions encoded as strings.
-    Where: '1' = boolean ,'0' = not(boolean), '-' = don't care, '^^' = boolean0 ^ boolean1
-    Example: set('1-','-0') = bit0 or not bit1
-    """
-    # TODO: cannot solve ones = ['00'] or a not(or(b0,b1))
-    # TODO: change to True, add XOR logic
-    qm_obj = qm.QuineMcCluskey(use_xor=False)
-    return qm_obj.simplify_los(ones)
+#def execute_qm_algorithm(ones):
+#    """
+#    Quine McCluskey algorithm.
+#    outputs the minimal boolean expression. Assumes that all none ones have a False output.
+#    :param ones: input combinations for which output is true
+#    :return: set containing lists of boolean expressions encoded as strings.
+#    Where: '1' = boolean ,'0' = not(boolean), '-' = don't care, '^^' = boolean0 ^ boolean1
+#    Example: set('1-','-0') = bit0 or not bit1
+#    """
+#    # TODO: cannot solve ones = ['00'] or a not(or(b0,b1))
+#    # TODO: change to True, add XOR logic
+#    qm_obj = qm.QuineMcCluskey(use_xor=False)
+#    return qm_obj.simplify_los(ones)
 
 
-def get_function_expression(table, inputs, the_output):
-    """
-    Get boolean expression. Can return empty string.
-    solution provided by mc algorithm.
-    :param inputs: Function explicit inputs or implicit added rules.
-    :param table: truth table.
-    :return: string with boolean expression.
-    """
-    ones = from_table_to_ones(table)
-    if len(ones) > 0:
-        qm_output = execute_qm_algorithm(ones)
-        expression = translate_to_python_expression(inputs, qm_output)
-    else:
-        expression = ''
+#def get_boolean_expression(table, inputs, the_output):
+#    """
+#    Get boolean expression. Can return empty string.
+#    solution provided by Quine-McCluskey algorithm.
+#    outputs a function that maps {0,1} -> {0,1}.
+#    :param inputs: Function explicit inputs or implicit added rules.
+#    :param table: truth table.
+#    :param the_output: function output
+#    :return: string with boolean expression.
+#    """
+#    ones = from_table_to_ones(table)
+#    if len(ones) > 0:
+#        qm_output = execute_qm_algorithm(ones)
+#        expression = translate_to_python_expression(inputs, qm_output)
+#    else:
+#        expression = ''
+#
+#    if expression == '':
+#        return '{}'.format(the_output)  # This happens when regardless of the input the output is the same
+#    else:
+#        return expression
 
-    if expression == '':
-        return '{}'.format(the_output)  # This happens when regardless of the input the output is the same
-    else:
-        return expression
 
-
-def from_table_to_ones(table):
-    """
-    Gets the ones as a list of strings from a truth table like set, containing tuples.
-    :param table: truth table
-    :return: list containing bits.
-    """
-    ones = []
-    for row in table:
-
-        # case 1: when the output is explicit.
-        if Rules.is_explicit(row):
-            if row[1]:  # only do it for true outputs.# TODO change for non booleans.
-                ones.append(''.join(list(map(h.from_bool_to_bit, list(row[0])))))
-
-        else:  # case 2: The output is an implicit True, inputs are in the row.
-            ones.append(''.join(list(map(h.from_bool_to_bit, list(row)))))
-
-    return ones
+#def from_table_to_ones(table):
+#    """
+#    Gets the ones as a list of strings from a truth table like set, containing tuples.
+#    :param table: truth table
+#    :return: list containing bits.
+#    """
+#    ones = []
+#    for row in table:
+#
+#        # case 1: when the output is explicit.
+#        if Rules.is_explicit(row):
+#            if row[1]:  # only do it for true outputs.# TODO change for non booleans.
+#                ones.append(''.join(list(map(h.from_bool_to_bit, list(row[0])))))
+#
+#        else:  # case 2: The output is an implicit True, inputs are in the row.
+#            ones.append(''.join(list(map(h.from_bool_to_bit, list(row)))))
+#
+#    return ones
 
 
 def alter_file(line_number, input_file_list, implementation, input_path):
@@ -164,7 +168,7 @@ def get_returning_implementation(implementation, definition, returning_value):
 
 def add_default_return(definition, processed_rules, implementation):
     """
-    Modify source code to include a default return if no True key is present.
+    Modify source code to include a default return if no True key is present and no return exists already.
     :param definition: function def
     :param processed_rules: obj containing dict with tables.
     :param implementation: source code
@@ -172,7 +176,7 @@ def add_default_return(definition, processed_rules, implementation):
     """
     if processed_rules.default:
         return get_returning_implementation(implementation, definition, processed_rules.default)
-    elif not h.has_true_key(processed_rules.tables):
+    elif not h.has_true_key(processed_rules.tables) and not h.has_return(implementation, definition):
         return get_returning_implementation(implementation, definition, False)
 
     return implementation
@@ -192,6 +196,36 @@ def get_input_values(rules, function_inputs, output):
         return list(function_inputs)
 
 
+def all_input_are_boolean(tables):
+    """
+    Assumes the problem is boolean and tries to prove the opposite.
+    :param tables: list containing inputs
+    :return: boolean
+    """
+    for _, table in tables.items():
+        for the_tuple in table:
+            for e in the_tuple:
+                if e not in (False, True) and not isinstance(e, Code):
+                    return False  # found non boolean element
+
+    return True
+
+
+def get_expression(table, rules, function_args, the_output):
+    """
+    returns a expression solving the problem.
+    :param table: inputs
+    :param rules:
+    :param function_args: collection of function inputs.
+    :param the_output: any output
+    ei. a function from {0,1} -> {0,1}
+    :return: string with an expression.
+    """
+
+    all_inputs = get_input_values(rules, function_args, the_output)
+    return QM_helper.get_boolean_expression(table, all_inputs, the_output)
+
+
 def find_candidate_solution(f, definition, rules, processed_rules, function_args):
     """
     Finds a possible solution with the Quine-McCluskey algorithm.
@@ -204,19 +238,38 @@ def find_candidate_solution(f, definition, rules, processed_rules, function_args
     """
     implementation = get_initial_implementation(definition)
 
-    for the_output, table in processed_rules.tables.items():
+    tables = processed_rules.tables
 
-        # will not solve anything when the output is False, as with True values is enough to specify a logical output
-        if the_output or not isinstance(the_output, bool):
+    if all_input_are_boolean(tables):
+        for the_output, table in tables.items():
 
-            all_inputs = get_input_values(rules, function_args, the_output)
-            expression = get_function_expression(table, all_inputs, the_output)
+            # will not solve anything when the output is False, as with True values is enough to specify a logical output
+            if the_output or not isinstance(the_output, bool):
 
-            if len(expression) > 0:
-                implementation = add_code_to_implementation(current_implementation=implementation,
-                                                            bool_expression=expression,
-                                                            definition=definition,
-                                                            the_output=the_output)
+                expression = get_expression(table, rules, function_args, the_output)
+
+                if len(expression) > 0:
+                    implementation = add_code_to_implementation(current_implementation=implementation,
+                                                                bool_expression=expression,
+                                                                definition=definition,
+                                                                the_output=the_output)
+
+    else:  # float case
+        all_inputs = get_input_values(rules, function_args, True)
+
+        # TODO:  missing False case
+        #all_inputs = get_input_values(rules, function_args, False)
+
+        # tables with True and False outcomes only.
+        binary_table = {True: tables[True], False: tables[False]}
+
+        expression = get_float_classification(binary_table, all_inputs)
+
+        if len(expression) > 0:
+            implementation = add_code_to_implementation(current_implementation=implementation,
+                                                        bool_expression=expression,
+                                                        definition=definition,
+                                                        the_output=True)  # TODO: is it right?
 
     implementation = add_default_return(definition, processed_rules, implementation)
     solution = Solution(implementation=implementation,
@@ -240,7 +293,7 @@ def return_solution(f, rules, unittest):
     f_line = h.get_function_line_number(f, file_code)
 
     # enters only if the function source code was found and has a signature.
-    if f_line > 0 and get_signature_from_definition(file_code[f_line]):
+    if f_line >= 0 and get_signature_from_definition(file_code[f_line]):
 
         definition = file_code[f_line]
         function_args = h.get_function_inputs(f)
@@ -254,9 +307,9 @@ def return_solution(f, rules, unittest):
 
         try:
             test_implementation(unittest, solution)
-        except AssertionError:
-            # A contradiction was detected, will use the non_deterministic module to clean the contradiction
-            # and output a table object free of contradictions.
+        except SolvableWithMLImplementation:
+            # A contradiction was detected, if it is a boolean problem will use the non_deterministic module
+            # to clean the contradiction and output a table object free of contradictions.
 
             tables = solution.rules.get_truth_tables(function_args)
             new_tables = learner.correct_truth_table(tables)

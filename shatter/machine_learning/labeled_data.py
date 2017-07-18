@@ -3,6 +3,7 @@
 """
 Defines classes and methods to package data for machine learning.
 """
+import pandas as pd
 from shatter.util.code_dict import CodeDict
 
 __author__ = 'juan pablo isaza'
@@ -60,3 +61,16 @@ def from_dict_to_lists(truth_tables):
         y += [k] * len(v)
 
     return LabeledData(x, y)
+
+
+def from_dict_to_data_frame(truth_tables, columns):
+    """
+    Returns a Pandas DataFrame with all the info
+    :param truth_tables: dict.
+    :param columns: list of all columns
+    :return: DataFrame
+    """
+
+    data = from_dict_to_lists(truth_tables)
+
+    return pd.DataFrame([tuple(x)+(y,) for x, y in zip(data.x, data.y)], columns=columns)

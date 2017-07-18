@@ -1,3 +1,6 @@
+from shatter.constants import *
+
+
 def get(l, idx, default):
     try:
         return l[idx]
@@ -25,9 +28,10 @@ def add_variable(variables, last_variable, input_var, output, last_input, last_o
     if not output and last_output:  # from 1 to 0
 
         if last_variable is None or 'and' in last_variable:  # starts new interval
-            variables.append('{} < {}'.format(input_name, mean(input_var, last_input)))
+            variables.append('{} <= {}'.format(input_name, mean(input_var, last_input)))
         else:  # completes interval
-            variables[-1] += ' and {} < {}'.format(input_name, mean(input_var, last_input))
+            # TODO: Make intervals the Pythonic may, eg: 2.5 < b < 5.5
+            variables[-1] = '({} and {} <= {})'.format(variables[-1], input_name, mean(input_var, last_input))
 
     elif output and not last_output:  # from 0 to 1
 
@@ -35,27 +39,32 @@ def add_variable(variables, last_variable, input_var, output, last_input, last_o
 
         # or len(variables) > 0
         if last_variable is None or 'and' in last_variable or on_first_var:  # starts new interval
-            variables.append('{} > {}'.format(input_name, mean(input_var, last_input)))
+            variables.append('{} >= {}'.format(input_name, mean(input_var, last_input)))
         else:  # completes interval
-            variables[-1] += ' and {} > {}'.format(input_name, mean(input_var, last_input))
+            variables[-1] = '({} and {} >= {})'.format(variables[-1], input_name, mean(input_var, last_input))
 
     return variables
 
 
-def get_variables(df, input_name):
-
+def get_variables(df, an_input):
+    """
+    Given a DataFrame and an_input it returns the associated conditions as variables.
+    :param df: DataFrame
+    :param an_input: string with an input.
+    :return: list containing strings. Each string is a condition as well as a variable of the QM problem
+    """
     variables = []
     last_output = None
     last_input = None
     for idx, row in df.iterrows():
 
-        input_var = row[input_name]
-        output = row['y']
+        input_var = row[an_input]
+        output = row[KEYWORDS[OUTPUT]]
 
         last_variable = get(variables, -1, None)
 
         if last_output is not None:
-            variables = add_variable(variables, last_variable, input_var, output, last_input, last_output, input_name)
+            variables = add_variable(variables, last_variable, input_var, output, last_input, last_output, an_input)
 
         last_output = output
         last_input = input_var

@@ -99,6 +99,27 @@ def validate(test_class):
         raise TypeError("unittest class of type {0}, has not assertEqual defined.".format(type(test_class)))
 
 
+def problem_has_boolean_output(tables):
+    """
+    The problem only has True or False outputs.
+    :param tables: all truth tables.
+    :return: boolean indicating whether the problem is boolean or not.
+    """
+    return all([isinstance(k, bool) or k in (0, 1) for k in tables.keys()])
+
+
+class SolvableWithMLImplementation(Exception):
+    """Not all cases have been implemented with machine learning. This error type indicates that this case can be
+    solved by running a machine learning algorithm."""
+    pass
+
+
+class NotImplementedWithMLYet(Exception):
+    """Not all cases have been implemented with machine learning. This error type indicates that this case
+    HAS NOT BEEN IMPLEMENTED YET"""
+    pass
+
+
 def test_implementation(test_class, solution):
     """
     :param test_class: the unittest instance
@@ -123,10 +144,20 @@ def test_implementation(test_class, solution):
         warnings.warn("Cannot test function, it has added code", UserWarning)
         return False
     else:
-        for expected_value, tuple_set in tables.items():
-            for a_tuple in tuple_set:
-                run_single_test(test_class=test_class,
-                                a_tuple=a_tuple,
-                                solution=solution,
-                                expected_value=expected_value)
+        try:
+            for expected_value, tuple_set in tables.items():
+                for a_tuple in tuple_set:
+                    run_single_test(test_class=test_class,
+                                    a_tuple=a_tuple,
+                                    solution=solution,
+                                    expected_value=expected_value)
+        except AssertionError:
+            # catches exception and re-raises 2 different exceptions depending if the problem is solvable with
+            # current machine learning implementation.
+            if problem_has_boolean_output(tables):
+                raise SolvableWithMLImplementation()
+
+            # TODO: add implementation
+            raise NotImplementedWithMLYet()
+
         return True
