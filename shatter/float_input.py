@@ -221,14 +221,8 @@ def get_data_frame(binary_tables, all_inputs):
 
         best_df = choose_compact_dataframe(df_list)
 
-        variables = []
-
-        #for df in df_list:
-        #    variables += helper.get_variables(df, an_input)
-        variables += helper.get_variables(best_df, an_input)
-
         # only takes unique values.
-        variables = set(variables)
+        variables = set(helper.get_variables(best_df, an_input))
 
         df = add_empty_columns(df, variables)
         df = add_boolean_table(df, variables, an_input)
