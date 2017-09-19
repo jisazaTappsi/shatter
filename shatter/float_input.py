@@ -2,7 +2,8 @@ import copy
 import itertools
 
 from sympy.logic import POSform
-from sympy import symbols
+import sympy
+import pyeda.inter as pyEDA
 
 from shatter import float_input_helper as helper
 from shatter.machine_learning.labeled_data import from_dict_to_data_frame
@@ -38,20 +39,18 @@ def add_boolean_table(df, variables, var_name):
     return df
 
 
-def get_qm_inputs(df, all_inputs):
+def get_qm_inputs(df):
     """
     Gets the inputs to the final QM problem(the one done upon the newly defined comparison variables).
-    Also removes the all_inputs and output from the DataFrame (not so desirable side-effect).
+    Also removes the output column.
     :param df: same old DataFrame
-    :param all_inputs: problem inputs.
     :return: outputs a list containing tuples with int values {0, 1}
     """
-    columns = all_inputs + [KEYWORDS[OUTPUT]]
-    df.drop(columns, inplace=True, axis=1)
+    df.drop([KEYWORDS[OUTPUT]], inplace=True, axis=1)
     return [tuple([int(e) for e in inputs]) for inputs in df.values.tolist()]
 
 
-def get_positive_negative_and_dont_care_sets(df, all_inputs):
+def get_positive_negative_and_dont_care_sets(df):
     """
     The product set of length n Boolean sequences eg: {(0, 0), (0, 1), (1, 0), (1, 1)} for n=2
     Can be divided into 3 sets:
@@ -59,14 +58,13 @@ def get_positive_negative_and_dont_care_sets(df, all_inputs):
     2. Set that should output a False value
     3. Set which output doesn't matter.(don't care)
     :param df: DataFrame with True and False outcomes
-    :param all_inputs: problem inputs
     :return: A tuple with 3 sets:
     1. True outcomes
     2. Don't care
     """
 
     qm_outputs = copy.copy(df[KEYWORDS[OUTPUT]])
-    qm_inputs = get_qm_inputs(df, all_inputs)
+    qm_inputs = get_qm_inputs(df)
 
     # Takes length of first element.
     length_n = len(qm_inputs[0])
@@ -92,11 +90,94 @@ def get_symbol_list(df):
     """
     symbols_str = ' '.join([e.replace(' ', '') for e in df.columns.values])
 
-    symbols_var = symbols(symbols_str)
+    symbols_var = sympy.symbols(symbols_str)
     if len(df.columns.values) > 1:  # has more than an element
         return [var for var in symbols_var]
     else:
         return [symbols_var]
+
+
+def print_pyeda_expression(pyeda_exp):
+    """
+    Print the right stuff. Has to traverse tree see:
+    http://pyeda.readthedocs.io/en/latest/expr.html
+    :param pyeda_exp:
+    :return: string
+    """
+
+    operation = pyeda_exp.ASTOP
+
+    if operation == 'lit':
+        return str(pyeda_exp).replace('~', 'not ')
+
+    expressions = pyeda_exp.xs
+
+    expression = ''
+    for idx, exp in enumerate(expressions):
+
+        if idx > 0:
+            expression += ' ' + operation + ' ' + print_pyeda_expression(exp)
+        else:
+            expression = print_pyeda_expression(exp)
+
+    return expression
+
+
+def get_pyeda_out_string(df, n):
+    """
+    Gets a string that is the output of a truth table, see a library pyEDA example.
+    :param df: DataFrame with minterms rows (False and True values).
+    :param n: size of the problem
+    :return: string with '0', '1', '-' values.
+    """
+
+    # all outputs are assumed to be don't cares.
+    out = '-'*(2**n)
+
+    for i, row in df.iterrows():
+
+        # calculates a binary number, and uses it as the index of the out string.
+        my_bin = ''
+        for key, value in row.iteritems():
+            if key != KEYWORDS[OUTPUT]:
+                my_bin += str(int(value))
+
+        idx = int(my_bin, 2)
+
+        value = str(int(row[KEYWORDS[OUTPUT]]))
+
+        tmp_list = list(out)
+        tmp_list[idx] = value
+        out = ''.join(tmp_list)
+
+    return out
+
+
+def get_pyEDA_expression(df):
+    """
+    Gets the expression with the Espresso heuristic algorithm.
+    Works when QM fails for problems with 7 variables or larger.
+    :param df: pandas DataFrame
+    :return: string with expression.
+    """
+    columns = list(df.columns.values)
+
+    # size of the problem
+    n = len(columns)-1
+
+    # gets all boolean combinations for a number of variables.
+    x = pyEDA.ttvars('x', n)
+
+    out = get_pyeda_out_string(df, n)
+
+    truth_table = pyEDA.truthtable(x, out)
+    pyeda_expression = pyEDA.espresso_tts(truth_table)[0]
+
+    expression = print_pyeda_expression(pyeda_expression)
+    for i, s in enumerate(reversed(columns[1:])):
+        expression = expression.replace('x[{}]'.format(i), s)
+
+    return expression
 
 
 def get_float_classification(binary_tables, all_inputs):
@@ -111,26 +192,28 @@ def get_float_classification(binary_tables, all_inputs):
 
     df = get_data_frame(binary_tables, all_inputs)
 
-    min_terms, dontcares = get_positive_negative_and_dont_care_sets(df, all_inputs)
+    if len(list(df.columns.values)) < 8:  # Uses exact solution with Quine McCluskey
+        min_terms, dontcares = get_positive_negative_and_dont_care_sets(df)
+        symbols_list = get_symbol_list(df)
+        exp = POSform(symbols_list, min_terms, dontcares)
+        exp = str(exp).replace('and', ' and ').replace('~', 'not ').replace('|', 'or').replace('&', 'and')
+    else:  # Big problem uses Heuristic Espresso.
+        exp = get_pyEDA_expression(df)
 
-    symbols_list = get_symbol_list(df)
-    exp = POSform(symbols_list, min_terms, dontcares)
-    exp = str(exp).replace('and', ' and ').replace('~', 'not ').replace('|', 'or').replace('&', 'and')
     # TODO: this expression are correct but none PEP-8 complaint
     return exp
 
 
-def get_dataframe_duplicates_recursive(df, an_input, from_idx=0):
+def get_dataframe_duplicates(df, an_input, from_idx=0):
     """
     Given a DataFrame that can have same repeated values for the "an_input" column, but different output.
     Then 2 DataFrames have to be considered by swapping rows.
+    This is done with a much more efficient algorithm.
     :param df: DataFrame
     :param an_input: string with a column of the DataFrame
     :param from_idx: searches for duplicates after this DataFrame index.
-    :return: List of possible DataFrame orderings. Called here duplicates.
+    :return: Best DataFrame candidate
     """
-    # At least the df is its same duplicate
-    duplicates = [df]
 
     values = list(df[an_input])
     outputs = list(df[KEYWORDS[OUTPUT]])
@@ -142,6 +225,8 @@ def get_dataframe_duplicates_recursive(df, an_input, from_idx=0):
     # Takes a slice of the zipped list.
     zipped_list = [(v, o) for v, o in zip(values, outputs)][from_idx:]
 
+    best_df = df
+    min_jumps = get_compactness(df)
     for idx, (value, output) in enumerate(zipped_list):
 
         # adds the missing value.
@@ -151,84 +236,72 @@ def get_dataframe_duplicates_recursive(df, an_input, from_idx=0):
         if value == last_value and output != last_output:
 
             # make completely new DataFrame
-            new_df = df.copy()
+            new_df = best_df.copy()
 
             # Swap DataFrame rows.
             new_df.iloc[idx-1], new_df.iloc[idx] = new_df.iloc[idx].copy(), new_df.iloc[idx-1].copy()
 
-            duplicates += get_dataframe_duplicates_recursive(new_df, an_input, from_idx=idx)
+            jumps = get_compactness(new_df)
+            if jumps < min_jumps:
+                best_df = new_df
+                min_jumps = jumps
 
         last_value = value
         last_output = output
 
-    return duplicates
+    return best_df
 
 
-def get_dataframe_duplicates(df, an_input):
+def get_compactness(df):
     """
-    Given a DataFrame that can have same repeated values for the "an_input" column, but different output.
-    Then 2 DataFrames have to be considered by swapping rows.
+    Number of changes from 0 to 1 or vice versa, when iterating over the DataFrame
     :param df: DataFrame
-    :param an_input: a column name
-    :return: List containing all DataFrames to consider.
+    :return: number of jumps, or measure of compactness.
     """
-    return get_dataframe_duplicates_recursive(df, an_input)
+    jumps = 0
+    last_output = None
+    for _, row in df.iterrows():
+        output = row[KEYWORDS[OUTPUT]]
+        if last_output is not None and output != last_output:
+            jumps += 1
 
+        last_output = output
 
-def choose_compact_dataframe(df_list):
-    """
-    Given a list of DataFrames will choose the one with the least number of 'ups' and 'downs'.
-    :param df_list: DataFrame list
-    :return: DataFrame
-    """
-
-    min_jumps = 1000000000
-    selected_df = None
-    for df in df_list:
-
-        # is the number of changes from 0 to 1 or vice versa, when iterating over the DataFrame
-        jumps = 0
-        last_output = None
-        for _, row in df.iterrows():
-            output = row[KEYWORDS[OUTPUT]]
-            if last_output is not None and output != last_output:
-                jumps += 1
-
-            last_output = output
-
-        if jumps < min_jumps:
-            min_jumps = jumps
-            selected_df = df
-
-    return selected_df
+    return jumps
 
 
 def get_data_frame(binary_tables, all_inputs):
     """
     Gets a data frame that needs QM reduction and further logic.
+    Also removes the all_inputs from the DataFrame.
     :param binary_tables: contains a tables with True and False outputs.
     :param all_inputs: columns
     :return: Pandas DataFrame.
     """
+
     columns = all_inputs + [KEYWORDS[OUTPUT]]
     df = from_dict_to_data_frame(binary_tables, columns)
 
     for an_input in all_inputs:
 
         df = df.sort([an_input], ascending=[1])
-
-        df_list = get_dataframe_duplicates(df, an_input)
-
-        best_df = choose_compact_dataframe(df_list)
+        #import time
+        #start = time.time()
+        best_df = get_dataframe_duplicates(df, an_input)
+        #print('get_dataframe_duplicates for {}: {}'.format(an_input, time.time() - start))
 
         # only takes unique values.
         variables = set(helper.get_variables(best_df, an_input))
 
+        #start = time.time()
         df = add_empty_columns(df, variables)
+        #print('add_empty_column for {}: {}'.format(an_input, time.time() - start))
+
+        #start = time.time()
         df = add_boolean_table(df, variables, an_input)
+        #print('add_boolean_table for {}: {}'.format(an_input, time.time() - start))
+
+    df.drop(all_inputs, inplace=True, axis=1)
+    df.drop_duplicates(keep='first', inplace=True)
 
     return df
-
-
-#if __name__ == '__main__':
-#    my_test()

@@ -204,14 +204,17 @@ class ConstantsTest(unittest.TestCase):
         # Make binary and add to df
         data_frame[KEYWORDS[OUTPUT]] = [int(bool(e)) for e in y]
 
-        print(data_frame)
-
         function = f.solve_iris
 
         code_solution_1 = ["def {}(x1, x2, x3, x4):".format(function.__name__),
-                           "    return "]
+                           "    return x3 >= 2.5"]
 
-        data_frame = data_frame.sample(n=26)
+        data_frame_false = data_frame.loc[data_frame['output'] == False].head(20)
+        data_frame_true = data_frame.loc[data_frame['output'] == True].head(20)
+        data_frame = pd.concat([data_frame_false, data_frame_true], axis=0)
+
+        # TODO: Make algorithm scale, this variables are just stupid:
+        # (x1 >= 5.0 and x1 <= 5.05) (x1 >= 5.5 and x1 <= 5.5)
 
         r = Rules(data_frame)
 
