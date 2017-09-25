@@ -15,10 +15,8 @@ __author__ = 'juan pablo isaza'
 
 class CodeTest(unittest.TestCase):
 
-
-## TODO: REMINDER THE ISINSTANCE OF A FUNCTION AND METHOD SHOULD BE LIKE:
+# TODO: REMINDER THE ISINSTANCE OF A FUNCTION AND METHOD SHOULD BE LIKE:
 #        elif not isinstance(self.build_fn, types.FunctionType) and not isinstance(self.build_fn, types.MethodType):
-
 
     @classmethod
     def setUpClass(cls):
@@ -91,7 +89,6 @@ class CodeTest(unittest.TestCase):
         self.assertTrue(isinstance(i not j, Code))
     """
 
-    # TODO: missing the real part of composition!.
     def test_composition(self):
         """
         Complex expression is assembled, should print out the same value.
@@ -180,9 +177,7 @@ class CodeTest(unittest.TestCase):
 
         i = Code()
         j = Code()
-        r = Rules(i != 0,
-                     i < 1,
-                     output=i * j)
+        r = Rules(i != 0, i < 1, output=i * j)
         r.add(i > j, output=i * j)
         solution = r.solve(function, self)
 
@@ -194,6 +189,51 @@ class CodeTest(unittest.TestCase):
         """
         name = Code()
         self.assertEqual(str(name), 'name')
+
+    # TODO: STUPID BUG HERE!!! Last representation is NOT working
+    def test_identity_representation(self):
+        """There are 4 equivalent representations of the identity function:
+
+        1. Boring:
+        >>> Rules(a=True, output=True)
+
+        2. Implicit True:
+        >>> Rules(a=True)
+
+        3. Using Code() magic:
+        >>> a = Code()
+        >>> Rules(a, output=True)
+
+        4. Using both Code() magic and implicit True output:
+        >>> a = Code()
+        >>> Rules(a)
+
+        lets test all representations!!!
+        """
+        a = Code()
+        solution = ['def {}(a):'.format(f.identity.__name__),
+                    '    return a']
+
+        r = Rules(a=True, output=True)
+        s = r.solve(f.identity)
+        self.assertEqual(s.implementation, solution)
+
+        r = Rules(a=True)
+        s = r.solve(f.identity)
+        self.assertEqual(s.implementation, solution)
+
+        r = Rules(a, output=True)
+        s = r.solve(f.identity)
+        self.assertEqual(s.implementation, solution)
+
+        # TODO: pass this test:
+        """
+        r = Rules(a)
+        s = r.solve(f.minimal_code)
+        self.assertEqual(s.implementation, solution)
+        """
+
+    # TODO: Do test to be able to represent 'a=False' as the more natural 'not a', with Code() objects
 
 
 if __name__ == '__main__':

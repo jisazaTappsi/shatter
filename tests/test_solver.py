@@ -6,10 +6,11 @@ import unittest
 
 from shatter import solver as s, rules as c
 from shatter.code_generator import translate_to_python_expression
-from shatter.util.last_update_set import LastUpdateSet
 from tests.generated_code import solver_functions as f
 from tests.testing_helpers import constants as cts
 from tests.testing_helpers import common_testing_code
+from shatter.rules import Rules
+from shatter import QM_helper
 
 __author__ = 'juan pablo isaza'
 
@@ -29,7 +30,7 @@ class SolverTest(unittest.TestCase):
         :param expected_exp: the expected expression in python.
         :return: passes or not
         """
-        qm_ordered_set = s.execute_qm_algorithm(qm_input)
+        qm_ordered_set = QM_helper.execute_qm_algorithm(qm_input)
         self.assertSetEqual(set(list(qm_ordered_set)), expected_qm_output)
 
         exp = translate_to_python_expression(var_names, qm_ordered_set)
@@ -108,7 +109,7 @@ class SolverTest(unittest.TestCase):
         it can work with table = {(inputs), ...}. As the output is redundant.
         """
         # case 1: all rows are implicit
-        implicit_output_xor_table = LastUpdateSet([(True, False), (False, True)])
+        implicit_output_xor_table = [(True, False), (False, True)]
 
         self.factor_execute(rules=implicit_output_xor_table,
                             a_callable=f.implicit_xor_function,
@@ -116,7 +117,7 @@ class SolverTest(unittest.TestCase):
                             expression=cts.exp_xor)
 
         # case 2: some rows are explicit and some implicit.
-        mix_output_xor_table = LastUpdateSet([((True, False), True), (False, True), ((True, True), False)])
+        mix_output_xor_table = [((True, False), True), (False, True), ((True, True), False)]
 
         self.factor_execute(rules=mix_output_xor_table,
                             a_callable=f.mix_xor_function,
@@ -145,6 +146,17 @@ class SolverTest(unittest.TestCase):
                             signature=f.mix_xor_function.__name__ + '(a, b)',
                             expression=cts.exp_xor)
 
+    def test_identity_explicit(self):
+        """
+        Identity will yield same result even though False and True inputs are explicit specified.
+        """
+        code = ['def {}(a):'.format(f.identity.__name__),
+                '    return a']
+
+        r = Rules(a=True, output=True)
+        r.add(a=False, output=False)
+        solution = r.solve(f.identity)
+        self.assertEqual(solution.implementation, code)
 
 if __name__ == '__main__':
     unittest.main()

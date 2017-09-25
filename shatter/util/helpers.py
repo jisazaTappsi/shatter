@@ -5,7 +5,7 @@ import inspect
 import warnings
 import os
 import re
-import types
+
 import shatter.constants as cts
 
 __author__ = 'juan pablo isaza'
@@ -136,8 +136,9 @@ def get_function_inputs(f):
     :param f: a callable function
     :return: input names on a tuple.
     """
-    if hasattr(f, cts.INTERNAL_CODE):
-        return f.internal_code.co_varnames
+    if hasattr(f, cts.INTERNAL_PARAMETERS):
+        # 'internal_parameters' is defined inside the solver() annotation, see solver.py for details.
+        return f.internal_parameters
     else:
         return f.__code__.co_varnames
 
@@ -206,6 +207,19 @@ def has_true_key(d):
     return False
 
 
+def has_return(implementation, definition):
+    """
+    Finds if the implementation already has a return.
+    :param implementation: array with code implementation
+    :param definition: function definition
+    :return: Boolean
+    """
+    last_line = implementation[-1]
+    indent = get_indent_from_definition(definition)
+    pattern = r"^{indent}    return".format(indent=indent)
+    return re.search(pattern, last_line) is not None
+
+
 def has_false_key(d):
     """
     Returns True only if it has a False value as key.
@@ -256,7 +270,6 @@ def is_function(f):
     :param f: function
     :return: boolean
     """
-    #return isinstance(f, types.FunctionType)#and not isinstance(self.build_fn, types.MethodType):
     return hasattr(f, '__call__')
 
 

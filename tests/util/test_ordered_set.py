@@ -4,18 +4,18 @@
 
 import unittest
 
-from shatter.util.last_update_set import LastUpdateSet
+from shatter.util.ordered_set import OrderedSet
 
 __author__ = 'juan pablo isaza'
 
 
-class LastUpdateSetTest(unittest.TestCase):
+class OrderedSetTest(unittest.TestCase):
 
     def test_order(self):
 
         """Check that order is preserved."""
 
-        s = LastUpdateSet()
+        s = OrderedSet()
 
         old_list = ['4', '3', '2', '1', '5']
 

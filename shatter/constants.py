@@ -8,6 +8,7 @@ __author__ = 'juan pablo isaza'
 
 PACKAGE_NAME = 'shatter'
 INTERNAL_CODE = 'internal_code'
+INTERNAL_PARAMETERS = 'internal_parameters'
 
 COMMENT_PATTERN = re.compile(r"\s*(#.*)?$")
 INDENT = re.compile(r"^\s*")
@@ -35,7 +36,6 @@ SOLVE_DECORATOR_PATTERN\
     = re.compile(r"{indent}@\s*({name}\.)?\s*solve\s*\(\){comment}".format(name=NAME.pattern,
                                                                            indent=INDENT.pattern,
                                                                            comment=COMMENT_PATTERN.pattern))
-
 
 # reserved keywords
 DEFAULT = 'DEFAULT'

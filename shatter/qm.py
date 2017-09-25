@@ -42,7 +42,7 @@ from __future__ import print_function
 
 import math
 
-from shatter.util.last_update_set import LastUpdateSet
+from shatter.util.ordered_set import OrderedSet
 from shatter.util.inverse_tree_set import InverseTreeSet
 
 
@@ -57,7 +57,7 @@ class QuineMcCluskey:
     """
     __version__ = "0.2"
 
-    def __init__(self, use_xor = False):
+    def __init__(self, use_xor=False):
         """The class constructor.
 
         Kwargs:
@@ -257,14 +257,14 @@ class QuineMcCluskey:
 
         # Sort and remove duplicates.
         n_groups = self.n_bits + 1
-        marked = LastUpdateSet()
+        marked = OrderedSet()
 
         # Group terms into the list groups.
         # groups is a list of length n_groups.
         # Each element of groups is a set of terms with the same number
         # of ones.  In other words, each term contained in the set
         # groups[i] contains exactly i ones.
-        groups = [LastUpdateSet() for i in range(n_groups)]
+        groups = [OrderedSet() for i in range(n_groups)]
         for t in terms:
             n_bits = t.count('1')
             groups[n_bits].add(t)
@@ -302,11 +302,11 @@ class QuineMcCluskey:
 
                 key = (n_ones, n_xor, n_xnor)
                 if key not in groups:
-                    groups[key] = LastUpdateSet()
+                    groups[key] = OrderedSet()
                 groups[key].add(t)
 
-            terms = LastUpdateSet()           # The set of new created terms
-            used = LastUpdateSet()            # The set of used terms
+            terms = OrderedSet()           # The set of new created terms
+            used = OrderedSet()            # The set of used terms
 
             # Find prime implicants
             for key in groups:
@@ -398,13 +398,13 @@ class QuineMcCluskey:
 
         # Now group the remaining terms and see if any term can be covered
         # by a combination of terms.
-        ei_range = LastUpdateSet()
+        ei_range = OrderedSet()
         ei = InverseTreeSet([])
         groups = dict()
         for t in terms:
             n = self.__get_term_rank(t, len(perms[t]))
             if n not in groups:
-                groups[n] = LastUpdateSet()
+                groups[n] = OrderedSet()
             groups[n].add(t)
         for t in sorted(list(groups.keys()), reverse=True):
             for g in groups[t]:

@@ -2,3 +2,5 @@ pip==6.1.1
 setuptools==15.2
 pypandoc==1.2.0
 keras
+pandas
+numpy
