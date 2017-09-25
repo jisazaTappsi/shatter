@@ -33,7 +33,7 @@ def add_boolean_table(df, variables, var_name):
             exec('{} = {}'.format(var_name, input_var))
 
             # STEP 2: Then executes a comparison on the assigned value from the previous step, and assign result to df.
-            result = eval(code)
+            result = eval(str(code))
             df.loc[idx, code] = result
 
     return df
@@ -88,7 +88,7 @@ def get_symbol_list(df):
     :param df: DataFrame
     :return: List with symbols for Sympy to solve.
     """
-    symbols_str = ' '.join([e.replace(' ', '') for e in df.columns.values])
+    symbols_str = ' '.join([str(comparison_obj).replace(' ', '') for comparison_obj in df.columns.values])
 
     symbols_var = sympy.symbols(symbols_str)
     if len(df.columns.values) > 1:  # has more than an element
@@ -175,9 +175,24 @@ def get_pyEDA_expression(df):
 
     expression = print_pyeda_expression(pyeda_expression)
     for i, s in enumerate(reversed(columns[1:])):
-        expression = expression.replace('x[{}]'.format(i), s)
+        expression = expression.replace('x[{}]'.format(i), str(s))
 
     return expression
+
+
+def clean_up_dataframe(df, percent_cut, input_ranges):
+
+    # yields Comparison objects.
+    comparisons = list(df.columns.values)
+    comparisons.remove(KEYWORDS[OUTPUT])
+
+    for comparison in comparisons:
+
+        my_range = input_ranges[comparison.get_input()]
+        if comparison.should_be_removed(my_range, percent_cut):
+            df.drop(comparison, inplace=True, axis=1)
+
+    return df
 
 
 def get_float_classification(binary_tables, all_inputs):
@@ -190,15 +205,47 @@ def get_float_classification(binary_tables, all_inputs):
     :return: a expression summarizing efficiently the hypothesis.
     """
 
-    df = get_data_frame(binary_tables, all_inputs)
+    df, input_ranges = get_data_frame(binary_tables, all_inputs)
 
     if len(list(df.columns.values)) < 8:  # Uses exact solution with Quine McCluskey
-        min_terms, dontcares = get_positive_negative_and_dont_care_sets(df)
+        min_terms, dont_cares = get_positive_negative_and_dont_care_sets(df)
         symbols_list = get_symbol_list(df)
-        exp = POSform(symbols_list, min_terms, dontcares)
+        exp = POSform(symbols_list, min_terms, dont_cares)
         exp = str(exp).replace('and', ' and ').replace('~', 'not ').replace('|', 'or').replace('&', 'and')
     else:  # Big problem uses Heuristic Espresso.
-        exp = get_pyEDA_expression(df)
+
+        import signal
+
+        class TimeoutException(Exception):   # Custom exception class
+            pass
+
+        def timeout_handler(signum, frame):   # Custom signal handler
+            raise TimeoutException
+
+        # Change the behavior of SIGALRM
+        signal.signal(signal.SIGALRM, timeout_handler)
+
+        # initially accepts every nuance.
+        cut_percent = 0
+        for i in range(5):
+            # Start the timer. Once 10 seconds are over, a SIGALRM signal is sent.
+            signal.alarm(10)
+            # This try/except loop ensures that
+            #   you'll catch TimeoutException when it's sent.
+            try:
+                exp = get_pyEDA_expression(df)
+            except TimeoutException:
+
+                # removes intervals shorter than this number
+                cut_percent += 0.1
+
+                df = clean_up_dataframe(df, cut_percent, input_ranges)
+
+                continue
+            else:
+                # Reset the alarm
+                signal.alarm(0)
+
 
     # TODO: this expression are correct but none PEP-8 complaint
     return exp
@@ -301,7 +348,12 @@ def get_data_frame(binary_tables, all_inputs):
         df = add_boolean_table(df, variables, an_input)
         #print('add_boolean_table for {}: {}'.format(an_input, time.time() - start))
 
+    # befire dropping all_inputs columns, will record their range.
+    input_ranges = {}
+    for the_input in all_inputs:
+        input_ranges[the_input] = [min(list(df[the_input])), max(list(df[the_input]))]
+
     df.drop(all_inputs, inplace=True, axis=1)
     df.drop_duplicates(keep='first', inplace=True)
 
-    return df
+    return df, input_ranges

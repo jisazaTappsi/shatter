@@ -1,6 +1,71 @@
 from shatter.constants import *
 
 
+class Comparison:
+
+    def __init__(self, a, b, operator):
+        self.a = a  # number 1
+        self.b = b  # number 2
+        self.operator = operator  # '>=', '<=', '==' or 'and'
+
+        # TODO: reactivate this, but first fix bug when making intervals (check them they suck)
+        #self.simplify()
+
+    def __str__(self):
+        out = '{} {} {}'.format(self.a, self.operator, self.b)
+        if self.is_composite():
+            out = '({})'.format(out)
+        return out
+
+    def is_composite(self):
+        return isinstance(self.a, Comparison) and isinstance(self.b, Comparison) and self.operator == 'and'
+
+    def get_input(self):
+        """
+        Returns the variable, it's a string
+        :return: string
+        """
+        return self.a.a if self.is_composite() else self.a
+
+    def composite_has_opposing_operators(self):
+        """
+        Composite Comparison Objects, that have opposing operators (<=, >=)
+        :return: Boolean
+        """
+        return self.a.operator == '>=' and self.b.operator == '<=' or self.a.operator == '<=' and self.b.operator == '>='
+
+    def should_be_removed(self, my_range, percent_cut):
+        """
+        Calculates whether the current variable is too particular to consider for the percent cut demanded.
+        :param my_range: absolute range of the variable
+        :param percent_cut: percentage of absolute range below which the variable should be dropped from dataframe.
+        :return: Boolean
+        """
+
+        if self.is_composite() and self.composite_has_opposing_operators():
+
+            current_percentage = abs(self.a.b - self.b.b) / abs(my_range[0] - my_range[1])
+            return current_percentage < percent_cut
+
+        elif self.operator == '==' and percent_cut > 0:  # if equality
+            return True
+
+        return False
+
+    def simplify(self):
+        """
+        It simplifies expressions like: x2 >= 3.25 and x2 <= 3.25   >>>  x2 == 3.25
+        Because this statement is just the single number x2 = 3.25
+        :return:
+        """
+        # it simplifies to an equality
+        if self.is_composite() and self.a.b == self.b.b:
+
+            self.a = self.a.a
+            self.b = self.b.b
+            self.operator = '=='
+
+
 def get(l, idx, default):
     try:
         return l[idx]
@@ -27,21 +92,23 @@ def add_variable(variables, last_variable, input_var, output, last_input, last_o
 
     if not output and last_output:  # from 1 to 0
 
-        if last_variable is None or 'and' in last_variable:  # starts new interval
-            variables.append('{} <= {}'.format(input_name, mean(input_var, last_input)))
+        if last_variable is None or last_variable.operator == 'and':  # starts new interval
+            variables.append(Comparison(input_name, mean(input_var, last_input), '<='))
         else:  # completes interval
             # TODO: Make intervals the Pythonic may, eg: 2.5 < b < 5.5
-            variables[-1] = '({} and {} <= {})'.format(variables[-1], input_name, mean(input_var, last_input))
+            comp2 = Comparison(input_name, mean(input_var, last_input), '<=')
+            variables[-1] = Comparison(variables[-1], comp2, 'and')
 
     elif output and not last_output:  # from 0 to 1
 
         on_first_var = len(variables) == 1
 
         # or len(variables) > 0
-        if last_variable is None or 'and' in last_variable or on_first_var:  # starts new interval
-            variables.append('{} >= {}'.format(input_name, mean(input_var, last_input)))
+        if last_variable is None or last_variable.operator == 'and' or on_first_var:  # starts new interval
+            variables.append(Comparison(input_name, mean(input_var, last_input), '>='))
         else:  # completes interval
-            variables[-1] = '({} and {} >= {})'.format(variables[-1], input_name, mean(input_var, last_input))
+            comp2 = Comparison(input_name, mean(input_var, last_input), '>=')
+            variables[-1] = Comparison(variables[-1], comp2, 'and')
 
     return variables
 
