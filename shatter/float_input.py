@@ -1,4 +1,5 @@
 import copy
+import signal
 import itertools
 
 from sympy.logic import POSform
@@ -195,6 +196,53 @@ def clean_up_dataframe(df, percent_cut, input_ranges):
     return df
 
 
+class TimeoutException(Exception):
+    """Custom exception class"""
+    pass
+
+
+def timeout_handler(signum, frame):
+    """Custom signal handler"""
+    raise TimeoutException
+
+
+def solve_big_table(df, input_ranges):
+    """
+    Tries several times to solve the problem, each time it fails (waiting more than 10 seconds) it relaxes constraints
+    and makes the problem a bit easier, although it might not be exact.
+    :param df: DataFrame.
+    :param input_ranges: dictionary with ranges for each variable.
+    :return: string with expression
+    """
+
+    # Change the behavior of SIGALRM
+    signal.signal(signal.SIGALRM, timeout_handler)
+
+    # initially accepts every nuance.
+    exp = ''
+    cut_percent = 0
+    for i in range(5):
+        # Start the timer. Once 10 seconds are over, a SIGALRM signal is sent.
+        signal.alarm(10)
+        # This try/except loop ensures that
+        #   you'll catch TimeoutException when it's sent.
+        try:
+            exp = get_pyEDA_expression(df)
+        except TimeoutException:
+
+            # removes intervals shorter than this number
+            cut_percent += 0.1
+
+            df = clean_up_dataframe(df, cut_percent, input_ranges)
+
+            continue
+        else:
+            # Reset the alarm
+            signal.alarm(0)
+
+    return exp
+
+
 def get_float_classification(binary_tables, all_inputs):
     """
     Outer function calculating expression when:
@@ -211,43 +259,12 @@ def get_float_classification(binary_tables, all_inputs):
         min_terms, dont_cares = get_positive_negative_and_dont_care_sets(df)
         symbols_list = get_symbol_list(df)
         exp = POSform(symbols_list, min_terms, dont_cares)
+
+        # TODO: this expression are correct but none PEP-8 complaint
         exp = str(exp).replace('and', ' and ').replace('~', 'not ').replace('|', 'or').replace('&', 'and')
     else:  # Big problem uses Heuristic Espresso.
+        exp = solve_big_table(df, input_ranges)
 
-        import signal
-
-        class TimeoutException(Exception):   # Custom exception class
-            pass
-
-        def timeout_handler(signum, frame):   # Custom signal handler
-            raise TimeoutException
-
-        # Change the behavior of SIGALRM
-        signal.signal(signal.SIGALRM, timeout_handler)
-
-        # initially accepts every nuance.
-        cut_percent = 0
-        for i in range(5):
-            # Start the timer. Once 10 seconds are over, a SIGALRM signal is sent.
-            signal.alarm(10)
-            # This try/except loop ensures that
-            #   you'll catch TimeoutException when it's sent.
-            try:
-                exp = get_pyEDA_expression(df)
-            except TimeoutException:
-
-                # removes intervals shorter than this number
-                cut_percent += 0.1
-
-                df = clean_up_dataframe(df, cut_percent, input_ranges)
-
-                continue
-            else:
-                # Reset the alarm
-                signal.alarm(0)
-
-
-    # TODO: this expression are correct but none PEP-8 complaint
     return exp
 
 

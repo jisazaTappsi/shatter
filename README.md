@@ -19,8 +19,21 @@ Install:
         $ pip install shatter
 
 
+Dependencies
+------------
+
+    pyeda==0.28.0
+    pandas==0.19.1
+    sympy==1.1
+    Keras==2.0.6
+    numpy==1.13.1
+    pip==9.0.1
+    scikit_learn==0.19.0
+
+
 Examples
 =============
+
 
 Get Started
 -------------
@@ -155,6 +168,45 @@ A dictionary for the inputs of the `recursive` function is declared. Those input
 
 After `out` is passed via `default` keyword when initializing the `Rules` object. This `default` keyword 
 is used to override the last return statement of the `recursive` function.
+
+
+Solve Small ML problem
+----------------------
+
+Copy paste this snippet:
+
+    import pandas as pd
+    from sklearn import datasets
+    from shatter.solver import Rules, solve
+
+
+    @solve()
+    def solve_iris(x1, x2, x3, x4):
+        pass
+
+
+    iris = datasets.load_iris()
+
+    x = iris.data
+    y = iris.target
+
+    data_frame = pd.DataFrame(x, columns=['x1', 'x2', 'x3', 'x4'])
+
+    # Make binary and add to df
+    data_frame['output'] = [int(bool(e)) for e in y]
+
+
+    print(data_frame)
+
+    r = Rules(data_frame)
+
+    solution = r.solve(solve_iris)
+
+
+Outputs:
+
+    def solve_iris():
+        return x3 >= 2.45
 
 
 Going deeper
