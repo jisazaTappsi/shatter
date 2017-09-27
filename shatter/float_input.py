@@ -34,8 +34,7 @@ def add_boolean_table(df, variables, var_name):
             exec('{} = {}'.format(var_name, input_var))
 
             # STEP 2: Then executes a comparison on the assigned value from the previous step, and assign result to df.
-            result = eval(str(code))
-            df.loc[idx, code] = result
+            df.loc[idx, code] = eval(str(code))
 
     return df
 
@@ -232,9 +231,12 @@ def solve_big_table(df, input_ranges):
 
             # removes intervals shorter than this number
             cut_percent += 0.1
-
             df = clean_up_dataframe(df, cut_percent, input_ranges)
-
+            continue
+        except MemoryError:
+            # removes intervals shorter than this number
+            cut_percent += 0.1
+            df = clean_up_dataframe(df, cut_percent, input_ranges)
             continue
         else:
             # Reset the alarm
@@ -349,6 +351,7 @@ def get_data_frame(binary_tables, all_inputs):
     for an_input in all_inputs:
 
         df = df.sort([an_input], ascending=[1])
+
         #import time
         #start = time.time()
         best_df = get_dataframe_duplicates(df, an_input)
@@ -365,7 +368,7 @@ def get_data_frame(binary_tables, all_inputs):
         df = add_boolean_table(df, variables, an_input)
         #print('add_boolean_table for {}: {}'.format(an_input, time.time() - start))
 
-    # befire dropping all_inputs columns, will record their range.
+    # before dropping all_inputs columns, will record their range.
     input_ranges = {}
     for the_input in all_inputs:
         input_ranges[the_input] = [min(list(df[the_input])), max(list(df[the_input]))]
