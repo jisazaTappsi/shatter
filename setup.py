@@ -25,7 +25,7 @@ requirements = [str(ir.req) for ir in install_requirements]
 
 setup(
     name='shatter',
-    version='0.6.2',
+    version='0.6.1',
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Data Driven Programming',

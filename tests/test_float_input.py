@@ -191,7 +191,7 @@ class ConstantsTest(unittest.TestCase):
 
     def test_sklearn_iris_data_set(self):
         """
-        Should generate a hypothesis for the sklearn iris dataset with low test error.
+        Should generate a hypothesis for the sklearn iris data-set with low test error.
         """
 
         iris = datasets.load_iris()
@@ -208,12 +208,6 @@ class ConstantsTest(unittest.TestCase):
 
         code_solution_1 = ["def {}(x1, x2, x3, x4):".format(function.__name__),
                            "    return x3 >= 2.45"]
-
-        #data_frame_false = data_frame.loc[data_frame['output'] == False].head(50)
-        #data_frame_true = data_frame.loc[data_frame['output'] == True].head(50)
-        #data_frame = pd.concat([data_frame_false, data_frame_true], axis=0)
-
-        print(data_frame)
 
         r = Rules(data_frame)
 

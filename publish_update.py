@@ -9,8 +9,8 @@ __author__ = 'juan pablo isaza'
 
 # create directory if missing
 if 'dist' not in [x[0] for x in os.walk('.')]:
-	create_subdirectory = 'mkdir dist'
-	subprocess.call(create_subdirectory, shell=True, executable="/bin/bash")
+    create_subdirectory = 'mkdir dist'
+    subprocess.call(create_subdirectory, shell=True, executable="/bin/bash")
 
 empty_folder = 'rm dist/*'
 subprocess.call(empty_folder, shell=True, executable="/bin/bash")
