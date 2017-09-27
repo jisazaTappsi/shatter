@@ -7,6 +7,7 @@ import unittest
 from shatter.solver import Rules
 from tests.generated_code import learner_functions as f
 from tests.testing_helpers import common_testing_code
+from shatter.tester import NotImplementedWithMLYet
 
 __author__ = 'juan pablo isaza'
 
@@ -205,6 +206,19 @@ class LearnerTest(unittest.TestCase):
         solution = r.solve(function, self)
 
         self.assertEqual(solution.implementation, code)
+
+    def test_raise_exception_with_non_boolean_output(self):
+        """Replaces True output for number 10, then it has a non boolean output, should raise NotImplementedWithMLYet"""
+
+        function = f.only_boolean
+        r = Rules()
+        r.add(a=True, output=10)
+        r.add(a=True, output=10)
+        r.add(b=True, output=False)
+
+        with self.assertRaises(NotImplementedWithMLYet):
+            r.solve(function)
+
 
 if __name__ == '__main__':
     unittest.main()

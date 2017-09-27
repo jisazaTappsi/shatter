@@ -37,7 +37,6 @@ SOLVE_DECORATOR_PATTERN\
                                                                            indent=INDENT.pattern,
                                                                            comment=COMMENT_PATTERN.pattern))
 
-
 # reserved keywords
 DEFAULT = 'DEFAULT'
 OUTPUT = 'OUTPUT'

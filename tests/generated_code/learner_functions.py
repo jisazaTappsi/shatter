@@ -44,3 +44,8 @@ def complex(a, b, c, d):
 @s.solve()
 def complex_2(a, b, c, d, e, f, g, h, i, j):
     pass
+
+
+@s.solve()
+def only_boolean(a, b):
+    pass

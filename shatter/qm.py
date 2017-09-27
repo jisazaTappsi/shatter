@@ -57,7 +57,7 @@ class QuineMcCluskey:
     """
     __version__ = "0.2"
 
-    def __init__(self, use_xor = False):
+    def __init__(self, use_xor=False):
         """The class constructor.
 
         Kwargs:

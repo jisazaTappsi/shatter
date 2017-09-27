@@ -67,8 +67,8 @@ class TesterTest(unittest.TestCase):
                 '    return False']
 
         r = Rules(a=True,
-                     b=True,
-                     output=ouput)
+                  b=True,
+                  output=ouput)
         r.add(b=True, output=ouput)
 
         solution = r.solve(function)

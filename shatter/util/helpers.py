@@ -207,6 +207,19 @@ def has_true_key(d):
     return False
 
 
+def has_return(implementation, definition):
+    """
+    Finds if the implementation already has a return.
+    :param implementation: array with code implementation
+    :param definition: function definition
+    :return: Boolean
+    """
+    last_line = implementation[-1]
+    indent = get_indent_from_definition(definition)
+    pattern = r"^{indent}    return".format(indent=indent)
+    return re.search(pattern, last_line) is not None
+
+
 def has_false_key(d):
     """
     Returns True only if it has a False value as key.
@@ -257,7 +270,6 @@ def is_function(f):
     :param f: function
     :return: boolean
     """
-    #return isinstance(f, types.FunctionType)#and not isinstance(self.build_fn, types.MethodType):
     return hasattr(f, '__call__')
 
 

@@ -3,6 +3,7 @@
 """Defines a more user friendly way of entering data."""
 
 import warnings
+import pandas as pd
 
 from shatter.constants import *
 from shatter.output import Output
@@ -64,16 +65,16 @@ class Rules(list):
         for d in self:
             for key in set(d.keys()) - set(KEYWORDS.values()):
                 if d[key] == value:
-                    return key
+                     return key
         return None
 
-    def get_dict(self, args, kwargs):
+    def get_dicts(self, args, kwargs):
         """
         Big issue solved here. Adds args, to have positional args always in the same order as the user inputs.
         Therefore the user can have short circuiting for logical operators, by having inputs in the right order.
         :param args: positional args. Used when specific order required.
         :param kwargs: a common dict
-        :return: a dict (which as of python 3.6 preserves insertion order)
+        :return: a vector containing dicts (which as of python 3.6 preserves insertion order)
         """
         a_dict = dict()
 
@@ -81,17 +82,33 @@ class Rules(list):
         start_idx = self.get_max_positional_arg()
         for idx, e in enumerate(args):
 
-            repeating_var = self.search_repeating_variable(e)
-            if repeating_var is None:  # first time: declares new value.
-                a_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
-            else:  # has been previously declared.
-                a_dict[repeating_var] = e
+            if isinstance(e, pd.DataFrame):
+                # TODO: implement
+
+                list_of_dicts = []
+
+                variables = list(e.columns.values)
+                for index, row in e.iterrows():
+                    new_dict = dict()
+                    for var in variables:
+                        new_dict[var] = row[var]
+
+                    list_of_dicts.append(new_dict)
+
+                return list_of_dicts
+            else:
+
+                repeating_var = self.search_repeating_variable(e)
+                if repeating_var is None:  # first time: declares new value.
+                    a_dict[POSITIONAL_ARGS_RULE + str(start_idx + idx)] = e
+                else:  # has been previously declared.
+                    a_dict[repeating_var] = e
 
         # Adds kwargs
         for k in kwargs.keys():
             a_dict[k] = kwargs[k]
 
-        return a_dict
+        return [a_dict]
 
     def __init__(self, *args, **kwargs):
         """
@@ -104,7 +121,7 @@ class Rules(list):
         list.__init__(list())
 
         if len(args) + len(kwargs) > 0:
-            self.append(self.get_dict(args, kwargs))
+            self += self.get_dicts(args, kwargs)
 
     def add(self, *args, **kwargs):
         """
@@ -113,7 +130,7 @@ class Rules(list):
         :return: void
         """
         if len(args) + len(kwargs) > 0:
-            self.append(self.get_dict(args, kwargs))
+            self += (self.get_dicts(args, kwargs))
         else:
             warnings.warn('To add condition at least 1 argument should be provided', UserWarning)
 
