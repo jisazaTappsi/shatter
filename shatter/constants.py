@@ -17,6 +17,8 @@ VARIABLE = re.compile(r"\s*\w+\s*")
 NAME = re.compile(r"\w+\s*")
 
 ABSTRACT_FUNCTION = re.compile(r"{name}\(({var}(,{var})*)?\)".format(name='{name}', var='{var}'))
+
+# TODO: add: "sync def function():" functions
 ABSTRACT_DEFINITION = re.compile(r"{indent}def\s+{function}\s*:{comment}".format(indent='{indent}',
                                                                                  function='{function}',
                                                                                  comment='{comment}'))
