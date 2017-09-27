@@ -14,7 +14,7 @@ from tests.testing_helpers import common_testing_code
 __author__ = 'juan pablo isaza'
 
 
-class ConstantsTest(unittest.TestCase):
+class FloatInputTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -203,6 +203,10 @@ class ConstantsTest(unittest.TestCase):
 
         # Make binary and add to df
         data_frame[KEYWORDS[OUTPUT]] = [int(bool(e)) for e in y]
+
+        # TODO: solve for the other classes: How to admit less than perfect solutions? introduce max_error, or timeout?
+        #data_frame[KEYWORDS[OUTPUT]] = [int(abs(e-1)) for e in y]
+        #data_frame[KEYWORDS[OUTPUT]] = [int(bool(abs(e-2))) for e in y]
 
         function = f.solve_iris
 

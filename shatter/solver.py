@@ -243,7 +243,7 @@ def find_candidate_solution(f, definition, rules, processed_rules, function_args
     if all_input_are_boolean(tables):
         for the_output, table in tables.items():
 
-            # will not solve anything when the output is False, as with True values is enough to specify a logical output
+            # will not solve anything when the output is False, as with True values is enough to specify an output
             if the_output or not isinstance(the_output, bool):
 
                 expression = get_expression(table, rules, function_args, the_output)
@@ -257,8 +257,8 @@ def find_candidate_solution(f, definition, rules, processed_rules, function_args
     else:  # float case
         all_inputs = get_input_values(rules, function_args, True)
 
-        # TODO:  missing False case
-        #all_inputs = get_input_values(rules, function_args, False)
+        # TODO: missing False case
+        # all_inputs = get_input_values(rules, function_args, False)
 
         # tables with True and False outcomes only.
         binary_table = {True: tables[True], False: tables[False]}
