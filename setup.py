@@ -5,7 +5,6 @@
 import os
 from setuptools import setup
 import setuptools
-import pypandoc
 from pip.req import parse_requirements
 
 __author__ = 'juan pablo isaza'
@@ -29,7 +28,7 @@ setup(
     author='Juan Pablo Isaza',
     author_email='biosolardecolombia@gmail.com',
     description='Data Driven Programming',
-    long_description=pypandoc.convert('README.md', 'rst'),
+    long_description=open('README.md').read(),
     license=open("LICENSE.txt").read(),
     keywords='Quine McCluskey, Machine Learning, code, automatic code generation, expression',
     url='https://github.com/jisazaTappsi/shatter',
